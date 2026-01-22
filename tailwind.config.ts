@@ -13,6 +13,7 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-geist)'],
         mono: ['var(--font-geist-mono)'],
+        funnel: ['var(--font-funnel-display)'],
       },
       screens: {
         'toast-mobile': '600px',
