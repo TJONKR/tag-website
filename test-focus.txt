@@ -1,0 +1,6 @@
+This file was created to test the workbench.editor.focusOnOpen setting.
+
+If the setting is working correctly, your editor should NOT have jumped to this file.
+You should still be viewing the README.md file you had open.
+
+You can delete this file after testing.
