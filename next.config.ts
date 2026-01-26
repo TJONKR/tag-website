@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
       {
         hostname: 'avatar.vercel.sh',
       },
+      {
+        hostname: 'media.licdn.com',
+      },
     ],
   },
 };

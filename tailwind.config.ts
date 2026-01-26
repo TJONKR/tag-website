@@ -14,6 +14,7 @@ const config: Config = {
         sans: ['var(--font-geist)'],
         mono: ['var(--font-geist-mono)'],
         funnel: ['var(--font-funnel-display)'],
+        jakarta: ['var(--font-plus-jakarta)'],
       },
       screens: {
         'toast-mobile': '600px',

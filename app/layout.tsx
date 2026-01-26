@@ -1,6 +1,6 @@
 import { Toaster } from 'sonner'
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Funnel_Display } from 'next/font/google'
+import { Geist, Geist_Mono, Funnel_Display, Plus_Jakarta_Sans } from 'next/font/google'
 import { ThemeProvider } from '@components/theme-provider'
 
 import './globals.css'
@@ -39,6 +39,13 @@ const funnelDisplay = Funnel_Display({
   weight: ['400', '500', '600', '700'],
 })
 
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-plus-jakarta',
+  weight: ['400', '500', '600', '700'],
+})
+
 const LIGHT_THEME_COLOR = 'hsl(0 0% 100%)'
 const DARK_THEME_COLOR = 'hsl(240deg 10% 3.92%)'
 const THEME_COLOR_SCRIPT = `\
@@ -68,7 +75,7 @@ export default async function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geist.variable} ${geistMono.variable} ${funnelDisplay.variable}`}
+      className={`${geist.variable} ${geistMono.variable} ${funnelDisplay.variable} ${plusJakartaSans.variable}`}
     >
       <head>
         <script

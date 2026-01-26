@@ -38,19 +38,19 @@ export const CoworkingSpace = () => {
     <section className="bg-background py-20">
       <div className="mx-auto max-w-3xl px-6">
         {/* Header */}
-        <h2 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+        <h2 className="font-funnel text-4xl font-semibold leading-none text-[#1E1E1E] dark:text-white md:text-[48px]">
           Coworking Space
         </h2>
-        <p className="mt-4 text-lg text-muted-foreground">
+        <p className="mt-4 font-jakarta text-xl leading-[150%] text-[#757575] md:text-2xl">
           People who ship things fast, share skills, help each other.
         </p>
 
         {/* Weekdays Section */}
         <div className="mt-12">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-red-500">
+          <h3 className="font-funnel text-base font-semibold uppercase leading-none text-[#FF3D44]">
             Weekdays are about momentum
           </h3>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-4 font-jakarta text-xl leading-[150%] text-[#757575] md:text-2xl">
             People work on their own projects, share progress, help each other out, and slowly
             build things into something real.
           </p>
@@ -58,10 +58,10 @@ export const CoworkingSpace = () => {
 
         {/* Weekends Section */}
         <div className="mt-12">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-red-500">
+          <h3 className="font-funnel text-base font-semibold uppercase leading-none text-[#FF3D44]">
             On weekends, we build.
           </h3>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-4 font-jakarta text-xl leading-[150%] text-[#757575] md:text-2xl">
             In the weekends, the space is an open build room. People come to work on whatever
             they&apos;re obsessed with, share what they&apos;re learning, and see what happens when
             builders spend time together.
@@ -70,7 +70,9 @@ export const CoworkingSpace = () => {
 
         {/* Events Section */}
         <div className="mt-16">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-red-500">Events</h3>
+          <h3 className="font-funnel text-base font-semibold uppercase leading-none text-[#FF3D44]">
+            Events
+          </h3>
 
           <div className="mt-6 space-y-0 divide-y divide-border">
             {events.map((event) => (
@@ -78,7 +80,7 @@ export const CoworkingSpace = () => {
             ))}
           </div>
 
-          <p className="mt-8 text-sm text-muted-foreground">
+          <p className="mt-8 font-jakarta text-base leading-[150%] text-[#757575]">
             We regularly organize new events. More dates will be announced soon.
           </p>
         </div>
@@ -106,14 +108,16 @@ const EventCard = ({ event }: EventCardProps) => {
 
       {/* Event Info */}
       <div className="flex-1">
-        <h4 className="font-semibold text-foreground group-hover:text-red-500">{event.title}</h4>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h4 className="font-funnel text-xl font-semibold leading-none text-[#1E1E1E] group-hover:text-[#FF3D44] dark:text-white md:text-2xl lg:text-[32px]">
+          {event.title}
+        </h4>
+        <p className="mt-2 font-jakarta text-lg leading-[150%] text-[#757575] md:text-xl lg:text-2xl">
           {event.type} – {event.date}
         </p>
       </div>
 
       {/* Arrow */}
-      <ArrowUpRight className="size-5 text-muted-foreground transition-colors group-hover:text-foreground" />
+      <ArrowUpRight className="size-5 text-[#757575] transition-colors group-hover:text-[#1E1E1E] dark:group-hover:text-white" />
     </a>
   )
 }
