@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAG - Dot Grid Network</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0e0d0b;
+      color: #f0ebe3;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      cursor: none;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .custom-cursor {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid rgba(255, 95, 31, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 100;
+      transform: translate(-50%, -50%);
+      transition: width 0.15s ease, height 0.15s ease, border-color 0.15s ease;
+    }
+
+    .custom-cursor.active {
+      width: 24px;
+      height: 24px;
+      border-color: rgba(255, 95, 31, 1);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 12vh;
+      pointer-events: none;
+    }
+
+    .overlay-bg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 60px;
+      border-radius: 4px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(14, 13, 11, 0.5);
+    }
+
+    .title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(50px, 6vw, 80px);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: #f0ebe3;
+    }
+
+    .subtitle {
+      font-family: 'Space Mono', monospace;
+      font-weight: 400;
+      font-size: 13px;
+      color: #9b9589;
+      letter-spacing: 0.1em;
+      margin-top: 12px;
+    }
+
+    .hint {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #3a3630;
+      letter-spacing: 0.08em;
+      z-index: 10;
+      pointer-events: none;
+      text-transform: uppercase;
+    }
+
+    .counter {
+      position: fixed;
+      top: 40px;
+      right: 40px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 10;
+      pointer-events: none;
+      text-align: right;
+    }
+
+    .counter .count-num {
+      font-size: 28px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      color: #ff5f1f;
+      display: block;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="grid-canvas"></canvas>
+  <div class="custom-cursor" id="cursor"></div>
+  <div class="overlay">
+    <div class="overlay-bg">
+      <div class="title">TAG</div>
+      <div class="subtitle">network &middot; 2,000+ builders</div>
+    </div>
+  </div>
+  <div class="counter">
+    <span class="count-num" id="active-count">0</span>
+    active nodes
+  </div>
+  <div class="hint">move cursor to activate &middot; click to pulse</div>
+
+  <script>
+    const canvas = document.getElementById('grid-canvas')
+    const ctx = canvas.getContext('2d')
+    const cursorEl = document.getElementById('cursor')
+    const activeCountEl = document.getElementById('active-count')
+
+    let mouseX = -1000
+    let mouseY = -1000
+    let dpr = window.devicePixelRatio || 1
+    const SPACING = 30
+    const INFLUENCE = 150
+    const BASE_RADIUS = 1.5
+    const MAX_RADIUS = 4.5
+    const BASE_COLOR = { r: 42, g: 39, b: 36 }
+    const ACTIVE_COLOR = { r: 255, g: 95, b: 31 }
+
+    let dots = []
+    let ripples = []
+
+    class Dot {
+      constructor(x, y) {
+        this.x = x
+        this.y = y
+        this.radius = BASE_RADIUS
+        this.targetRadius = BASE_RADIUS
+        this.r = BASE_COLOR.r
+        this.g = BASE_COLOR.g
+        this.b = BASE_COLOR.b
+        this.targetR = BASE_COLOR.r
+        this.targetG = BASE_COLOR.g
+        this.targetB = BASE_COLOR.b
+        this.alpha = 1
+        this.rippleBoost = 0
+      }
+
+      update() {
+        // Mouse influence
+        const dx = this.x - mouseX
+        const dy = this.y - mouseY
+        const dist = Math.sqrt(dx * dx + dy * dy)
+
+        if (dist < INFLUENCE) {
+          const t = 1 - dist / INFLUENCE
+          const ease = t * t // quadratic ease for sharper falloff
+          this.targetRadius = BASE_RADIUS + (MAX_RADIUS - BASE_RADIUS) * ease
+          this.targetR = BASE_COLOR.r + (ACTIVE_COLOR.r - BASE_COLOR.r) * ease
+          this.targetG = BASE_COLOR.g + (ACTIVE_COLOR.g - BASE_COLOR.g) * ease
+          this.targetB = BASE_COLOR.b + (ACTIVE_COLOR.b - BASE_COLOR.b) * ease
+        } else {
+          this.targetRadius = BASE_RADIUS
+          this.targetR = BASE_COLOR.r
+          this.targetG = BASE_COLOR.g
+          this.targetB = BASE_COLOR.b
+        }
+
+        // Ripple influence
+        if (this.rippleBoost > 0) {
+          this.targetRadius = Math.max(this.targetRadius, BASE_RADIUS + (MAX_RADIUS - BASE_RADIUS) * this.rippleBoost)
+          this.targetR = Math.max(this.targetR, BASE_COLOR.r + (ACTIVE_COLOR.r - BASE_COLOR.r) * this.rippleBoost)
+          this.targetG = Math.max(this.targetG, BASE_COLOR.g + (ACTIVE_COLOR.g - BASE_COLOR.g) * this.rippleBoost)
+          this.targetB = Math.max(this.targetB, BASE_COLOR.b + (ACTIVE_COLOR.b - BASE_COLOR.b) * this.rippleBoost)
+          this.rippleBoost *= 0.94
+          if (this.rippleBoost < 0.01) this.rippleBoost = 0
+        }
+
+        // Lerp
+        const lerpSpeed = 0.12
+        this.radius += (this.targetRadius - this.radius) * lerpSpeed
+        this.r += (this.targetR - this.r) * lerpSpeed
+        this.g += (this.targetG - this.g) * lerpSpeed
+        this.b += (this.targetB - this.b) * lerpSpeed
+      }
+
+      draw(ctx) {
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
+        ctx.fillStyle = `rgb(${Math.round(this.r)},${Math.round(this.g)},${Math.round(this.b)})`
+        ctx.fill()
+
+        // Glow for active dots
+        if (this.radius > BASE_RADIUS + 0.8) {
+          const glowStrength = (this.radius - BASE_RADIUS) / (MAX_RADIUS - BASE_RADIUS)
+          ctx.beginPath()
+          ctx.arc(this.x, this.y, this.radius * 2.5, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(255,95,31,${glowStrength * 0.08})`
+          ctx.fill()
+        }
+      }
+    }
+
+    class Ripple {
+      constructor(x, y) {
+        this.x = x
+        this.y = y
+        this.radius = 0
+        this.maxRadius = Math.max(canvas.width, canvas.height) * 0.6
+        this.speed = 5 // px per frame at 60fps
+        this.life = 1
+        this.ringWidth = 40
+      }
+
+      update() {
+        this.radius += this.speed
+        this.life = 1 - this.radius / this.maxRadius
+        if (this.life < 0) this.life = 0
+        return this.life > 0
+      }
+
+      affectDots(dots) {
+        for (const dot of dots) {
+          const dx = dot.x - this.x
+          const dy = dot.y - this.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          const ringDist = Math.abs(dist - this.radius)
+
+          if (ringDist < this.ringWidth) {
+            const t = 1 - ringDist / this.ringWidth
+            dot.rippleBoost = Math.max(dot.rippleBoost, t * this.life)
+          }
+        }
+      }
+
+      draw(ctx) {
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
+        ctx.strokeStyle = `rgba(255,95,31,${this.life * 0.12})`
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+      }
+    }
+
+    function createDots() {
+      dots = []
+      const cw = canvas.width / dpr
+      const ch = canvas.height / dpr
+      const cols = Math.ceil(cw / SPACING) + 1
+      const rows = Math.ceil(ch / SPACING) + 1
+      const offsetX = (cw - (cols - 1) * SPACING) / 2
+      const offsetY = (ch - (rows - 1) * SPACING) / 2
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          dots.push(new Dot(
+            offsetX + col * SPACING,
+            offsetY + row * SPACING
+          ))
+        }
+      }
+    }
+
+    function resize() {
+      dpr = window.devicePixelRatio || 1
+      canvas.width = window.innerWidth * dpr
+      canvas.height = window.innerHeight * dpr
+      ctx.scale(dpr, dpr)
+      createDots()
+    }
+    resize()
+    window.addEventListener('resize', resize)
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX
+      mouseY = e.clientY
+      cursorEl.style.left = e.clientX + 'px'
+      cursorEl.style.top = e.clientY + 'px'
+    })
+
+    document.addEventListener('mousedown', () => {
+      cursorEl.classList.add('active')
+    })
+
+    document.addEventListener('mouseup', () => {
+      cursorEl.classList.remove('active')
+    })
+
+    document.addEventListener('click', (e) => {
+      ripples.push(new Ripple(e.clientX, e.clientY))
+    })
+
+    // Connection lines between nearby active dots
+    function drawConnections() {
+      const activeDots = dots.filter(d => d.radius > BASE_RADIUS + 0.5)
+      if (activeDots.length < 2) return
+
+      for (let i = 0; i < activeDots.length; i++) {
+        for (let j = i + 1; j < activeDots.length; j++) {
+          const a = activeDots[i]
+          const b = activeDots[j]
+          const dx = a.x - b.x
+          const dy = a.y - b.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+
+          if (dist < 60) {
+            const strength = (1 - dist / 60) * 0.15
+            const rAvg = (a.r + b.r) / 2
+            const gAvg = (a.g + b.g) / 2
+            const bAvg = (a.b + b.b) / 2
+            ctx.beginPath()
+            ctx.moveTo(a.x, a.y)
+            ctx.lineTo(b.x, b.y)
+            ctx.strokeStyle = `rgba(${Math.round(rAvg)},${Math.round(gAvg)},${Math.round(bAvg)},${strength})`
+            ctx.lineWidth = 0.5
+            ctx.stroke()
+          }
+        }
+      }
+    }
+
+    function animate() {
+      const cw = window.innerWidth
+      const ch = window.innerHeight
+
+      ctx.clearRect(0, 0, cw, ch)
+      ctx.fillStyle = '#0e0d0b'
+      ctx.fillRect(0, 0, cw, ch)
+
+      // Update and draw ripples
+      ripples = ripples.filter(r => {
+        r.affectDots(dots)
+        const alive = r.update()
+        if (alive) r.draw(ctx)
+        return alive
+      })
+
+      // Count active
+      let activeCount = 0
+
+      // Update and draw dots
+      for (const dot of dots) {
+        dot.update()
+        if (dot.radius > BASE_RADIUS + 0.3) activeCount++
+        dot.draw(ctx)
+      }
+
+      drawConnections()
+
+      activeCountEl.textContent = activeCount
+
+      requestAnimationFrame(animate)
+    }
+
+    animate()
+  </script>
+</body>
+</html>

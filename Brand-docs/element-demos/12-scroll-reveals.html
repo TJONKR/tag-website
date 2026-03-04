@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scroll Reveals - TAG Element Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      z-index: 100;
+    }
+
+    .scroll-hint {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      z-index: 100;
+      animation: pulse-hint 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-hint {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 80px 40px;
+    }
+
+    .section--intro {
+      min-height: 80vh;
+    }
+
+    .intro-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(32px, 5vw, 56px);
+      text-align: center;
+      color: #5e5850;
+      line-height: 1.2;
+    }
+
+    /* Section 1: Slide-up heading */
+    .reveal-heading {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(48px, 8vw, 96px);
+      text-align: center;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      transform: translateY(60px);
+      opacity: 0;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+    }
+
+    .reveal-heading.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .reveal-heading span {
+      color: #ff5f1f;
+    }
+
+    /* Section 2: Staggered cards */
+    .cards-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 960px;
+    }
+
+    .card {
+      background: #1e1c19;
+      border: 1px solid #2a2724;
+      border-radius: 12px;
+      padding: 32px;
+      width: 280px;
+      transform: translateY(50px);
+      opacity: 0;
+      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+    }
+
+    .card.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .card:nth-child(1) { transition-delay: 0ms; }
+    .card:nth-child(2) { transition-delay: 150ms; }
+    .card:nth-child(3) { transition-delay: 300ms; }
+
+    .card-number {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 48px;
+      color: #ff5f1f;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: #f0ebe3;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      color: #5e5850;
+      line-height: 1.5;
+    }
+
+    /* Section 3: Word-by-word reveal */
+    .word-reveal {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: clamp(20px, 3vw, 32px);
+      line-height: 1.6;
+      text-align: center;
+      max-width: 700px;
+      color: #f0ebe3;
+    }
+
+    .word-reveal .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      margin-right: 0.3em;
+    }
+
+    .word-reveal.visible .word {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Section 4: Counter */
+    .counter-section {
+      text-align: center;
+    }
+
+    .counter-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #5e5850;
+      margin-bottom: 16px;
+    }
+
+    .counter-number {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: clamp(80px, 15vw, 160px);
+      color: #f0ebe3;
+      line-height: 1;
+      tabular-nums: true;
+      font-variant-numeric: tabular-nums;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .counter-number.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .counter-suffix {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 20px;
+      color: #ff5f1f;
+      margin-top: 12px;
+    }
+
+    .section-divider {
+      width: 40px;
+      height: 2px;
+      background: #2a2724;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">scroll reveals</div>
+  <div class="scroll-hint">Scroll down</div>
+
+  <!-- Intro -->
+  <div class="section section--intro">
+    <p class="intro-text">Scroll to reveal<br>each section.</p>
+  </div>
+
+  <!-- Section 1: Slide-up heading -->
+  <div class="section">
+    <h1 class="reveal-heading" data-reveal="slide-up">
+      We build things<br>that <span>matter.</span>
+    </h1>
+  </div>
+
+  <!-- Section 2: Staggered cards -->
+  <div class="section">
+    <div class="cards-row" data-reveal="stagger-cards">
+      <div class="card">
+        <div class="card-number">01</div>
+        <div class="card-title">Weekly Meetups</div>
+        <div class="card-desc">Every Thursday at A Lab, Amsterdam. Builders share what they're working on.</div>
+      </div>
+      <div class="card">
+        <div class="card-number">02</div>
+        <div class="card-title">Ship Sprints</div>
+        <div class="card-desc">48-hour build challenges. Pick a problem. Ship a solution. Demo it live.</div>
+      </div>
+      <div class="card">
+        <div class="card-number">03</div>
+        <div class="card-title">Demo Night</div>
+        <div class="card-desc">Monthly showcase. 5-minute demos. Real feedback from real builders.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Word-by-word reveal -->
+  <div class="section">
+    <p class="word-reveal" data-reveal="word-by-word">
+      We don't wait for permission. We prototype fast, break things on purpose, and ship before it's comfortable. That's the TAG way.
+    </p>
+  </div>
+
+  <!-- Section 4: Counter -->
+  <div class="section">
+    <div class="counter-section">
+      <div class="counter-label">Active Builders</div>
+      <div class="counter-number" data-reveal="counter" data-target="427">0</div>
+      <div class="counter-suffix">and counting</div>
+    </div>
+  </div>
+
+  <div class="section section--intro">
+    <div class="section-divider"></div>
+  </div>
+
+  <script>
+    // Intersection Observer for all reveal animations
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px 0px -50px 0px'
+    }
+
+    // Slide-up heading
+    const headingObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible')
+          headingObserver.unobserve(entry.target)
+        }
+      })
+    }, observerOptions)
+
+    document.querySelectorAll('[data-reveal="slide-up"]').forEach(el => {
+      headingObserver.observe(el)
+    })
+
+    // Staggered cards
+    const cardsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const cards = entry.target.querySelectorAll('.card')
+          cards.forEach(card => card.classList.add('visible'))
+          cardsObserver.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0.15 })
+
+    document.querySelectorAll('[data-reveal="stagger-cards"]').forEach(el => {
+      cardsObserver.observe(el)
+    })
+
+    // Word-by-word reveal
+    document.querySelectorAll('[data-reveal="word-by-word"]').forEach(el => {
+      const text = el.textContent.trim()
+      const words = text.split(/\s+/)
+      el.innerHTML = words.map((word, i) =>
+        `<span class="word" style="transition-delay: ${i * 60}ms">${word}</span>`
+      ).join('')
+    })
+
+    const wordObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible')
+          wordObserver.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0.3 })
+
+    document.querySelectorAll('[data-reveal="word-by-word"]').forEach(el => {
+      wordObserver.observe(el)
+    })
+
+    // Counter animation
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible')
+          const target = parseInt(entry.target.dataset.target, 10)
+          animateCounter(entry.target, target)
+          counterObserver.unobserve(entry.target)
+        }
+      })
+    }, { threshold: 0.5 })
+
+    document.querySelectorAll('[data-reveal="counter"]').forEach(el => {
+      counterObserver.observe(el)
+    })
+
+    function animateCounter(element, target) {
+      const duration = 2000
+      const startTime = performance.now()
+
+      function easeOutExpo(t) {
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+      }
+
+      function update(currentTime) {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const easedProgress = easeOutExpo(progress)
+        const current = Math.round(easedProgress * target)
+
+        element.textContent = current
+
+        if (progress < 1) {
+          requestAnimationFrame(update)
+        } else {
+          element.textContent = target
+        }
+      }
+
+      requestAnimationFrame(update)
+    }
+
+    // Hide scroll hint after scrolling
+    let scrollHint = document.querySelector('.scroll-hint')
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100 && scrollHint) {
+        scrollHint.style.opacity = '0'
+        scrollHint.style.transition = 'opacity 0.5s ease'
+      }
+    }, { passive: true })
+  </script>
+</body>
+</html>

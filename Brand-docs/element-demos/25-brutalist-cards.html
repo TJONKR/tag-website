@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brutalist Cards - TAG Brand Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      min-height: 100vh;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 40px;
+      gap: 48px;
+    }
+
+    .label {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    .section-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      align-self: flex-start;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+      max-width: 860px;
+      width: 100%;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Base card styles */
+    .card {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      cursor: pointer;
+    }
+
+    .card-date {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: #ff5f1f;
+      letter-spacing: 0.02em;
+    }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .card-desc {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #5e5850;
+      line-height: 1.5;
+    }
+
+    .card-link {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: #ff5f1f;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .card-link .arrow {
+      transition: transform 0.15s ease;
+    }
+
+    .card:hover .card-link .arrow {
+      transform: translateX(4px);
+    }
+
+    /* 1. Hard shadow - orange border + orange shadow */
+    .card--hard-shadow {
+      background: #141210;
+      border: 2px solid #ff5f1f;
+      box-shadow: 6px 6px 0 #ff5f1f;
+    }
+
+    .card--hard-shadow:hover {
+      transform: translate(4px, 4px);
+      box-shadow: 2px 2px 0 #ff5f1f;
+    }
+
+    /* 2. Thick border only */
+    .card--thick-border {
+      background: #141210;
+      border: 3px solid #f0ebe3;
+    }
+
+    .card--thick-border:hover {
+      border-color: #ff5f1f;
+    }
+
+    /* 3. Mixed - white border + orange shadow */
+    .card--mixed {
+      background: #141210;
+      border: 2px solid #f0ebe3;
+      box-shadow: 6px 6px 0 #ff5f1f;
+    }
+
+    .card--mixed:hover {
+      transform: translate(4px, 4px);
+      box-shadow: 2px 2px 0 #ff5f1f;
+    }
+
+    /* 4. Inverted - orange bg, dark text */
+    .card--inverted {
+      background: #ff5f1f;
+      border: 2px solid #ff5f1f;
+      box-shadow: 6px 6px 0 #0e0d0b;
+    }
+
+    .card--inverted .card-title { color: #141210; }
+    .card--inverted .card-date { color: #141210; opacity: 0.6; }
+    .card--inverted .card-desc { color: #141210; opacity: 0.7; }
+    .card--inverted .card-link { color: #141210; }
+
+    .card--inverted:hover {
+      transform: translate(4px, 4px);
+      box-shadow: 2px 2px 0 #0e0d0b;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">brutalist cards</div>
+
+  <div class="section-title">01 / Hard Shadow</div>
+  <div class="grid">
+    <div class="card card--hard-shadow">
+      <div class="card-date">Mar 15, 2026</div>
+      <div class="card-title">Build Night #47</div>
+      <div class="card-desc">Monthly build night at TAG Amsterdam. Bring your laptop, your project, and your curiosity.</div>
+      <a class="card-link" href="#">View event <span class="arrow">&rarr;</span></a>
+    </div>
+    <div class="card card--hard-shadow">
+      <div class="card-date">Mar 22, 2026</div>
+      <div class="card-title">AI Hackathon: Voice</div>
+      <div class="card-desc">48-hour hackathon focused on voice AI. Teams of 2-4. Prizes for most creative and most useful.</div>
+      <a class="card-link" href="#">View event <span class="arrow">&rarr;</span></a>
+    </div>
+  </div>
+
+  <div class="section-title">02 / Thick Border</div>
+  <div class="grid">
+    <div class="card card--thick-border">
+      <div class="card-date">Apr 05, 2026</div>
+      <div class="card-title">Demo Day</div>
+      <div class="card-desc">Show what you've built. 5-minute pitches, no slides, live demos only.</div>
+      <a class="card-link" href="#">RSVP <span class="arrow">&rarr;</span></a>
+    </div>
+    <div class="card card--thick-border">
+      <div class="card-date">Apr 12, 2026</div>
+      <div class="card-title">Workshop: Ship Fast</div>
+      <div class="card-desc">Learn to go from idea to deployed product in under 4 hours. Hands-on workshop.</div>
+      <a class="card-link" href="#">RSVP <span class="arrow">&rarr;</span></a>
+    </div>
+  </div>
+
+  <div class="section-title">03 / Mixed &amp; Inverted</div>
+  <div class="grid">
+    <div class="card card--mixed">
+      <div class="card-date">May 01, 2026</div>
+      <div class="card-title">Builder Retreat</div>
+      <div class="card-desc">3-day retreat outside Amsterdam. Build, connect, recharge. Limited to 20 spots.</div>
+      <a class="card-link" href="#">Apply <span class="arrow">&rarr;</span></a>
+    </div>
+    <div class="card card--inverted">
+      <div class="card-date">Ongoing</div>
+      <div class="card-title">Tag In</div>
+      <div class="card-desc">Join the TAG builder community. Apply to become a member and start shipping with us.</div>
+      <a class="card-link" href="#">Apply now <span class="arrow">&rarr;</span></a>
+    </div>
+  </div>
+</body>
+</html>

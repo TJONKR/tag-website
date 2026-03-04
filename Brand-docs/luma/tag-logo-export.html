@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TAG Logo — Export</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #888; display: flex; gap: 40px; padding: 40px; flex-wrap: wrap; }
+
+    .logo {
+      width: 400px;
+      height: 400px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* VERSION A: Orange burst + halftone — RECOMMENDED */
+    .logo-main {
+      background: #141210;
+    }
+    .logo-main .gradient {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 60% 50%, #ff5f1f 0%, #cc4c18 20%, #662610 50%, #141210 80%);
+    }
+    .logo-main .halftone {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, transparent 35%, #141210 36%) 0 0 / 6px 6px;
+      opacity: 0.55;
+    }
+    .logo-main .text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 100px;
+      color: #f0ebe3;
+      letter-spacing: -0.03em;
+      text-shadow: 0 0 60px rgba(0,0,0,0.4);
+      z-index: 2;
+    }
+    .logo-main .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* VERSION B: Inverted — orange bg */
+    .logo-inverted {
+      background: #ff5f1f;
+    }
+    .logo-inverted .halftone {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, #141210 1px, transparent 1px) 0 0 / 5px 5px;
+      opacity: 0.15;
+    }
+    .logo-inverted .text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 100px;
+      color: #141210;
+      letter-spacing: -0.03em;
+      z-index: 2;
+    }
+
+    /* VERSION C: Dark halftone dots subtle */
+    .logo-subtle {
+      background: #141210;
+    }
+    .logo-subtle .halftone {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle, #ff5f1f 1.5px, transparent 1.5px) 0 0 / 8px 8px,
+        radial-gradient(circle, #ff5f1f 1px, transparent 1px) 4px 4px / 8px 8px;
+      opacity: 0.2;
+    }
+    .logo-subtle .glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 60%, rgba(255,95,31,0.15) 0%, transparent 60%);
+    }
+    .logo-subtle .text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 100px;
+      color: #f0ebe3;
+      letter-spacing: -0.03em;
+      z-index: 2;
+    }
+    .logo-subtle .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .label {
+      position: absolute;
+      bottom: -28px;
+      left: 0;
+      font-family: monospace;
+      font-size: 11px;
+      color: #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- A: Orange burst -->
+  <div style="position: relative;">
+    <div class="logo logo-main">
+      <div class="gradient"></div>
+      <div class="halftone"></div>
+      <div class="text">TAG</div>
+      <svg class="grain" xmlns="http://www.w3.org/2000/svg" width="400" height="400">
+        <filter id="g1"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" stitchTiles="stitch"/></filter>
+        <rect width="100%" height="100%" filter="url(#g1)" opacity="0.04"/>
+      </svg>
+    </div>
+    <div class="label">A — Orange burst (aanbevolen)</div>
+  </div>
+
+  <!-- B: Inverted -->
+  <div style="position: relative;">
+    <div class="logo logo-inverted">
+      <div class="halftone"></div>
+      <div class="text">TAG</div>
+    </div>
+    <div class="label">B — Inverted</div>
+  </div>
+
+  <!-- C: Subtle dark -->
+  <div style="position: relative;">
+    <div class="logo logo-subtle">
+      <div class="halftone"></div>
+      <div class="glow"></div>
+      <div class="text">TAG</div>
+      <svg class="grain" xmlns="http://www.w3.org/2000/svg" width="400" height="400">
+        <filter id="g2"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" stitchTiles="stitch"/></filter>
+        <rect width="100%" height="100%" filter="url(#g2)" opacity="0.05"/>
+      </svg>
+    </div>
+    <div class="label">C — Subtle dark</div>
+  </div>
+
+</body>
+</html>

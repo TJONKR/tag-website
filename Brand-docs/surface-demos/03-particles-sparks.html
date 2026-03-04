@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG - Particles & Sparks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #141210;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .tag-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 100px;
+    color: #f0ebe3;
+    letter-spacing: 14px;
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow:
+      0 0 80px rgba(255, 95, 31, 0.12),
+      0 0 160px rgba(255, 95, 31, 0.06);
+  }
+
+  .subtitle {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: #9b9589;
+    letter-spacing: 3px;
+  }
+
+  /* Warm glow at the bottom */
+  .bottom-glow {
+    position: fixed;
+    bottom: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120%;
+    height: 400px;
+    background: radial-gradient(ellipse at center, rgba(255, 95, 31, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <div class="bottom-glow"></div>
+
+  <div class="overlay">
+    <div class="tag-text">TAG</div>
+    <div class="subtitle">where builders gather</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas')
+    const ctx = canvas.getContext('2d')
+
+    let W, H, dpr
+    let mouseX = -9999
+    let mouseY = -9999
+
+    const EMBER_COUNT = 180
+    const SPARK_COUNT = 12
+    const MOUSE_RADIUS = 150
+
+    const embers = []
+    const sparkParticles = []
+
+    const resize = () => {
+      dpr = devicePixelRatio
+      W = window.innerWidth * dpr
+      H = window.innerHeight * dpr
+      canvas.width = W
+      canvas.height = H
+      canvas.style.width = window.innerWidth + 'px'
+      canvas.style.height = window.innerHeight + 'px'
+    }
+
+    window.addEventListener('resize', resize)
+    resize()
+
+    // Track mouse
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX * dpr
+      mouseY = e.clientY * dpr
+    })
+
+    window.addEventListener('mouseleave', () => {
+      mouseX = -9999
+      mouseY = -9999
+    })
+
+    // Ember particle
+    const createEmber = (randomY) => {
+      return {
+        x: Math.random() * W,
+        y: randomY ? Math.random() * H : H + Math.random() * 50 * dpr,
+        size: (1 + Math.random() * 3) * dpr,
+        speedY: -(0.3 + Math.random() * 0.8) * dpr,
+        wobbleSpeed: 0.5 + Math.random() * 1.5,
+        wobbleAmount: (10 + Math.random() * 25) * dpr,
+        wobbleOffset: Math.random() * Math.PI * 2,
+        opacity: 0.2 + Math.random() * 0.6,
+        glowBlur: Math.random() * 12 * dpr,
+        // Slight color variation
+        hue: Math.random() < 0.3 ? 25 : 15 + Math.random() * 10
+      }
+    }
+
+    // Spark particle (larger, brighter, faster)
+    const createSpark = (randomY) => {
+      return {
+        x: Math.random() * W,
+        y: randomY ? Math.random() * H : H + Math.random() * 100 * dpr,
+        size: (4 + Math.random() * 4) * dpr,
+        speedY: -(0.6 + Math.random() * 1.2) * dpr,
+        wobbleSpeed: 0.3 + Math.random() * 1,
+        wobbleAmount: (15 + Math.random() * 30) * dpr,
+        wobbleOffset: Math.random() * Math.PI * 2,
+        opacity: 0.5 + Math.random() * 0.4,
+        glowBlur: (8 + Math.random() * 12) * dpr,
+        // Sparks occasionally pulse
+        pulseSpeed: 1 + Math.random() * 2,
+        pulseOffset: Math.random() * Math.PI * 2
+      }
+    }
+
+    // Initialize
+    for (let i = 0; i < EMBER_COUNT; i++) {
+      embers.push(createEmber(true))
+    }
+    for (let i = 0; i < SPARK_COUNT; i++) {
+      sparkParticles.push(createSpark(true))
+    }
+
+    const applyMouseRepel = (particle) => {
+      const dx = particle.x - mouseX
+      const dy = particle.y - mouseY
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      const radius = MOUSE_RADIUS * dpr
+
+      if (dist < radius && dist > 0) {
+        const force = (1 - dist / radius) * 2.5 * dpr
+        particle.x += (dx / dist) * force
+        particle.y += (dy / dist) * force
+      }
+    }
+
+    let time = 0
+
+    const loop = () => {
+      time += 0.016 // ~60fps
+
+      // Clear
+      ctx.clearRect(0, 0, W, H)
+      ctx.fillStyle = '#141210'
+      ctx.fillRect(0, 0, W, H)
+
+      // Draw embers
+      for (let i = 0; i < embers.length; i++) {
+        const e = embers[i]
+
+        // Movement
+        e.y += e.speedY
+        const wobbleX = Math.sin(time * e.wobbleSpeed + e.wobbleOffset) * e.wobbleAmount * 0.016
+        e.x += wobbleX
+
+        // Mouse repel
+        applyMouseRepel(e)
+
+        // Respawn at bottom
+        if (e.y < -20 * dpr) {
+          embers[i] = createEmber(false)
+          continue
+        }
+
+        // Wrap horizontal
+        if (e.x < -50 * dpr) e.x = W + 50 * dpr
+        if (e.x > W + 50 * dpr) e.x = -50 * dpr
+
+        // Fade near top
+        const fadeTop = e.y < H * 0.15 ? e.y / (H * 0.15) : 1
+        const alpha = e.opacity * fadeTop
+
+        // Draw
+        if (e.glowBlur > 2) {
+          ctx.shadowColor = `hsla(${e.hue}, 100%, 56%, ${alpha * 0.6})`
+          ctx.shadowBlur = e.glowBlur
+        } else {
+          ctx.shadowBlur = 0
+        }
+
+        ctx.beginPath()
+        ctx.arc(e.x, e.y, e.size / 2, 0, Math.PI * 2)
+        ctx.fillStyle = `hsla(${e.hue}, 100%, 56%, ${alpha})`
+        ctx.fill()
+        ctx.shadowBlur = 0
+      }
+
+      // Draw sparks
+      for (let i = 0; i < sparkParticles.length; i++) {
+        const s = sparkParticles[i]
+
+        // Movement
+        s.y += s.speedY
+        const wobbleX = Math.sin(time * s.wobbleSpeed + s.wobbleOffset) * s.wobbleAmount * 0.016
+        s.x += wobbleX
+
+        // Mouse repel
+        applyMouseRepel(s)
+
+        // Respawn
+        if (s.y < -30 * dpr) {
+          sparkParticles[i] = createSpark(false)
+          continue
+        }
+
+        // Wrap horizontal
+        if (s.x < -50 * dpr) s.x = W + 50 * dpr
+        if (s.x > W + 50 * dpr) s.x = -50 * dpr
+
+        // Pulsing opacity
+        const pulse = 0.7 + 0.3 * Math.sin(time * s.pulseSpeed + s.pulseOffset)
+        const fadeTop = s.y < H * 0.15 ? s.y / (H * 0.15) : 1
+        const alpha = s.opacity * pulse * fadeTop
+
+        // Draw with glow
+        ctx.shadowColor = `rgba(255, 95, 31, ${alpha * 0.8})`
+        ctx.shadowBlur = s.glowBlur
+
+        ctx.beginPath()
+        ctx.arc(s.x, s.y, s.size / 2, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255, 140, 60, ${alpha})`
+        ctx.fill()
+
+        // Bright core
+        ctx.beginPath()
+        ctx.arc(s.x, s.y, s.size * 0.25, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255, 220, 180, ${alpha * 0.7})`
+        ctx.fill()
+
+        ctx.shadowBlur = 0
+      }
+
+      // Subtle warm ambient glow at the bottom center
+      const gradient = ctx.createRadialGradient(
+        W / 2, H + 50 * dpr, 0,
+        W / 2, H + 50 * dpr, H * 0.6
+      )
+      gradient.addColorStop(0, 'rgba(255, 95, 31, 0.04)')
+      gradient.addColorStop(0.5, 'rgba(255, 95, 31, 0.015)')
+      gradient.addColorStop(1, 'transparent')
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, W, H)
+
+      requestAnimationFrame(loop)
+    }
+
+    requestAnimationFrame(loop)
+  </script>
+</body>
+</html>

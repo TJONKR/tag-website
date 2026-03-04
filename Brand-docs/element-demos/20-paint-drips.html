@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paint Drips - TAG Brand Element</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      padding: 60px 80px;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    h2 {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      margin-bottom: 40px;
+      margin-top: 80px;
+    }
+
+    h2:first-of-type {
+      margin-top: 30px;
+    }
+
+    /* --- Section 1: Line with drips --- */
+    .drip-line {
+      position: relative;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .drip-line__svg {
+      width: 100%;
+      overflow: visible;
+    }
+
+    /* --- Section 2: TAG text with drips --- */
+    .tag-text-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tag-text-svg {
+      overflow: visible;
+    }
+
+    /* --- Section 3: Card with drip border --- */
+    .drip-card {
+      position: relative;
+      background: #1e1c19;
+      border: 1px solid #2a2724;
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      padding: 40px 32px;
+      max-width: 400px;
+    }
+
+    .drip-card__top {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .drip-card__name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      color: #f0ebe3;
+      margin-bottom: 8px;
+    }
+
+    .drip-card__desc {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      color: #8a8279;
+      line-height: 1.6;
+    }
+
+    .drip-card__meta {
+      margin-top: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+      text-transform: uppercase;
+    }
+
+    /* --- Context note --- */
+    .context-note {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: #3a3632;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 24px;
+    }
+
+    /* Extra demo: thin drip accent */
+    .drip-accent {
+      position: relative;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">Paint Drips</div>
+
+  <!-- Section 1: Horizontal line with drips -->
+  <h2>Line with Paint Drips</h2>
+
+  <div class="drip-line">
+    <svg class="drip-line__svg" viewBox="0 0 700 90" xmlns="http://www.w3.org/2000/svg">
+      <!-- Main horizontal line -->
+      <rect x="0" y="0" width="700" height="4" rx="2" fill="#ff5f1f" />
+
+      <!-- Drip 1: medium, at ~15% -->
+      <path d="
+        M 102,4
+        C 102,4 104,4 104,6
+        L 104,38
+        C 104,38 104.5,50 103,55
+        C 101.5,60 98,62 98,55
+        C 98,48 99,42 100,36
+        L 100,6
+        C 100,4 102,4 102,4
+        Z
+      " fill="#ff5f1f" />
+
+      <!-- Drip 2: long, at ~40% -->
+      <path d="
+        M 280,4
+        C 280,4 282.5,4 282.5,7
+        L 283,52
+        C 283,56 284,65 282,72
+        C 280,79 276,80 275.5,72
+        C 275,64 276,56 277,48
+        L 277.5,7
+        C 277.5,4 280,4 280,4
+        Z
+      " fill="#ff5f1f" />
+
+      <!-- Drip 3: short, at ~58% -->
+      <path d="
+        M 405,4
+        C 405,4 407,4 407,6
+        L 407,24
+        C 407,28 407.5,34 406,37
+        C 404.5,40 402,40 402,36
+        C 402,32 403,28 403.5,24
+        L 403.5,6
+        C 403.5,4 405,4 405,4
+        Z
+      " fill="#ff5f1f" />
+
+      <!-- Drip 4: medium-long, at ~82% -->
+      <path d="
+        M 575,4
+        C 575,4 577.5,4 577.5,7
+        L 578,45
+        C 578,49 578.5,58 577,63
+        C 575.5,68 572.5,69 572,63
+        C 571.5,57 572.5,50 573.5,44
+        L 573.5,7
+        C 573.5,4 575,4 575,4
+        Z
+      " fill="#ff5f1f" />
+    </svg>
+    <div class="context-note">Drips vary in length (20-60px) with teardrop bulge at the bottom</div>
+  </div>
+
+  <!-- Section 2: TAG text with drips -->
+  <h2>Text with Paint Drips</h2>
+
+  <div class="tag-text-wrap">
+    <svg class="tag-text-svg" viewBox="0 0 520 200" width="520" height="200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Syne:wght@800&amp;display=swap');
+        </style>
+      </defs>
+
+      <!-- TAG text -->
+      <text x="0" y="120" font-family="'Syne', sans-serif" font-weight="800" font-size="140" fill="#ff5f1f" letter-spacing="8">TAG</text>
+
+      <!-- Drip from T (left stem, bottom) -->
+      <path d="
+        M 42,128
+        C 42,128 44.5,128 44.5,131
+        L 45,160
+        C 45,164 45.5,172 44,177
+        C 42.5,182 40,183 39.5,177
+        C 39,171 40,164 41,158
+        L 41,131
+        C 41,128 42,128 42,128
+        Z
+      " fill="#ff5f1f" />
+
+      <!-- Drip from A (right leg, bottom) — longer drip -->
+      <path d="
+        M 275,128
+        C 275,128 277,128 277.5,131
+        L 278,168
+        C 278,173 278.5,184 277,190
+        C 275.5,196 273,197 272.5,190
+        C 272,183 273,174 274,166
+        L 274,131
+        C 274,128 275,128 275,128
+        Z
+      " fill="#ff5f1f" />
+
+      <!-- Small drip from G (bottom curve) -->
+      <path d="
+        M 430,128
+        C 430,128 432,128 432,130
+        L 432,146
+        C 432,149 432.5,155 431,158
+        C 429.5,161 427.5,161 427.5,157
+        C 427.5,153 428.5,149 429,145
+        L 429,130
+        C 429,128 430,128 430,128
+        Z
+      " fill="#ff5f1f" />
+    </svg>
+    <div class="context-note">Subtle drips from select letter strokes -- not every letter</div>
+  </div>
+
+  <!-- Section 3: Card with drip top border -->
+  <h2>Card with Dripping Border</h2>
+
+  <div>
+    <div class="drip-card__top">
+      <svg viewBox="0 0 400 36" width="400" height="36" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+        <!-- Top border bar with rounded top corners -->
+        <path d="M 10,0 L 390,0 Q 400,0 400,10 L 400,4 L 0,4 L 0,10 Q 0,0 10,0 Z" fill="#ff5f1f" />
+        <rect x="0" y="2" width="400" height="4" fill="#ff5f1f" />
+
+        <!-- Single drip running down from the border -->
+        <path d="
+          M 120,6
+          C 120,6 122.5,6 122.5,9
+          L 123,28
+          C 123,30 123.3,34 122,36
+          C 121.5,36.8 120.5,36.8 120,36
+          C 118.7,34 119,30 119,28
+          L 119.5,9
+          C 119.5,6 120,6 120,6
+          Z
+        " fill="#ff5f1f" />
+      </svg>
+    </div>
+    <div class="drip-card" style="border-top-left-radius: 0; border-top-right-radius: 0;">
+      <div class="drip-card__name">Voice Canvas</div>
+      <div class="drip-card__desc">
+        Transform voice notes into structured visual boards and action items. Built for builders who think out loud.
+      </div>
+      <div class="drip-card__meta">Status: Building &middot; Week 4</div>
+    </div>
+  </div>
+
+  <!-- Extra: Thin drip accent line -->
+  <h2>Drip Accent Line (Thin Variant)</h2>
+  <div class="drip-accent">
+    <svg viewBox="0 0 500 50" width="500" height="50" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+      <!-- Thin line -->
+      <rect x="0" y="0" width="500" height="2" fill="#ff5f1f" opacity="0.6" />
+
+      <!-- Small thin drip at ~25% -->
+      <path d="
+        M 124,2
+        C 124,2 125.5,2 125.5,4
+        L 125.5,18
+        C 125.5,20 125.8,24 125,26
+        C 124.2,28 123,28 122.8,25
+        C 122.6,22 123,19 123.5,16
+        L 123.5,4
+        C 123.5,2 124,2 124,2
+        Z
+      " fill="#ff5f1f" opacity="0.6" />
+
+      <!-- Medium thin drip at ~65% -->
+      <path d="
+        M 325,2
+        C 325,2 326.5,2 326.5,4
+        L 327,30
+        C 327,33 327.3,38 326,41
+        C 324.7,44 323,44 322.8,40
+        C 322.6,36 323.5,32 324,28
+        L 324,4
+        C 324,2 325,2 325,2
+        Z
+      " fill="#ff5f1f" opacity="0.6" />
+    </svg>
+    <div class="context-note">Lighter/thinner variant for more subtle accents</div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Counters - TAG Brand Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      min-height: 100vh;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 80px;
+      padding: 60px 40px;
+    }
+
+    .label {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 60px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 140px;
+    }
+
+    .stat-number {
+      font-family: 'Space Mono', monospace;
+      font-size: 72px;
+      font-weight: 700;
+      color: #f0ebe3;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #5e5850;
+      text-transform: lowercase;
+    }
+
+    .hero-counter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hero-number {
+      font-family: 'Space Mono', monospace;
+      font-size: 200px;
+      font-weight: 700;
+      color: #f0ebe3;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-label-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 16px;
+      color: #5e5850;
+      text-transform: lowercase;
+      letter-spacing: 0.02em;
+    }
+
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #22c55e;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .pulse-dot::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: #22c55e;
+      opacity: 0;
+      animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes ping {
+      0% { transform: scale(1); opacity: 0.4; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="label">animated counters</div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-number" data-target="60" data-suffix="+">0</div>
+      <div class="stat-label">builders</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number" data-target="51" data-suffix="+">0</div>
+      <div class="stat-label">projects shipped</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number" data-target="2000" data-suffix="+" data-format="comma">0</div>
+      <div class="stat-label">network</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number" data-target="6" data-suffix="+">0</div>
+      <div class="stat-label">hackathons / year</div>
+    </div>
+  </div>
+
+  <div class="hero-counter">
+    <div class="hero-number" data-target="427" data-hero="true">0</div>
+    <div class="hero-label-row">
+      <div class="pulse-dot"></div>
+      <div class="hero-label">builders online</div>
+    </div>
+  </div>
+
+  <script>
+    const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4)
+
+    const formatNumber = (n, useComma) => {
+      if (useComma) return n.toLocaleString('en-US')
+      return n.toString()
+    }
+
+    const animateCounter = (el, delay = 0) => {
+      const target = parseInt(el.dataset.target, 10)
+      const suffix = el.dataset.suffix || ''
+      const useComma = el.dataset.format === 'comma'
+      const duration = 2000
+      let start = null
+
+      const step = (timestamp) => {
+        if (!start) start = timestamp
+        const elapsed = timestamp - start
+
+        if (elapsed < delay) {
+          requestAnimationFrame(step)
+          return
+        }
+
+        const progress = Math.min((elapsed - delay) / duration, 1)
+        const eased = easeOutQuart(progress)
+        const current = Math.round(eased * target)
+
+        el.textContent = formatNumber(current, useComma) + suffix
+
+        if (progress < 1) {
+          requestAnimationFrame(step)
+        }
+      }
+
+      requestAnimationFrame(step)
+    }
+
+    document.querySelectorAll('.stat-number').forEach((el, i) => {
+      animateCounter(el, i * 150)
+    })
+
+    document.querySelectorAll('.hero-number').forEach((el) => {
+      animateCounter(el, 600)
+    })
+  </script>
+</body>
+</html>

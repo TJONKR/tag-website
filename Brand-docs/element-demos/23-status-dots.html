@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status Dots - TAG Brand Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      min-height: 100vh;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 40px;
+      gap: 32px;
+    }
+
+    .label {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    .live-clock {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      color: #5e5850;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      align-self: flex-end;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .live-clock .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: clockPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes clockPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .builder-card {
+      background: #1e1c19;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-dot-wrapper {
+      position: relative;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      position: relative;
+      z-index: 2;
+    }
+
+    .status-dot.green { background: #22c55e; }
+    .status-dot.orange { background: #ff5f1f; }
+    .status-dot.gray { background: #5e5850; }
+
+    .status-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid;
+      opacity: 0;
+      z-index: 1;
+    }
+
+    .status-ring.green { border-color: #22c55e; }
+    .status-ring.orange { border-color: #ff5f1f; }
+
+    .status-dot-wrapper.pulsing .status-ring {
+      animation: radarPing 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes radarPing {
+      0% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+      100% {
+        transform: scale(3.5);
+        opacity: 0;
+      }
+    }
+
+    .builder-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .builder-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #f0ebe3;
+    }
+
+    .builder-project {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: #5e5850;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .builder-status {
+      margin-left: auto;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .builder-status.green { color: #22c55e; }
+    .builder-status.orange { color: #ff5f1f; }
+    .builder-status.gray { color: #5e5850; }
+  </style>
+</head>
+<body>
+  <div class="label">status dots</div>
+
+  <div class="live-clock">
+    <span class="dot"></span>
+    <span id="clock">--:--:--</span>
+    <span>CET &mdash; live</span>
+  </div>
+
+  <div class="grid">
+    <div class="builder-card">
+      <div class="status-dot-wrapper pulsing">
+        <div class="status-dot green"></div>
+        <div class="status-ring green"></div>
+      </div>
+      <div class="builder-info">
+        <div class="builder-name">Boris</div>
+        <div class="builder-project">invoice-ai</div>
+      </div>
+      <div class="builder-status green">building</div>
+    </div>
+
+    <div class="builder-card">
+      <div class="status-dot-wrapper pulsing">
+        <div class="status-dot green"></div>
+        <div class="status-ring green"></div>
+      </div>
+      <div class="builder-info">
+        <div class="builder-name">Kevin</div>
+        <div class="builder-project">tag-dashboard</div>
+      </div>
+      <div class="builder-status green">building</div>
+    </div>
+
+    <div class="builder-card">
+      <div class="status-dot-wrapper pulsing">
+        <div class="status-dot green"></div>
+        <div class="status-ring green"></div>
+      </div>
+      <div class="builder-info">
+        <div class="builder-name">Thomas</div>
+        <div class="builder-project">voice-clone-api</div>
+      </div>
+      <div class="builder-status green">building</div>
+    </div>
+
+    <div class="builder-card">
+      <div class="status-dot-wrapper pulsing">
+        <div class="status-dot orange"></div>
+        <div class="status-ring orange"></div>
+      </div>
+      <div class="builder-info">
+        <div class="builder-name">Caesar</div>
+        <div class="builder-project">nlp-summarizer</div>
+      </div>
+      <div class="builder-status orange">shipping</div>
+    </div>
+
+    <div class="builder-card">
+      <div class="status-dot-wrapper pulsing">
+        <div class="status-dot orange"></div>
+        <div class="status-ring orange"></div>
+      </div>
+      <div class="builder-info">
+        <div class="builder-name">Lena</div>
+        <div class="builder-project">design-system v3</div>
+      </div>
+      <div class="builder-status orange">shipping</div>
+    </div>
+
+    <div class="builder-card">
+      <div class="status-dot-wrapper">
+        <div class="status-dot gray"></div>
+      </div>
+      <div class="builder-info">
+        <div class="builder-name">Marco</div>
+        <div class="builder-project">data-pipeline</div>
+      </div>
+      <div class="builder-status gray">idle</div>
+    </div>
+  </div>
+
+  <script>
+    const clockEl = document.getElementById('clock')
+
+    const updateClock = () => {
+      const now = new Date()
+      const h = String(now.getHours()).padStart(2, '0')
+      const m = String(now.getMinutes()).padStart(2, '0')
+      const s = String(now.getSeconds()).padStart(2, '0')
+      clockEl.textContent = `${h}:${m}:${s}`
+    }
+
+    updateClock()
+    setInterval(updateClock, 1000)
+  </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG - Aurora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0e0d0b;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  /* ── Grain overlay ── */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.25;
+  }
+
+  /* ── Content overlay ── */
+  .content {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 12vh;
+    pointer-events: none;
+  }
+
+  .label {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 13px;
+    color: #5e5850;
+    letter-spacing: 5px;
+    text-transform: lowercase;
+    margin-bottom: 20px;
+  }
+
+  .tag-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 160px;
+    color: #f0ebe3;
+    letter-spacing: 24px;
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow:
+      0 0 100px rgba(255, 95, 31, 0.06),
+      0 -4px 0 rgba(14, 13, 11, 0.5);
+  }
+
+  /* ── Vignette ── */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    background:
+      linear-gradient(to top, #0e0d0b 0%, transparent 40%),
+      radial-gradient(ellipse at center top, transparent 30%, rgba(14, 13, 11, 0.6) 80%);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* ── Bottom fade for text grounding ── */
+  .bottom-fade {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 45vh;
+    background: linear-gradient(to top, #0e0d0b 0%, rgba(14, 13, 11, 0.8) 40%, transparent 100%);
+    pointer-events: none;
+    z-index: 15;
+  }
+
+  @media (max-width: 768px) {
+    .tag-text {
+      font-size: 80px;
+      letter-spacing: 14px;
+    }
+    .content {
+      padding-bottom: 15vh;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <canvas id="aurora"></canvas>
+
+  <!-- Vignette and fades -->
+  <div class="vignette"></div>
+  <div class="bottom-fade"></div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="label">amsterdam &middot; est. 2024</div>
+    <div class="tag-text">TAG</div>
+  </div>
+
+  <!-- Grain -->
+  <svg class="grain" viewBox="0 0 512 512" preserveAspectRatio="none">
+    <filter id="grain-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain-filter)" />
+  </svg>
+
+  <script>
+    const canvas = document.getElementById('aurora')
+    const ctx = canvas.getContext('2d')
+
+    let width, height, time = 0
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      width = window.innerWidth
+      height = window.innerHeight
+      canvas.width = width * dpr
+      canvas.height = height * dpr
+      ctx.scale(dpr, dpr)
+    }
+
+    window.addEventListener('resize', resize)
+    resize()
+
+    // Aurora band configuration
+    const bands = [
+      {
+        color: [255, 95, 31],    // orange
+        opacity: 0.12,
+        yBase: 0.2,
+        amplitude: 0.08,
+        frequency: 0.003,
+        speed: 0.0004,
+        thickness: 0.18,
+        phaseOffset: 0
+      },
+      {
+        color: [255, 179, 71],   // amber
+        opacity: 0.08,
+        yBase: 0.28,
+        amplitude: 0.06,
+        frequency: 0.004,
+        speed: 0.0003,
+        thickness: 0.14,
+        phaseOffset: 1.5
+      },
+      {
+        color: [255, 95, 31],    // orange (darker)
+        opacity: 0.1,
+        yBase: 0.15,
+        amplitude: 0.1,
+        frequency: 0.002,
+        speed: 0.00025,
+        thickness: 0.2,
+        phaseOffset: 3
+      },
+      {
+        color: [43, 92, 255],    // blue — very subtle
+        opacity: 0.05,
+        yBase: 0.35,
+        amplitude: 0.05,
+        frequency: 0.0035,
+        speed: 0.00035,
+        thickness: 0.12,
+        phaseOffset: 4.5
+      }
+    ]
+
+    function drawBand(band, t) {
+      const cols = Math.ceil(width / 4) // sample every 4px for performance
+      const step = width / cols
+
+      for (let i = 0; i <= cols; i++) {
+        const x = i * step
+
+        // Multiple sine waves for organic undulation
+        const wave1 = Math.sin(x * band.frequency + t * band.speed * 1000 + band.phaseOffset) * band.amplitude
+        const wave2 = Math.sin(x * band.frequency * 1.7 + t * band.speed * 700 + band.phaseOffset + 2) * band.amplitude * 0.5
+        const wave3 = Math.sin(x * band.frequency * 0.5 + t * band.speed * 400 + band.phaseOffset + 4) * band.amplitude * 0.3
+
+        const yCenter = (band.yBase + wave1 + wave2 + wave3) * height
+        const bandHeight = band.thickness * height
+
+        // Vertical gradient for each column slice
+        const gradient = ctx.createLinearGradient(x, yCenter - bandHeight, x, yCenter + bandHeight)
+
+        // Intensity varies along x for shimmer effect
+        const shimmer = 0.6 + 0.4 * Math.sin(x * 0.008 + t * 0.001 + band.phaseOffset)
+        const alpha = band.opacity * shimmer
+
+        gradient.addColorStop(0, `rgba(${band.color[0]}, ${band.color[1]}, ${band.color[2]}, 0)`)
+        gradient.addColorStop(0.3, `rgba(${band.color[0]}, ${band.color[1]}, ${band.color[2]}, ${alpha * 0.5})`)
+        gradient.addColorStop(0.5, `rgba(${band.color[0]}, ${band.color[1]}, ${band.color[2]}, ${alpha})`)
+        gradient.addColorStop(0.7, `rgba(${band.color[0]}, ${band.color[1]}, ${band.color[2]}, ${alpha * 0.5})`)
+        gradient.addColorStop(1, `rgba(${band.color[0]}, ${band.color[1]}, ${band.color[2]}, 0)`)
+
+        ctx.fillStyle = gradient
+        ctx.fillRect(x, yCenter - bandHeight, step + 1, bandHeight * 2)
+      }
+    }
+
+    function render(timestamp) {
+      time = timestamp || 0
+
+      ctx.clearRect(0, 0, width, height)
+
+      // Use "lighter" blend mode for aurora overlap
+      ctx.globalCompositeOperation = 'lighter'
+
+      bands.forEach((band) => {
+        drawBand(band, time)
+      })
+
+      // Reset blend mode
+      ctx.globalCompositeOperation = 'source-over'
+
+      requestAnimationFrame(render)
+    }
+
+    requestAnimationFrame(render)
+  </script>
+
+</body>
+</html>

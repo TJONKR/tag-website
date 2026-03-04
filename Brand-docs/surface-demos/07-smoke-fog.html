@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG - Smoke & Fog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    min-height: 100%;
+    background: #0e0d0b;
+    color: #f0ebe3;
+    overflow-x: hidden;
+  }
+
+  /* ── Grain overlay ── */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.3;
+  }
+
+  /* ── Smoke container ── */
+  .smoke-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .smoke {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+  }
+
+  /* Smoke element 1 — large warm gray, drifts right */
+  .smoke-1 {
+    width: 500px;
+    height: 420px;
+    background: rgba(200, 190, 175, 0.04);
+    filter: blur(100px);
+    border-radius: 45%;
+    top: 10%;
+    left: -15%;
+    animation: drift-1 32s ease-in-out infinite;
+  }
+
+  /* Smoke element 2 — barely visible orange, drifts left */
+  .smoke-2 {
+    width: 600px;
+    height: 350px;
+    background: rgba(255, 95, 31, 0.03);
+    filter: blur(110px);
+    border-radius: 55%;
+    top: 30%;
+    right: -20%;
+    animation: drift-2 38s ease-in-out infinite;
+  }
+
+  /* Smoke element 3 — warm gray, slow vertical */
+  .smoke-3 {
+    width: 400px;
+    height: 500px;
+    background: rgba(200, 190, 175, 0.05);
+    filter: blur(90px);
+    border-radius: 42%;
+    top: 50%;
+    left: 20%;
+    animation: drift-3 28s ease-in-out infinite;
+  }
+
+  /* Smoke element 4 — barely visible blue */
+  .smoke-4 {
+    width: 450px;
+    height: 380px;
+    background: rgba(43, 92, 255, 0.02);
+    filter: blur(120px);
+    border-radius: 58%;
+    top: 15%;
+    left: 55%;
+    animation: drift-4 35s ease-in-out infinite;
+  }
+
+  /* Smoke element 5 — large warm gray */
+  .smoke-5 {
+    width: 550px;
+    height: 450px;
+    background: rgba(200, 190, 175, 0.04);
+    filter: blur(80px);
+    border-radius: 48%;
+    bottom: 5%;
+    left: 40%;
+    animation: drift-5 40s ease-in-out infinite;
+  }
+
+  /* Smoke element 6 — subtle orange */
+  .smoke-6 {
+    width: 380px;
+    height: 320px;
+    background: rgba(255, 95, 31, 0.025);
+    filter: blur(100px);
+    border-radius: 52%;
+    top: 60%;
+    right: 5%;
+    animation: drift-6 30s ease-in-out infinite;
+  }
+
+  /* Smoke element 7 — warm gray, high */
+  .smoke-7 {
+    width: 300px;
+    height: 400px;
+    background: rgba(200, 190, 175, 0.035);
+    filter: blur(95px);
+    border-radius: 60%;
+    top: -5%;
+    left: 35%;
+    animation: drift-7 26s ease-in-out infinite;
+  }
+
+  /* Smoke element 8 — faint blue */
+  .smoke-8 {
+    width: 350px;
+    height: 300px;
+    background: rgba(43, 92, 255, 0.018);
+    filter: blur(110px);
+    border-radius: 44%;
+    bottom: 20%;
+    left: -5%;
+    animation: drift-8 36s ease-in-out infinite;
+  }
+
+  @keyframes drift-1 {
+    0%   { transform: translate(0, 0) scale(1); }
+    25%  { transform: translate(30vw, 5vh) scale(1.05); }
+    50%  { transform: translate(55vw, -3vh) scale(0.95); }
+    75%  { transform: translate(25vw, 8vh) scale(1.08); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes drift-2 {
+    0%   { transform: translate(0, 0) scale(1); }
+    30%  { transform: translate(-40vw, 8vh) scale(1.1); }
+    60%  { transform: translate(-20vw, -5vh) scale(0.92); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes drift-3 {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    33%  { transform: translate(15vw, -20vh) rotate(5deg); }
+    66%  { transform: translate(-10vw, -10vh) rotate(-3deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  @keyframes drift-4 {
+    0%   { transform: translate(0, 0) scale(1); }
+    40%  { transform: translate(-25vw, 12vh) scale(1.15); }
+    70%  { transform: translate(-10vw, 5vh) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes drift-5 {
+    0%   { transform: translate(0, 0) scale(1); }
+    35%  { transform: translate(-20vw, -15vh) scale(1.08); }
+    65%  { transform: translate(15vw, -8vh) scale(0.95); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes drift-6 {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    50%  { transform: translate(-30vw, -10vh) rotate(8deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  @keyframes drift-7 {
+    0%   { transform: translate(0, 0) scale(1); }
+    30%  { transform: translate(20vw, 15vh) scale(1.12); }
+    60%  { transform: translate(40vw, 5vh) scale(0.88); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes drift-8 {
+    0%   { transform: translate(0, 0) scale(1); }
+    45%  { transform: translate(35vw, -8vh) scale(1.1); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  /* ── Hero section ── */
+  .hero {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .tag-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 100px;
+    color: #f0ebe3;
+    letter-spacing: 16px;
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow: 0 0 60px rgba(255, 95, 31, 0.08);
+  }
+
+  .subtitle {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: #9b9589;
+    letter-spacing: 2px;
+    margin-top: 16px;
+    text-transform: lowercase;
+  }
+
+  /* ── Cards section ── */
+  .cards-section {
+    position: relative;
+    z-index: 10;
+    padding: 0 40px 120px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 11px;
+    color: #5e5850;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .card-grid {
+      grid-template-columns: 1fr;
+    }
+    .tag-text {
+      font-size: 64px;
+      letter-spacing: 10px;
+    }
+  }
+
+  .card {
+    background: rgba(20, 18, 16, 0.7);
+    border: 1px solid rgba(240, 235, 227, 0.06);
+    border-radius: 12px;
+    padding: 32px 28px;
+    backdrop-filter: blur(4px);
+    transition: border-color 0.4s ease;
+  }
+
+  .card:hover {
+    border-color: rgba(255, 95, 31, 0.15);
+  }
+
+  .card-number {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    color: #ff5f1f;
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: #f0ebe3;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .card-desc {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #7a7368;
+    line-height: 1.6;
+  }
+
+  .card-tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 11px;
+    color: #5e5850;
+    border: 1px solid rgba(240, 235, 227, 0.08);
+    border-radius: 4px;
+    padding: 4px 10px;
+    margin-top: 20px;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Grain overlay -->
+  <svg class="grain" viewBox="0 0 512 512" preserveAspectRatio="none">
+    <filter id="grain-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain-filter)" />
+  </svg>
+
+  <!-- Smoke layer -->
+  <div class="smoke-layer">
+    <div class="smoke smoke-1"></div>
+    <div class="smoke smoke-2"></div>
+    <div class="smoke smoke-3"></div>
+    <div class="smoke smoke-4"></div>
+    <div class="smoke smoke-5"></div>
+    <div class="smoke smoke-6"></div>
+    <div class="smoke smoke-7"></div>
+    <div class="smoke smoke-8"></div>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="tag-text">TAG</div>
+    <div class="subtitle">emerging from the underground</div>
+  </section>
+
+  <!-- Cards section — smoke drifts over these -->
+  <section class="cards-section">
+    <div class="section-label">what we build</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-number">01</div>
+        <div class="card-title">Forge Sessions</div>
+        <div class="card-desc">Weekly build nights where makers gather, prototype, and ship real products in a single session.</div>
+        <div class="card-tag">every thursday</div>
+      </div>
+      <div class="card">
+        <div class="card-number">02</div>
+        <div class="card-title">Demo Days</div>
+        <div class="card-desc">Monthly showcases where builders present what they've shipped. No slides, only live demos.</div>
+        <div class="card-tag">monthly</div>
+      </div>
+      <div class="card">
+        <div class="card-number">03</div>
+        <div class="card-title">Underground Labs</div>
+        <div class="card-desc">Experimental projects that push boundaries. Small teams, big ambitions, zero constraints.</div>
+        <div class="card-tag">ongoing</div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

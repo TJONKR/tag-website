@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>06 — Grain Texture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      z-index: 100;
+    }
+
+    .split-container {
+      display: flex;
+      width: 100vw;
+      height: calc(100vh - 80px);
+      position: relative;
+    }
+
+    .half {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .half-label {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.15em;
+      white-space: nowrap;
+    }
+
+    .half-left {
+      background: #141210;
+    }
+
+    .half-right {
+      background: #141210;
+      position: relative;
+    }
+
+    .half-right .warm-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(255,95,31,0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .tag-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 10vw;
+      color: #f0ebe3;
+      letter-spacing: -0.02em;
+      user-select: none;
+    }
+
+    /* Divider */
+    .divider {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: calc(100vh - 80px);
+      background: #5e5850;
+      z-index: 10;
+    }
+
+    /* SVG grain filter */
+    .grain-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .grain-overlay svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Slider section */
+    .slider-section {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 0 40px;
+    }
+
+    .slider-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+    }
+
+    .slider-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: #ff5f1f;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 300px;
+      height: 2px;
+      background: #5e5850;
+      outline: none;
+      border-radius: 1px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ff5f1f;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ff5f1f;
+      cursor: pointer;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="label">06 / grain texture overlay</div>
+
+  <div class="split-container">
+    <!-- Left: Flat -->
+    <div class="half half-left">
+      <span class="tag-text">TAG</span>
+      <div class="half-label">Flat</div>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Right: Grain + Warm Glow -->
+    <div class="half half-right">
+      <span class="tag-text">TAG</span>
+      <div class="warm-glow"></div>
+      <div class="grain-overlay" id="grainOverlay">
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <filter id="grain">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.7"
+              numOctaves="3"
+              stitchTiles="stitch"
+              result="noise"
+            />
+            <feColorMatrix
+              type="saturate"
+              values="0"
+              in="noise"
+              result="grayNoise"
+            />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#grain)" opacity="0.45" />
+        </svg>
+      </div>
+      <div class="half-label">Grain + Warm Glow</div>
+    </div>
+  </div>
+
+  <div class="slider-section">
+    <span class="slider-label">Grain Opacity</span>
+    <input type="range" id="grainSlider" min="0" max="100" value="45">
+    <span class="slider-value" id="sliderValue">0.45</span>
+  </div>
+
+  <script>
+    const slider = document.getElementById('grainSlider')
+    const valueDisplay = document.getElementById('sliderValue')
+    const grainRect = document.querySelector('#grainOverlay svg rect')
+
+    slider.addEventListener('input', () => {
+      const val = slider.value / 100
+      grainRect.setAttribute('opacity', val.toString())
+      valueDisplay.textContent = val.toFixed(2)
+    })
+  </script>
+
+</body>
+</html>

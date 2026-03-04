@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stickers - TAG Brand Element</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      padding: 60px 80px;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    h2 {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      margin-bottom: 40px;
+      margin-top: 60px;
+    }
+
+    h2:first-of-type {
+      margin-top: 30px;
+    }
+
+    /* --- Sticker base --- */
+    .sticker {
+      display: inline-block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 6px 14px;
+      border: 2px solid;
+      box-shadow: 2px 3px 0px rgba(0, 0, 0, 0.4);
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .sticker--orange {
+      background: #ff5f1f;
+      color: #141210;
+      border-color: #141210;
+    }
+
+    .sticker--dark {
+      background: #141210;
+      color: #ff5f1f;
+      border-color: #ff5f1f;
+    }
+
+    .sticker--outline {
+      background: transparent;
+      color: #ff5f1f;
+      border-color: #ff5f1f;
+    }
+
+    .sticker--cream {
+      background: #f0ebe3;
+      color: #141210;
+      border-color: #141210;
+    }
+
+    /* --- Round sticker --- */
+    .sticker-round {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 2px solid;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+      box-shadow: 2px 3px 0px rgba(0, 0, 0, 0.4);
+    }
+
+    .sticker-round--orange {
+      background: #ff5f1f;
+      color: #141210;
+      border-color: #141210;
+    }
+
+    .sticker-round--dark {
+      background: #1e1c19;
+      color: #ff5f1f;
+      border-color: #ff5f1f;
+    }
+
+    .sticker-round--large {
+      width: 110px;
+      height: 110px;
+      font-size: 12px;
+    }
+
+    /* --- Scatter section --- */
+    .scatter {
+      position: relative;
+      min-height: 260px;
+      margin-bottom: 20px;
+    }
+
+    .scatter > * {
+      position: absolute;
+    }
+
+    /* --- Card --- */
+    .project-card {
+      background: #1e1c19;
+      border: 1px solid #2a2724;
+      border-radius: 8px;
+      padding: 28px 24px;
+      width: 280px;
+      position: relative;
+      overflow: visible;
+    }
+
+    .project-card__name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: #f0ebe3;
+      margin-bottom: 8px;
+    }
+
+    .project-card__desc {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      color: #8a8279;
+      line-height: 1.5;
+    }
+
+    .project-card__meta {
+      margin-top: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+      text-transform: uppercase;
+    }
+
+    .cards-row {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .card-wrap {
+      position: relative;
+    }
+
+    .card-wrap .sticker,
+    .card-wrap .sticker-round {
+      position: absolute;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">Stickers</div>
+
+  <!-- Section 1: Label stickers -->
+  <h2>Label Stickers</h2>
+  <div class="scatter">
+    <span class="sticker sticker--orange" style="top: 10px; left: 30px; transform: rotate(-3deg);">SHIPPED</span>
+    <span class="sticker sticker--dark" style="top: 50px; left: 200px; transform: rotate(4deg);">NEW</span>
+    <span class="sticker sticker--cream" style="top: 5px; left: 340px; transform: rotate(-1.5deg);">LIVE</span>
+    <span class="sticker sticker--outline" style="top: 60px; left: 470px; transform: rotate(2.5deg);">AMS</span>
+    <span class="sticker sticker--orange" style="top: 100px; left: 80px; transform: rotate(5deg);">BETA</span>
+    <span class="sticker sticker--dark" style="top: 120px; left: 280px; transform: rotate(-4deg);">OPEN SOURCE</span>
+    <span class="sticker sticker--cream" style="top: 140px; left: 530px; transform: rotate(1deg);">v2.0</span>
+    <span class="sticker sticker--outline" style="top: 170px; left: 140px; transform: rotate(-2deg);">TAG</span>
+  </div>
+
+  <!-- Section 2: Round stickers -->
+  <h2>Round Stickers</h2>
+  <div class="scatter" style="min-height: 200px;">
+    <div class="sticker-round sticker-round--orange" style="top: 0; left: 40px; transform: rotate(-8deg);">
+      EST.<br>2024
+    </div>
+    <div class="sticker-round sticker-round--dark sticker-round--large" style="top: 10px; left: 200px; transform: rotate(5deg);">
+      60+<br>BUILDERS
+    </div>
+    <div class="sticker-round sticker-round--orange" style="top: 30px; left: 380px; transform: rotate(-3deg);">
+      AMS<br>NL
+    </div>
+    <div class="sticker-round sticker-round--dark" style="top: 60px; left: 540px; transform: rotate(10deg);">
+      AI &times;<br>BUILD
+    </div>
+  </div>
+
+  <!-- Section 3: Cards with stickers -->
+  <h2>Stickers on Cards</h2>
+  <div class="cards-row">
+    <div class="card-wrap">
+      <span class="sticker sticker--orange" style="top: -10px; right: -14px; transform: rotate(4deg);">SHIPPED</span>
+      <div class="project-card">
+        <div class="project-card__name">Agentic CRM</div>
+        <div class="project-card__desc">AI-powered customer relationship management with autonomous outreach.</div>
+        <div class="project-card__meta">Built by Sarah K.</div>
+      </div>
+    </div>
+
+    <div class="card-wrap">
+      <span class="sticker sticker--dark" style="top: 14px; right: -18px; transform: rotate(-3deg);">BUILDING</span>
+      <div class="project-card">
+        <div class="project-card__name">Voice Canvas</div>
+        <div class="project-card__desc">Transform voice notes into structured visual boards and action items.</div>
+        <div class="project-card__meta">Built by Marcus T.</div>
+      </div>
+    </div>
+
+    <div class="card-wrap">
+      <span class="sticker sticker--cream" style="top: -12px; left: -10px; transform: rotate(-5deg);">NEW</span>
+      <div class="sticker-round sticker-round--dark" style="bottom: -20px; right: -20px; transform: rotate(6deg); width: 70px; height: 70px; font-size: 9px;">
+        WEEK<br>3
+      </div>
+      <div class="project-card">
+        <div class="project-card__name">Supply Graph</div>
+        <div class="project-card__desc">Real-time supply chain visualization with anomaly detection.</div>
+        <div class="project-card__meta">Built by Daan V.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

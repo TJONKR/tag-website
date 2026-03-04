@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG - Pulse Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0e0d0b;
+  }
+
+  .scene {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Static radar grid lines */
+  .grid-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(42, 39, 36, 0.2);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .grid-ring:nth-child(1) { width: 200px; height: 200px; }
+  .grid-ring:nth-child(2) { width: 400px; height: 400px; }
+  .grid-ring:nth-child(3) { width: 600px; height: 600px; }
+  .grid-ring:nth-child(4) { width: 900px; height: 900px; }
+  .grid-ring:nth-child(5) { width: 1200px; height: 1200px; }
+  .grid-ring:nth-child(6) { width: 1600px; height: 1600px; }
+
+  /* Crosshair lines */
+  .crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .crosshair-h, .crosshair-v {
+    position: absolute;
+    background: rgba(42, 39, 36, 0.12);
+  }
+
+  .crosshair-h {
+    width: 200vw;
+    height: 1px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .crosshair-v {
+    width: 1px;
+    height: 200vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Rotating sweep line */
+  .sweep {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1000px;
+    height: 2px;
+    transform-origin: 0 50%;
+    animation: sweep-rotate 6s linear infinite;
+    pointer-events: none;
+  }
+
+  .sweep::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 95, 31, 0.25) 0%, rgba(255, 95, 31, 0) 100%);
+  }
+
+  /* Sweep trail / cone */
+  .sweep-trail {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1000px;
+    height: 1000px;
+    transform-origin: 0 0;
+    animation: sweep-rotate 6s linear infinite;
+    pointer-events: none;
+  }
+
+  .sweep-trail::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: conic-gradient(
+      from -30deg,
+      rgba(255, 95, 31, 0.06) 0deg,
+      rgba(255, 95, 31, 0.02) 15deg,
+      rgba(255, 95, 31, 0) 30deg,
+      transparent 30deg
+    );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  @keyframes sweep-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Pulsing rings */
+  .pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 2px solid #ff5f1f;
+    opacity: 0;
+    pointer-events: none;
+    animation: pulse-expand 4s ease-out infinite;
+    box-shadow:
+      0 0 8px rgba(255, 95, 31, 0.4),
+      0 0 20px rgba(255, 95, 31, 0.15),
+      inset 0 0 8px rgba(255, 95, 31, 0.1);
+  }
+
+  .pulse-ring:nth-child(1) { animation-delay: 0s; }
+  .pulse-ring:nth-child(2) { animation-delay: 0.8s; }
+  .pulse-ring:nth-child(3) { animation-delay: 1.6s; }
+  .pulse-ring:nth-child(4) { animation-delay: 2.4s; }
+  .pulse-ring:nth-child(5) { animation-delay: 3.2s; }
+
+  @keyframes pulse-expand {
+    0% {
+      width: 40px;
+      height: 40px;
+      opacity: 0.6;
+      border-width: 2.5px;
+    }
+    100% {
+      width: 1600px;
+      height: 1600px;
+      opacity: 0;
+      border-width: 0.5px;
+    }
+  }
+
+  /* Center content */
+  .center-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Small dot at center */
+  .center-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: #ff5f1f;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow:
+      0 0 8px rgba(255, 95, 31, 0.8),
+      0 0 24px rgba(255, 95, 31, 0.4);
+    z-index: 5;
+    animation: dot-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 95, 31, 0.8), 0 0 24px rgba(255, 95, 31, 0.4); }
+    50% { box-shadow: 0 0 12px rgba(255, 95, 31, 1), 0 0 40px rgba(255, 95, 31, 0.6); }
+  }
+
+  .tag-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 60px;
+    color: #f0ebe3;
+    letter-spacing: 12px;
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(255, 95, 31, 0.15);
+  }
+
+  .subtitle {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 12px;
+    color: #5e5850;
+    letter-spacing: 4px;
+    text-transform: lowercase;
+  }
+
+  /* Faint blip dots on radar */
+  .blip {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #ff5f1f;
+    border-radius: 50%;
+    opacity: 0;
+    animation: blip-flash 6s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(255, 95, 31, 0.5);
+  }
+
+  .blip:nth-child(1) { top: 25%; left: 35%; animation-delay: 1s; }
+  .blip:nth-child(2) { top: 40%; left: 72%; animation-delay: 2.5s; }
+  .blip:nth-child(3) { top: 65%; left: 28%; animation-delay: 4s; }
+  .blip:nth-child(4) { top: 30%; left: 60%; animation-delay: 0.5s; }
+  .blip:nth-child(5) { top: 70%; left: 65%; animation-delay: 3s; }
+  .blip:nth-child(6) { top: 55%; left: 40%; animation-delay: 5s; }
+  .blip:nth-child(7) { top: 20%; left: 55%; animation-delay: 1.8s; }
+  .blip:nth-child(8) { top: 75%; left: 48%; animation-delay: 3.8s; }
+
+  @keyframes blip-flash {
+    0%, 80%, 100% { opacity: 0; }
+    10%, 30% { opacity: 0.5; }
+    15% { opacity: 0.8; }
+  }
+
+  /* Vignette overlay */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, #0e0d0b 85%);
+    pointer-events: none;
+    z-index: 3;
+  }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <!-- Static radar grid -->
+    <div class="grid-ring"></div>
+    <div class="grid-ring"></div>
+    <div class="grid-ring"></div>
+    <div class="grid-ring"></div>
+    <div class="grid-ring"></div>
+    <div class="grid-ring"></div>
+
+    <!-- Crosshair -->
+    <div class="crosshair">
+      <div class="crosshair-h"></div>
+      <div class="crosshair-v"></div>
+    </div>
+
+    <!-- Sweep -->
+    <div class="sweep-trail"></div>
+    <div class="sweep"></div>
+
+    <!-- Pulsing rings -->
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+
+    <!-- Center dot -->
+    <div class="center-dot"></div>
+
+    <!-- Blips -->
+    <div class="blip"></div>
+    <div class="blip"></div>
+    <div class="blip"></div>
+    <div class="blip"></div>
+    <div class="blip"></div>
+    <div class="blip"></div>
+    <div class="blip"></div>
+    <div class="blip"></div>
+
+    <!-- Center text -->
+    <div class="center-content">
+      <div class="tag-text">TAG</div>
+      <div class="subtitle">amsterdam &middot; broadcasting</div>
+    </div>
+  </div>
+
+  <!-- Vignette -->
+  <div class="vignette"></div>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magnetic Buttons - TAG Brand Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      min-height: 100vh;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 60px 40px;
+      overflow: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    .hint {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: #5e5850;
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
+    .title {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #f0ebe3;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .button-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 48px;
+      justify-content: center;
+      align-items: center;
+      max-width: 700px;
+    }
+
+    .magnetic-wrap {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .magnetic-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 16px 36px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+      will-change: transform;
+      overflow: hidden;
+    }
+
+    .magnetic-btn .btn-text {
+      position: relative;
+      z-index: 1;
+      will-change: transform;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .magnetic-btn--primary {
+      background: #ff5f1f;
+      color: #141210;
+    }
+
+    .magnetic-btn--primary:hover {
+      background: #e8551b;
+    }
+
+    .magnetic-btn--ghost {
+      background: transparent;
+      color: #f0ebe3;
+      border: 1px solid #3d3a35;
+    }
+
+    .magnetic-btn--ghost:hover {
+      border-color: #5e5850;
+    }
+
+    .magnetic-btn--outline-accent {
+      background: transparent;
+      color: #ff5f1f;
+      border: 2px solid #ff5f1f;
+    }
+
+    .magnetic-btn--outline-accent:hover {
+      background: rgba(255, 95, 31, 0.08);
+    }
+
+    .magnetic-btn--large {
+      padding: 20px 48px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">magnetic buttons</div>
+
+  <div class="title">Hover near a button</div>
+
+  <div class="button-grid">
+    <div class="magnetic-wrap">
+      <button class="magnetic-btn magnetic-btn--primary magnetic-btn--large" data-magnetic data-strength="0.35">
+        <span class="btn-text">Tag in <span>&rarr;</span></span>
+      </button>
+    </div>
+
+    <div class="magnetic-wrap">
+      <button class="magnetic-btn magnetic-btn--ghost" data-magnetic data-strength="0.3">
+        <span class="btn-text">See what's happening</span>
+      </button>
+    </div>
+
+    <div class="magnetic-wrap">
+      <button class="magnetic-btn magnetic-btn--outline-accent" data-magnetic data-strength="0.3">
+        <span class="btn-text">Leave your tag</span>
+      </button>
+    </div>
+
+    <div class="magnetic-wrap">
+      <button class="magnetic-btn magnetic-btn--primary" data-magnetic data-strength="0.3">
+        <span class="btn-text">Apply</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="hint">Move your mouse near the buttons to feel the pull</div>
+
+  <script>
+    const PULL_RADIUS = 120
+    const SPRING = 0.08
+    const FRICTION = 0.75
+    const TEXT_PARALLAX = -0.4
+
+    class MagneticButton {
+      constructor(el) {
+        this.el = el
+        this.textEl = el.querySelector('.btn-text')
+        this.strength = parseFloat(el.dataset.strength) || 0.3
+
+        this.x = 0
+        this.y = 0
+        this.vx = 0
+        this.vy = 0
+        this.targetX = 0
+        this.targetY = 0
+        this.textX = 0
+        this.textY = 0
+
+        this.rect = null
+        this.centerX = 0
+        this.centerY = 0
+
+        this.updateRect()
+        this.animate()
+      }
+
+      updateRect() {
+        this.rect = this.el.getBoundingClientRect()
+        this.centerX = this.rect.left + this.rect.width / 2
+        this.centerY = this.rect.top + this.rect.height / 2
+      }
+
+      onMouseMove(mx, my) {
+        this.updateRect()
+
+        const dx = mx - this.centerX
+        const dy = my - this.centerY
+        const dist = Math.sqrt(dx * dx + dy * dy)
+
+        if (dist < PULL_RADIUS) {
+          const force = (1 - dist / PULL_RADIUS) * this.strength
+          this.targetX = dx * force
+          this.targetY = dy * force
+        } else {
+          this.targetX = 0
+          this.targetY = 0
+        }
+      }
+
+      animate() {
+        /* Spring physics */
+        const ax = (this.targetX - this.x) * SPRING
+        const ay = (this.targetY - this.y) * SPRING
+        this.vx = (this.vx + ax) * FRICTION
+        this.vy = (this.vy + ay) * FRICTION
+        this.x += this.vx
+        this.y += this.vy
+
+        /* Text parallax (opposite direction) */
+        this.textX = this.x * TEXT_PARALLAX
+        this.textY = this.y * TEXT_PARALLAX
+
+        this.el.style.transform = `translate(${this.x}px, ${this.y}px)`
+        this.textEl.style.transform = `translate(${this.textX}px, ${this.textY}px)`
+
+        requestAnimationFrame(() => this.animate())
+      }
+    }
+
+    const buttons = []
+
+    document.querySelectorAll('[data-magnetic]').forEach((el) => {
+      buttons.push(new MagneticButton(el))
+    })
+
+    document.addEventListener('mousemove', (e) => {
+      buttons.forEach((btn) => btn.onMouseMove(e.clientX, e.clientY))
+    })
+
+    /* Reset on resize */
+    window.addEventListener('resize', () => {
+      buttons.forEach((btn) => btn.updateRect())
+    })
+  </script>
+</body>
+</html>

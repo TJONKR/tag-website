@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG — Direction 3: Bold</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #e8e4de;
+    --black: #111;
+    --accent: #0038ff;
+    --mid: #777;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--black);
+    font-family: 'IBM Plex Mono', monospace;
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2.5rem;
+    z-index: 100;
+    border-bottom: 2px solid var(--black);
+    background: var(--bg);
+  }
+
+  .topbar .left {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+  }
+
+  .topbar .right {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 2.5rem 4rem;
+    padding-top: 80px;
+  }
+
+  .hero-tag {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(6rem, 20vw, 16rem);
+    letter-spacing: -0.04em;
+    line-height: 0.85;
+    color: var(--black);
+    display: flex;
+    align-items: baseline;
+    animation: slideIn 0.6s ease-out;
+  }
+
+  .hero-tag .dot {
+    width: clamp(12px, 2vw, 24px);
+    height: clamp(12px, 2vw, 24px);
+    background: var(--accent);
+    border-radius: 50%;
+    margin-left: 0.1em;
+    display: inline-block;
+    animation: popIn 0.3s ease-out 0.6s both;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+  }
+
+  .hero-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+    gap: 2rem;
+    animation: slideIn 0.6s ease-out 0.3s both;
+  }
+
+  .hero-desc {
+    max-width: 420px;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--mid);
+    font-weight: 300;
+  }
+
+  .hero-acronym {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  .hero-acronym .blue { color: var(--accent); }
+
+  /* Big statement section */
+  .statement {
+    padding: 6rem 2.5rem;
+    border-top: 2px solid var(--black);
+  }
+
+  .statement-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5.5vw, 4.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    max-width: 900px;
+  }
+
+  .statement-text .blue { color: var(--accent); }
+
+  /* Two column */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 2px solid var(--black);
+  }
+
+  .col {
+    padding: 4rem 2.5rem;
+  }
+
+  .col:first-child {
+    border-right: 2px solid var(--black);
+  }
+
+  .col-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+
+  .col h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .col p {
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--mid);
+    font-weight: 300;
+  }
+
+  /* Stats band */
+  .stats-band {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 2px solid var(--black);
+  }
+
+  .stat-cell {
+    padding: 3rem 2.5rem;
+    border-right: 2px solid var(--black);
+  }
+
+  .stat-cell:last-child { border-right: none; }
+
+  .stat-cell .num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    color: var(--black);
+    line-height: 1;
+  }
+
+  .stat-cell .lbl {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-top: 0.5rem;
+  }
+
+  /* CTA */
+  .cta-band {
+    border-top: 2px solid var(--black);
+    padding: 6rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .cta-band h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.02em;
+  }
+
+  .btn-bold {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: white;
+    background: var(--accent);
+    padding: 1.2rem 3rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+
+  .btn-bold:hover {
+    background: var(--black);
+    transform: translateY(-2px);
+  }
+
+  .footer {
+    border-top: 2px solid var(--black);
+    padding: 2rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+    .col:first-child { border-right: none; border-bottom: 2px solid var(--black); }
+    .stats-band { grid-template-columns: 1fr 1fr; }
+    .stat-cell:nth-child(2) { border-right: none; }
+    .stat-cell:nth-child(1), .stat-cell:nth-child(2) { border-bottom: 2px solid var(--black); }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="left">TAG</div>
+  <div class="right">Amsterdam · Builder Community</div>
+</div>
+
+<section class="hero">
+  <div class="hero-tag">TAG<span class="dot"></span></div>
+  <div class="hero-row">
+    <div class="hero-desc">
+      The cultural layer underneath the startup ecosystem. We attract the obsessed, creative, talented people before they're ready for their next step.
+    </div>
+    <div class="hero-acronym">
+      <span class="blue">T</span>o<br>
+      <span class="blue">A</span>chieve<br>
+      <span class="blue">G</span>reatness
+    </div>
+  </div>
+</section>
+
+<section class="statement">
+  <div class="statement-text">
+    What if the hackathon <span class="blue">never ended?</span> A room in Amsterdam where builders show up every day and ship.
+  </div>
+</section>
+
+<div class="two-col">
+  <div class="col">
+    <div class="col-label">What we are</div>
+    <h3>Not an accelerator.</h3>
+    <p>No cohorts. No demo days. No equity. No 12-week programs. We're the upstream — where interesting people are before they're fundable. Where projects exist before they're startups.</p>
+  </div>
+  <div class="col">
+    <div class="col-label">What matters here</div>
+    <h3>What are you building?</h3>
+    <p>Not your LinkedIn title. Not your funding round. Not how many followers you have. Show us what you shipped. That's the only currency.</p>
+  </div>
+</div>
+
+<div class="stats-band">
+  <div class="stat-cell">
+    <div class="num">60</div>
+    <div class="lbl">Builders at HQ</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">2K+</div>
+    <div class="lbl">Network</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">51</div>
+    <div class="lbl">Projects shipped</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">60</div>
+    <div class="lbl">Events / year</div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="col">
+    <div class="col-label">The culture</div>
+    <h3>Ship fast. Show your work.</h3>
+    <p>Demos are the currency. The person who shipped three things this month is more respected than the person who's been planning one thing for six months. Help each other. Joy is the point.</p>
+  </div>
+  <div class="col">
+    <div class="col-label">The thesis</div>
+    <h3>Europe needs the hype man.</h3>
+    <p>Europe has the talent and technical excellence. What we're missing is the irrational belief that we deserve to win. We're the celebration that creates the momentum that creates the belief.</p>
+  </div>
+</div>
+
+<div class="cta-band">
+  <h2>Are you building something?</h2>
+  <a href="#" class="btn-bold">Tag in →</a>
+</div>
+
+<div class="footer">
+  <span>© TAG Amsterdam 2026</span>
+  <span>Partners: Techleap · Norsken · AI AM</span>
+</div>
+
+</body>
+</html>

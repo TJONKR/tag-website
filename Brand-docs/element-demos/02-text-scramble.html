@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Scramble - TAG Brand Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .label {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      z-index: 10;
+    }
+
+    .demo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px;
+      gap: 80px;
+    }
+
+    .scramble-block {
+      text-align: center;
+    }
+
+    .scramble-line {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 80px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
+    .scramble-line-sub {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 36px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      margin-top: 40px;
+    }
+
+    .scramble-line span,
+    .scramble-line-sub span {
+      display: inline-block;
+      transition: color 0.05s;
+    }
+
+    .char-scrambling {
+      color: #5e5850;
+    }
+
+    .char-resolved {
+      color: #f0ebe3;
+    }
+
+    .char-space {
+      width: 0.3em;
+    }
+
+    /* Subtle cursor line */
+    .cursor-line {
+      display: inline-block;
+      width: 3px;
+      height: 0.8em;
+      background: #ff5f1f;
+      margin-left: 4px;
+      animation: cursorBlink 0.8s ease-in-out infinite;
+      vertical-align: baseline;
+      position: relative;
+      top: 0.05em;
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .divider {
+      width: 40px;
+      height: 2px;
+      background: #ff5f1f;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">02 / text scramble &mdash; character-by-character reveal</div>
+
+  <div class="demo-container">
+    <div class="scramble-block">
+      <div class="scramble-line" id="line1"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="scramble-block">
+      <div class="scramble-line-sub" id="line2"></div>
+    </div>
+  </div>
+
+  <script>
+    const CHARS = '!@#$%^&*<>{}[]/\\|=+~`?:;'
+    const SCRAMBLE_SPEED = 35
+    const ITERATIONS_PER_CHAR = 6
+    const CHAR_REVEAL_DELAY = 60
+    const LOOP_PAUSE = 3000
+
+    class TextScrambler {
+      constructor(element, text, onComplete) {
+        this.element = element
+        this.text = text
+        this.onComplete = onComplete
+        this.chars = text.split('')
+        this.resolved = new Array(this.chars.length).fill(false)
+        this.iterations = new Array(this.chars.length).fill(0)
+        this.currentIndex = 0
+        this.animationFrame = null
+        this.lastTime = 0
+        this.charTimers = []
+      }
+
+      scrambleAll() {
+        this.resolved = new Array(this.chars.length).fill(false)
+        this.iterations = new Array(this.chars.length).fill(0)
+        this.currentIndex = 0
+        this.charTimers = []
+        this.render()
+        this.startResolving()
+      }
+
+      startResolving() {
+        this.chars.forEach((char, i) => {
+          if (char === ' ') {
+            this.resolved[i] = true
+            return
+          }
+
+          const timer = setTimeout(() => {
+            this.resolveChar(i)
+          }, i * CHAR_REVEAL_DELAY)
+
+          this.charTimers.push(timer)
+        })
+      }
+
+      resolveChar(index) {
+        let count = 0
+        const interval = setInterval(() => {
+          count++
+          this.render()
+          if (count >= ITERATIONS_PER_CHAR) {
+            clearInterval(interval)
+            this.resolved[index] = true
+            this.render()
+
+            if (this.resolved.every(r => r)) {
+              if (this.onComplete) this.onComplete()
+            }
+          }
+        }, SCRAMBLE_SPEED)
+      }
+
+      render() {
+        let html = ''
+        this.chars.forEach((char, i) => {
+          if (char === ' ') {
+            html += '<span class="char-space"> </span>'
+          } else if (this.resolved[i]) {
+            html += `<span class="char-resolved">${char}</span>`
+          } else {
+            const randomChar = CHARS[Math.floor(Math.random() * CHARS.length)]
+            html += `<span class="char-scrambling">${randomChar}</span>`
+          }
+        })
+        this.element.innerHTML = html
+      }
+
+      // Continuous scramble animation for unresolved chars
+      startScrambleAnimation() {
+        const animate = () => {
+          if (!this.resolved.every(r => r)) {
+            this.render()
+          }
+          this.animationFrame = requestAnimationFrame(animate)
+        }
+        this.animationFrame = requestAnimationFrame(animate)
+      }
+
+      stopScrambleAnimation() {
+        if (this.animationFrame) {
+          cancelAnimationFrame(this.animationFrame)
+        }
+      }
+
+      destroy() {
+        this.stopScrambleAnimation()
+        this.charTimers.forEach(t => clearTimeout(t))
+      }
+    }
+
+    const line1El = document.getElementById('line1')
+    const line2El = document.getElementById('line2')
+
+    const TEXT1 = 'Leave your tag.'
+    const TEXT2 = 'TAG \u2014 To Achieve Greatness'
+
+    let scrambler1, scrambler2
+
+    function runCycle() {
+      // Start line 1
+      scrambler1 = new TextScrambler(line1El, TEXT1, () => {
+        // Line 1 done
+      })
+      scrambler1.scrambleAll()
+      scrambler1.startScrambleAnimation()
+
+      // Start line 2 with delay
+      setTimeout(() => {
+        scrambler2 = new TextScrambler(line2El, TEXT2, () => {
+          // Both done, wait then loop
+          setTimeout(() => {
+            scrambler1.destroy()
+            scrambler2.destroy()
+            runCycle()
+          }, LOOP_PAUSE)
+        })
+        scrambler2.scrambleAll()
+        scrambler2.startScrambleAnimation()
+      }, 600)
+    }
+
+    // Initial state: show scrambled
+    line1El.innerHTML = TEXT1.split('').map(c =>
+      c === ' ' ? '<span class="char-space"> </span>'
+        : `<span class="char-scrambling">${CHARS[Math.floor(Math.random() * CHARS.length)]}</span>`
+    ).join('')
+
+    line2El.innerHTML = TEXT2.split('').map(c =>
+      c === ' ' ? '<span class="char-space"> </span>'
+        : `<span class="char-scrambling">${CHARS[Math.floor(Math.random() * CHARS.length)]}</span>`
+    ).join('')
+
+    // Start after short delay
+    setTimeout(runCycle, 500)
+  </script>
+</body>
+</html>

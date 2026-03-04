@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG - Glowing Orbs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0e0d0b;
+    cursor: crosshair;
+  }
+
+  .scene {
+    position: fixed;
+    inset: 0;
+  }
+
+  /* ── Grain overlay ── */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.2;
+  }
+
+  /* ── Orbs ── */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    will-change: transform;
+    transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  /* Orange orbs */
+  .orb-1 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle at center, rgba(255, 95, 31, 0.12) 0%, rgba(255, 95, 31, 0.04) 35%, transparent 70%);
+    filter: blur(80px);
+    top: 20%;
+    left: 15%;
+    animation: orbit-1 45s ease-in-out infinite;
+  }
+
+  .orb-2 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle at center, rgba(255, 95, 31, 0.1) 0%, rgba(255, 95, 31, 0.03) 40%, transparent 70%);
+    filter: blur(70px);
+    top: 50%;
+    right: 20%;
+    animation: orbit-2 38s ease-in-out infinite;
+  }
+
+  .orb-3 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle at center, rgba(255, 95, 31, 0.09) 0%, rgba(255, 95, 31, 0.025) 35%, transparent 70%);
+    filter: blur(90px);
+    bottom: 15%;
+    left: 35%;
+    animation: orbit-3 52s ease-in-out infinite;
+  }
+
+  .orb-4 {
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle at center, rgba(255, 95, 31, 0.08) 0%, rgba(255, 95, 31, 0.02) 40%, transparent 70%);
+    filter: blur(60px);
+    top: 35%;
+    left: 55%;
+    animation: orbit-4 42s ease-in-out infinite;
+  }
+
+  /* Amber orbs */
+  .orb-5 {
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle at center, rgba(255, 179, 71, 0.1) 0%, rgba(255, 179, 71, 0.03) 35%, transparent 70%);
+    filter: blur(75px);
+    top: 10%;
+    right: 30%;
+    animation: orbit-5 48s ease-in-out infinite;
+  }
+
+  .orb-6 {
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle at center, rgba(255, 179, 71, 0.08) 0%, rgba(255, 179, 71, 0.02) 40%, transparent 70%);
+    filter: blur(65px);
+    bottom: 25%;
+    right: 15%;
+    animation: orbit-6 35s ease-in-out infinite;
+  }
+
+  /* Blue orb — very subtle */
+  .orb-7 {
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle at center, rgba(43, 92, 255, 0.06) 0%, rgba(43, 92, 255, 0.015) 40%, transparent 70%);
+    filter: blur(100px);
+    top: 60%;
+    left: 10%;
+    animation: orbit-7 55s ease-in-out infinite;
+  }
+
+  /* Figure-8 and circular orbits */
+  @keyframes orbit-1 {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(12vw, 8vh); }
+    50%  { transform: translate(5vw, -6vh); }
+    75%  { transform: translate(-8vw, 4vh); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes orbit-2 {
+    0%   { transform: translate(0, 0); }
+    20%  { transform: translate(-10vw, -5vh); }
+    40%  { transform: translate(-5vw, 8vh); }
+    60%  { transform: translate(8vw, 3vh); }
+    80%  { transform: translate(4vw, -7vh); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes orbit-3 {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(10vw, -12vh) scale(1.1); }
+    66%  { transform: translate(-8vw, -5vh) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes orbit-4 {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-15vw, 6vh); }
+    50%  { transform: translate(-7vw, -10vh); }
+    75%  { transform: translate(10vw, -3vh); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes orbit-5 {
+    0%   { transform: translate(0, 0) scale(1); }
+    30%  { transform: translate(8vw, 10vh) scale(1.15); }
+    60%  { transform: translate(-12vw, 4vh) scale(0.85); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes orbit-6 {
+    0%   { transform: translate(0, 0); }
+    40%  { transform: translate(-8vw, -8vh); }
+    70%  { transform: translate(6vw, -3vh); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes orbit-7 {
+    0%   { transform: translate(0, 0) scale(1); }
+    35%  { transform: translate(15vw, -5vh) scale(1.2); }
+    65%  { transform: translate(8vw, 8vh) scale(0.8); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  /* ── Center content ── */
+  .center-content {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .tag-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 120px;
+    color: #f0ebe3;
+    letter-spacing: 20px;
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow:
+      0 0 80px rgba(255, 95, 31, 0.1),
+      0 0 160px rgba(255, 95, 31, 0.05);
+  }
+
+  .subtitle {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 14px;
+    color: #5e5850;
+    letter-spacing: 6px;
+    text-transform: lowercase;
+    margin-top: 20px;
+  }
+
+  /* ── Vignette ── */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 25%, rgba(14, 13, 11, 0.4) 70%, #0e0d0b 100%);
+    pointer-events: none;
+    z-index: 30;
+  }
+
+  @media (max-width: 768px) {
+    .tag-text {
+      font-size: 72px;
+      letter-spacing: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="scene">
+    <!-- Orbs -->
+    <div class="orb orb-1" data-speed="0.04"></div>
+    <div class="orb orb-2" data-speed="0.06"></div>
+    <div class="orb orb-3" data-speed="0.03"></div>
+    <div class="orb orb-4" data-speed="0.07"></div>
+    <div class="orb orb-5" data-speed="0.05"></div>
+    <div class="orb orb-6" data-speed="0.04"></div>
+    <div class="orb orb-7" data-speed="0.02"></div>
+  </div>
+
+  <!-- Vignette -->
+  <div class="vignette"></div>
+
+  <!-- Center text -->
+  <div class="center-content">
+    <div class="tag-text">TAG</div>
+    <div class="subtitle">amsterdam</div>
+  </div>
+
+  <!-- Grain -->
+  <svg class="grain" viewBox="0 0 512 512" preserveAspectRatio="none">
+    <filter id="grain-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain-filter)" />
+  </svg>
+
+  <script>
+    // Mouse interaction: orbs drift slightly toward/away from cursor
+    const orbs = document.querySelectorAll('.orb')
+    let mouseX = window.innerWidth / 2
+    let mouseY = window.innerHeight / 2
+    let targetX = mouseX
+    let targetY = mouseY
+
+    document.addEventListener('mousemove', (e) => {
+      targetX = e.clientX
+      targetY = e.clientY
+    })
+
+    function animate() {
+      // Smooth lerp toward target
+      mouseX += (targetX - mouseX) * 0.05
+      mouseY += (targetY - mouseY) * 0.05
+
+      orbs.forEach((orb) => {
+        const rect = orb.getBoundingClientRect()
+        const orbCenterX = rect.left + rect.width / 2
+        const orbCenterY = rect.top + rect.height / 2
+
+        const dx = mouseX - orbCenterX
+        const dy = mouseY - orbCenterY
+        const dist = Math.sqrt(dx * dx + dy * dy)
+
+        const speed = parseFloat(orb.dataset.speed) || 0.04
+        const maxDrift = 10
+        const influence = Math.max(0, 1 - dist / 600)
+
+        const offsetX = dx * influence * speed
+        const offsetY = dy * influence * speed
+
+        // Clamp the drift
+        const clampedX = Math.max(-maxDrift, Math.min(maxDrift, offsetX))
+        const clampedY = Math.max(-maxDrift, Math.min(maxDrift, offsetY))
+
+        // Apply as a CSS custom property used in addition to the animation
+        orb.style.marginLeft = clampedX + 'px'
+        orb.style.marginTop = clampedY + 'px'
+      })
+
+      requestAnimationFrame(animate)
+    }
+
+    animate()
+  </script>
+
+</body>
+</html>

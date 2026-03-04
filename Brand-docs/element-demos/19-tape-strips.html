@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tape Strips - TAG Brand Element</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      padding: 60px 80px;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    h2 {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      margin-bottom: 40px;
+      margin-top: 80px;
+    }
+
+    h2:first-of-type {
+      margin-top: 30px;
+    }
+
+    /* --- SVG noise pattern for tape texture --- */
+    .svg-defs {
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+
+    /* --- Tape base style --- */
+    .tape {
+      position: absolute;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 240, 0.22) 0%,
+        rgba(255, 255, 240, 0.30) 20%,
+        rgba(255, 255, 240, 0.26) 50%,
+        rgba(255, 255, 240, 0.32) 80%,
+        rgba(255, 255, 240, 0.24) 100%
+      );
+      box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.15),
+        inset 0 0 8px rgba(255, 255, 255, 0.03);
+      z-index: 5;
+    }
+
+    .tape::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      opacity: 0.5;
+      mix-blend-mode: overlay;
+    }
+
+    /* Torn tape edges */
+    .tape--torn-left {
+      clip-path: polygon(
+        3% 0%, 100% 0%, 100% 100%, 2% 100%,
+        0% 90%, 4% 80%, 1% 70%, 3% 60%,
+        0% 50%, 5% 40%, 1% 30%, 4% 20%,
+        0% 10%
+      );
+    }
+
+    .tape--torn-right {
+      clip-path: polygon(
+        0% 0%, 97% 0%,
+        100% 10%, 96% 20%, 99% 30%, 95% 40%,
+        100% 50%, 97% 60%, 99% 70%, 96% 80%,
+        100% 90%, 98% 100%, 0% 100%
+      );
+    }
+
+    .tape--torn-both {
+      clip-path: polygon(
+        3% 0%,
+        97% 0%,
+        100% 10%, 96% 20%, 99% 30%, 95% 40%,
+        100% 50%, 97% 60%, 99% 70%, 96% 80%,
+        100% 90%, 98% 100%,
+        2% 100%,
+        0% 90%, 4% 80%, 1% 70%, 3% 60%,
+        0% 50%, 5% 40%, 1% 30%, 4% 20%,
+        0% 10%
+      );
+    }
+
+    /* --- Photo grid --- */
+    .photo-grid {
+      display: flex;
+      gap: 50px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    .photo-frame {
+      position: relative;
+      width: 260px;
+      height: 200px;
+    }
+
+    .photo {
+      width: 100%;
+      height: 100%;
+      border-radius: 2px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .photo--1 {
+      background: linear-gradient(135deg, #2a1f3d 0%, #1a3a4a 50%, #1e2d1e 100%);
+    }
+
+    .photo--2 {
+      background: linear-gradient(135deg, #3d2a1f 0%, #4a3a1a 50%, #2d1e1e 100%);
+    }
+
+    .photo--3 {
+      background: linear-gradient(135deg, #1f2a3d 0%, #1a4a3a 50%, #1e1e2d 100%);
+    }
+
+    .photo-caption {
+      position: absolute;
+      bottom: -28px;
+      left: 0;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: #5e5850;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* --- Tape label section --- */
+    .tape-label-section {
+      margin-top: 20px;
+    }
+
+    .tape-label-wrap {
+      display: inline-block;
+      margin-right: 30px;
+      margin-bottom: 20px;
+    }
+
+    .tape-label {
+      position: relative;
+      display: inline-block;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 240, 0.25) 0%,
+        rgba(255, 255, 240, 0.32) 30%,
+        rgba(255, 255, 240, 0.28) 70%,
+        rgba(255, 255, 240, 0.25) 100%
+      );
+      padding: 10px 28px;
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        inset 0 0 6px rgba(255, 255, 255, 0.03);
+    }
+
+    .tape-label::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      opacity: 0.5;
+      mix-blend-mode: overlay;
+    }
+
+    .tape-label__text {
+      position: relative;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: 13px;
+      color: #3a3632;
+      letter-spacing: 0.02em;
+      z-index: 1;
+    }
+
+    /* --- Full-width tape divider --- */
+    .tape-divider-section {
+      margin-top: 20px;
+    }
+
+    .tape-divider {
+      position: relative;
+      width: 100%;
+      height: 36px;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 240, 0.18) 0%,
+        rgba(255, 255, 240, 0.28) 15%,
+        rgba(255, 255, 240, 0.24) 40%,
+        rgba(255, 255, 240, 0.30) 60%,
+        rgba(255, 255, 240, 0.26) 85%,
+        rgba(255, 255, 240, 0.20) 100%
+      );
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .tape-divider::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      opacity: 0.6;
+      mix-blend-mode: overlay;
+    }
+
+    .tape-divider--torn {
+      clip-path: polygon(
+        0% 10%, 2% 0%, 4% 8%, 6% 2%, 8% 12%, 10% 0%, 12% 6%,
+        14% 0%, 16% 10%, 18% 2%, 20% 8%, 22% 0%, 24% 12%,
+        26% 4%, 28% 0%, 30% 8%, 32% 2%, 34% 10%, 36% 0%,
+        38% 6%, 40% 0%, 42% 8%, 44% 2%, 46% 12%, 48% 0%,
+        50% 10%, 52% 4%, 54% 0%, 56% 8%, 58% 2%, 60% 10%,
+        62% 0%, 64% 6%, 66% 0%, 68% 12%, 70% 4%, 72% 0%,
+        74% 8%, 76% 2%, 78% 10%, 80% 0%, 82% 6%, 84% 0%,
+        86% 12%, 88% 4%, 90% 0%, 92% 8%, 94% 2%, 96% 10%,
+        98% 0%, 100% 6%,
+        100% 90%, 98% 100%, 96% 92%, 94% 100%, 92% 88%,
+        90% 100%, 88% 94%, 86% 100%, 84% 88%, 82% 100%,
+        80% 92%, 78% 100%, 76% 90%, 74% 100%, 72% 94%,
+        70% 100%, 68% 88%, 66% 100%, 64% 92%, 62% 100%,
+        60% 90%, 58% 100%, 56% 94%, 54% 100%, 52% 88%,
+        50% 100%, 48% 92%, 46% 100%, 44% 88%, 42% 100%,
+        40% 94%, 38% 100%, 36% 90%, 34% 100%, 32% 92%,
+        30% 100%, 28% 88%, 26% 100%, 24% 94%, 22% 100%,
+        20% 90%, 18% 100%, 16% 92%, 14% 100%, 12% 88%,
+        10% 100%, 8% 94%, 6% 100%, 4% 90%, 2% 100%, 0% 92%
+      );
+    }
+
+    .context-row {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .context-block {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      color: #8a8279;
+      line-height: 1.6;
+      max-width: 400px;
+    }
+
+    .context-block strong {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      color: #f0ebe3;
+      font-size: 18px;
+      display: block;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">Tape Strips</div>
+
+  <!-- Section 1: Photos with tape -->
+  <h2>Photos Held by Tape</h2>
+  <div class="photo-grid">
+    <!-- Photo 1 -->
+    <div class="photo-frame">
+      <div class="photo photo--1"></div>
+      <!-- Top-left tape -->
+      <div class="tape tape--torn-both" style="
+        width: 90px; height: 22px;
+        top: -8px; left: -12px;
+        transform: rotate(-18deg);
+      "></div>
+      <!-- Bottom-right tape -->
+      <div class="tape tape--torn-both" style="
+        width: 80px; height: 20px;
+        bottom: -6px; right: -10px;
+        transform: rotate(12deg);
+      "></div>
+      <div class="photo-caption">Workshop 01 / AMS</div>
+    </div>
+
+    <!-- Photo 2 -->
+    <div class="photo-frame">
+      <div class="photo photo--2"></div>
+      <!-- Top-right tape -->
+      <div class="tape tape--torn-both" style="
+        width: 100px; height: 22px;
+        top: -6px; right: -16px;
+        transform: rotate(22deg);
+      "></div>
+      <!-- Bottom-left tape -->
+      <div class="tape tape--torn-both" style="
+        width: 85px; height: 20px;
+        bottom: -8px; left: -14px;
+        transform: rotate(-15deg);
+      "></div>
+      <div class="photo-caption">Demo Day / Spring</div>
+    </div>
+
+    <!-- Photo 3 -->
+    <div class="photo-frame">
+      <div class="photo photo--3"></div>
+      <!-- Top tape centered -->
+      <div class="tape tape--torn-both" style="
+        width: 110px; height: 22px;
+        top: -10px; left: 50%;
+        transform: translateX(-50%) rotate(-3deg);
+      "></div>
+      <!-- Bottom tape centered -->
+      <div class="tape tape--torn-both" style="
+        width: 95px; height: 20px;
+        bottom: -8px; left: 50%;
+        transform: translateX(-50%) rotate(2deg);
+      "></div>
+      <div class="photo-caption">Builder Night / Q2</div>
+    </div>
+  </div>
+
+  <!-- Section 2: Tape as labels -->
+  <h2>Tape Labels</h2>
+  <div class="tape-label-section">
+    <div class="tape-label-wrap" style="transform: rotate(-1.5deg);">
+      <div class="tape-label tape--torn-both">
+        <span class="tape-label__text">Week 04 notes</span>
+      </div>
+    </div>
+
+    <div class="tape-label-wrap" style="transform: rotate(1deg);">
+      <div class="tape-label tape--torn-both">
+        <span class="tape-label__text">Prototype v2</span>
+      </div>
+    </div>
+
+    <div class="tape-label-wrap" style="transform: rotate(-0.5deg);">
+      <div class="tape-label tape--torn-both">
+        <span class="tape-label__text">Ship it!</span>
+      </div>
+    </div>
+
+    <div class="tape-label-wrap" style="transform: rotate(2deg);">
+      <div class="tape-label tape--torn-both">
+        <span class="tape-label__text">TODO: refactor</span>
+      </div>
+    </div>
+
+    <div class="tape-label-wrap" style="transform: rotate(-2deg);">
+      <div class="tape-label tape--torn-both">
+        <span class="tape-label__text">Amsterdam HQ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Full-width tape divider -->
+  <h2>Tape as Section Divider</h2>
+
+  <div class="context-row" style="margin-bottom: 30px;">
+    <div class="context-block">
+      <strong>What we built</strong>
+      First cohort shipped 12 projects in 8 weeks. From AI agents to voice interfaces.
+    </div>
+  </div>
+
+  <div class="tape-divider tape-divider--torn"></div>
+
+  <div class="context-row" style="margin-top: 30px;">
+    <div class="context-block">
+      <strong>What's next</strong>
+      Spring cohort opens March 2025. Applications are reviewed on a rolling basis.
+    </div>
+  </div>
+
+  <div style="margin-top: 60px;">
+    <div class="tape-divider" style="height: 28px; opacity: 0.7;"></div>
+    <div style="margin-top: 16px; font-family: 'Space Mono', monospace; font-size: 10px; color: #5e5850; text-transform: uppercase; letter-spacing: 0.08em;">
+      Smooth-edge variant (no torn clip-path)
+    </div>
+  </div>
+</body>
+</html>

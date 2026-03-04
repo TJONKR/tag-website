@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09 — Duotone Effect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 60px 40px 80px;
+    }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      z-index: 100;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.15em;
+      margin-bottom: 20px;
+    }
+
+    .row {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .card-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #f0ebe3;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid #2a2520;
+    }
+
+    /* "Photo" simulation — colorful gradient */
+    .photo-gradient {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg,
+          #ff6b35 0%,
+          #e8453c 15%,
+          #c92a6d 30%,
+          #9b2d9b 45%,
+          #5b47ab 60%,
+          #2b7ab5 75%,
+          #1ba88e 90%,
+          #4ec44e 100%
+        );
+    }
+
+    /* Grayscale filter */
+    .grayscale .photo-gradient {
+      filter: grayscale(100%);
+    }
+
+    /* Duotone: grayscale + color overlay with multiply */
+    .duotone-orange .photo-gradient {
+      filter: grayscale(100%) contrast(1.1);
+    }
+
+    .duotone-orange .overlay {
+      position: absolute;
+      inset: 0;
+      background: #ff5f1f;
+      mix-blend-mode: multiply;
+    }
+
+    .duotone-blue .photo-gradient {
+      filter: grayscale(100%) contrast(1.1);
+    }
+
+    .duotone-blue .overlay {
+      position: absolute;
+      inset: 0;
+      background: #2b5cff;
+      mix-blend-mode: multiply;
+    }
+
+    /* Code blocks */
+    .code-block {
+      margin-top: 12px;
+      background: rgba(42,37,32,0.4);
+      border: 1px solid #2a2520;
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      line-height: 1.7;
+      color: #5e5850;
+      overflow-x: auto;
+    }
+
+    .code-block .prop {
+      color: #ff5f1f;
+    }
+
+    .code-block .val {
+      color: #f0ebe3;
+      opacity: 0.7;
+    }
+
+    .code-block .comment {
+      color: #3a3530;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: #2a2520;
+      margin: 48px 0;
+    }
+
+    /* Arrow indicator */
+    .arrow-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .arrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #5e5850;
+      display: flex;
+      align-items: center;
+      padding-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="label">09 / duotone effect</div>
+
+  <!-- Row 1: Orange Duotone Pipeline -->
+  <div class="section-label">1 / Orange duotone (#ff5f1f)</div>
+
+  <div class="row">
+    <!-- Original -->
+    <div class="card">
+      <div class="card-label">Original</div>
+      <div class="frame">
+        <div class="photo-gradient"></div>
+      </div>
+      <div class="code-block">
+<span class="comment">/* No filters applied */</span>
+<span class="prop">background</span>: <span class="val">linear-gradient(...);</span>
+      </div>
+    </div>
+
+    <!-- Grayscale -->
+    <div class="card">
+      <div class="card-label">Grayscale</div>
+      <div class="frame grayscale">
+        <div class="photo-gradient"></div>
+      </div>
+      <div class="code-block">
+<span class="prop">filter</span>: <span class="val">grayscale(100%);</span>
+      </div>
+    </div>
+
+    <!-- Duotone Orange -->
+    <div class="card">
+      <div class="card-label">Duotone TAG</div>
+      <div class="frame duotone-orange">
+        <div class="photo-gradient"></div>
+        <div class="overlay"></div>
+      </div>
+      <div class="code-block">
+<span class="prop">filter</span>: <span class="val">grayscale(100%) contrast(1.1);</span>
+<span class="comment">/* overlay element: */</span>
+<span class="prop">background</span>: <span class="val">#ff5f1f;</span>
+<span class="prop">mix-blend-mode</span>: <span class="val">multiply;</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Row 2: Blue Duotone for comparison -->
+  <div class="section-label">2 / Blue duotone (#2b5cff) for comparison</div>
+
+  <div class="row">
+    <!-- Original -->
+    <div class="card">
+      <div class="card-label">Original</div>
+      <div class="frame">
+        <div class="photo-gradient"></div>
+      </div>
+      <div class="code-block">
+<span class="comment">/* Same gradient source */</span>
+<span class="prop">background</span>: <span class="val">linear-gradient(...);</span>
+      </div>
+    </div>
+
+    <!-- Grayscale -->
+    <div class="card">
+      <div class="card-label">Grayscale</div>
+      <div class="frame grayscale">
+        <div class="photo-gradient"></div>
+      </div>
+      <div class="code-block">
+<span class="prop">filter</span>: <span class="val">grayscale(100%);</span>
+      </div>
+    </div>
+
+    <!-- Duotone Blue -->
+    <div class="card">
+      <div class="card-label">Duotone Blue</div>
+      <div class="frame duotone-blue">
+        <div class="photo-gradient"></div>
+        <div class="overlay"></div>
+      </div>
+      <div class="code-block">
+<span class="prop">filter</span>: <span class="val">grayscale(100%) contrast(1.1);</span>
+<span class="comment">/* overlay element: */</span>
+<span class="prop">background</span>: <span class="val">#2b5cff;</span>
+<span class="prop">mix-blend-mode</span>: <span class="val">multiply;</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Additional: Side-by-side large comparison -->
+  <div class="section-label">3 / Side-by-side: Orange vs Blue</div>
+
+  <div class="row">
+    <div class="card">
+      <div class="card-label" style="color: #ff5f1f;">TAG Orange</div>
+      <div class="frame duotone-orange" style="aspect-ratio: 2 / 1;">
+        <div class="photo-gradient"></div>
+        <div class="overlay"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label" style="color: #2b5cff;">Comparison Blue</div>
+      <div class="frame duotone-blue" style="aspect-ratio: 2 / 1;">
+        <div class="photo-gradient"></div>
+        <div class="overlay"></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

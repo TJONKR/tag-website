@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stacked Text - TAG Brand Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@400;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .label {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      z-index: 10;
+    }
+
+    /* --- Section 1: BUILD / SHIP / TAG --- */
+    .section-1 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .stacked-group {
+      text-align: center;
+      line-height: 0.78;
+    }
+
+    .stacked-group .line {
+      display: block;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15vw;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    .line-1 { color: #5e5850; }
+    .line-2 { color: #9b9589; }
+    .line-3 { color: #ff5f1f; }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    /* --- Divider --- */
+    .divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+    }
+
+    .divider span {
+      width: 40px;
+      height: 2px;
+      background: #ff5f1f;
+      opacity: 0.4;
+    }
+
+    /* --- Section 2: Quote with tight stacking --- */
+    .section-2 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      padding: 60px 40px 100px;
+    }
+
+    .quote-stack {
+      text-align: center;
+      line-height: 0.88;
+      max-width: 90vw;
+    }
+
+    .quote-stack .q-line {
+      display: block;
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(32px, 6vw, 80px);
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    .q-line.weight-light {
+      font-weight: 400;
+      color: #5e5850;
+    }
+
+    .q-line.weight-heavy {
+      font-weight: 800;
+      color: #f0ebe3;
+    }
+
+    /* Accent for specific words */
+    .q-line .accent {
+      color: #ff5f1f;
+    }
+
+    .quote-attribution {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    .quote-attribution .dash {
+      color: #ff5f1f;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">05 / stacked text &mdash; tight line-height &amp; overlapping layers</div>
+
+  <!-- Section 1: BUILD / SHIP / TAG -->
+  <div class="section-1">
+    <div class="stacked-group">
+      <span class="line line-1">BUILD</span>
+      <span class="line line-2">SHIP</span>
+      <span class="line line-3">TAG</span>
+    </div>
+    <div class="section-label">line-height: 0.78 &mdash; overlapping creates depth and hierarchy</div>
+  </div>
+
+  <div class="divider"><span></span></div>
+
+  <!-- Section 2: Quote stacked -->
+  <div class="section-2">
+    <div class="quote-stack">
+      <span class="q-line weight-heavy">We're the <span class="accent">cultural</span></span>
+      <span class="q-line weight-light">layer underneath the</span>
+      <span class="q-line weight-heavy">startup <span class="accent">ecosystem</span></span>
+    </div>
+    <div class="quote-attribution"><span class="dash">&mdash;</span> tag amsterdam manifesto</div>
+  </div>
+</body>
+</html>

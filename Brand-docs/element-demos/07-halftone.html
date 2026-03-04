@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>07 — Halftone Pattern</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 60px 40px 80px;
+    }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      z-index: 100;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.15em;
+      margin-bottom: 16px;
+    }
+
+    /* -- Section 1: Halftone as background texture -- */
+    .halftone-text-section {
+      position: relative;
+      width: 100%;
+      min-height: 50vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 60px;
+      overflow: hidden;
+      border: 1px solid #2a2520;
+      border-radius: 4px;
+    }
+
+    .halftone-bg {
+      position: absolute;
+      inset: 0;
+      /* Subtle halftone dot pattern using radial-gradient */
+      background-image:
+        radial-gradient(circle, rgba(255,95,31,0.12) 1px, transparent 1px);
+      background-size: 6px 6px;
+      pointer-events: none;
+    }
+
+    .halftone-text-section .title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(3rem, 8vw, 7rem);
+      color: #f0ebe3;
+      letter-spacing: -0.02em;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* -- Section 2: Halftone simulating photo effect -- */
+    .halftone-photo-section {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .photo-card {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .photo-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border: 1px solid #2a2520;
+      border-radius: 4px;
+    }
+
+    /* Gradient simulating underlying image */
+    .gradient-base {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #ff5f1f 0%, #e04a10 30%, #8a2e08 60%, #141210 100%);
+    }
+
+    /* Halftone dots overlay — varying size approach using multiple layers */
+    .halftone-dots {
+      position: absolute;
+      inset: 0;
+      /* Large pattern for darker areas */
+      background-image:
+        radial-gradient(circle, #141210 2.5px, transparent 2.5px),
+        radial-gradient(circle, #141210 1.5px, transparent 1.5px);
+      background-size:
+        8px 8px,
+        8px 8px;
+      background-position:
+        0 0,
+        4px 4px;
+      mix-blend-mode: multiply;
+      opacity: 0.8;
+    }
+
+    /* Alternative: more visible halftone with contrast */
+    .halftone-dots-v2 {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 50%, transparent 35%, #141210 36%) 0 0 / 6px 6px;
+      mix-blend-mode: normal;
+      opacity: 0.6;
+    }
+
+    .photo-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    .photo-label code {
+      display: block;
+      color: #ff5f1f;
+      font-size: 10px;
+      margin-top: 4px;
+      opacity: 0.7;
+    }
+
+    /* Second row: staggered dot pattern */
+    .halftone-staggered {
+      position: absolute;
+      inset: 0;
+      /* Staggered rows of dots for more print-like feel */
+      background-image:
+        radial-gradient(circle, #f0ebe3 1.8px, transparent 1.8px),
+        radial-gradient(circle, #f0ebe3 1.2px, transparent 1.2px);
+      background-size:
+        10px 10px,
+        10px 10px;
+      background-position:
+        0 0,
+        5px 5px;
+      opacity: 0.5;
+    }
+
+    .gradient-base-dark {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #141210 0%, #2a2520 40%, #4a3f35 70%, #5e5850 100%);
+    }
+
+    .gradient-base-warm {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #ff5f1f 0%, #cc4c18 25%, #662610 55%, #141210 100%);
+    }
+
+    /* Clean halftone circle pattern */
+    .halftone-clean {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle closest-side, #141210 92%, transparent 93%) 0 0 / 8px 8px;
+      opacity: 0.7;
+    }
+
+    .row-gap {
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="label">07 / halftone dot pattern</div>
+
+  <!-- Section 1: Halftone as background texture behind text -->
+  <div class="section-label">1 / Halftone as background texture</div>
+  <div class="halftone-text-section">
+    <div class="halftone-bg"></div>
+    <div class="title">THE BUILDERS</div>
+  </div>
+
+  <!-- Section 2: Halftone photo simulation -->
+  <div class="row-gap">
+    <div class="section-label">2 / Halftone applied to gradient (simulated photo)</div>
+  </div>
+
+  <div class="halftone-photo-section" style="margin-top: 16px;">
+
+    <!-- Card 1: Base gradient (no halftone) -->
+    <div class="photo-card">
+      <div class="photo-frame">
+        <div class="gradient-base-warm"></div>
+      </div>
+      <div class="photo-label">
+        Original gradient
+        <code>background: linear-gradient(...);</code>
+      </div>
+    </div>
+
+    <!-- Card 2: Gradient + halftone dots -->
+    <div class="photo-card">
+      <div class="photo-frame">
+        <div class="gradient-base-warm"></div>
+        <div class="halftone-dots-v2"></div>
+      </div>
+      <div class="photo-label">
+        With halftone overlay
+        <code>radial-gradient(circle, transparent 35%, #141210 36%) / 6px 6px</code>
+      </div>
+    </div>
+
+    <!-- Card 3: Gradient + staggered halftone -->
+    <div class="photo-card">
+      <div class="photo-frame">
+        <div class="gradient-base-dark"></div>
+        <div class="halftone-staggered"></div>
+      </div>
+      <div class="photo-label">
+        Staggered dots on dark base
+        <code>Two offset radial-gradients at 5px shift</code>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Row 2: More variations -->
+  <div class="halftone-photo-section" style="margin-top: 40px;">
+
+    <!-- Card 4: Large dot halftone -->
+    <div class="photo-card">
+      <div class="photo-frame">
+        <div class="gradient-base-warm"></div>
+        <div style="
+          position: absolute; inset: 0;
+          background: radial-gradient(circle closest-side, #141210 80%, transparent 81%) 0 0 / 12px 12px;
+          opacity: 0.6;
+        "></div>
+      </div>
+      <div class="photo-label">
+        Large dots (12px grid)
+        <code>radial-gradient(circle closest-side, #141210 80%, transparent 81%) / 12px</code>
+      </div>
+    </div>
+
+    <!-- Card 5: Fine dots -->
+    <div class="photo-card">
+      <div class="photo-frame">
+        <div class="gradient-base-warm"></div>
+        <div style="
+          position: absolute; inset: 0;
+          background: radial-gradient(circle closest-side, #141210 88%, transparent 89%) 0 0 / 4px 4px;
+          opacity: 0.5;
+        "></div>
+      </div>
+      <div class="photo-label">
+        Fine dots (4px grid)
+        <code>radial-gradient(circle closest-side, #141210 88%, transparent 89%) / 4px</code>
+      </div>
+    </div>
+
+    <!-- Card 6: Inverted (light dots on dark) -->
+    <div class="photo-card">
+      <div class="photo-frame" style="background: #141210;">
+        <div style="
+          position: absolute; inset: 0;
+          background:
+            radial-gradient(circle, #ff5f1f 1.5px, transparent 1.5px) 0 0 / 8px 8px,
+            radial-gradient(circle, #ff5f1f 1px, transparent 1px) 4px 4px / 8px 8px;
+          opacity: 0.6;
+        "></div>
+      </div>
+      <div class="photo-label">
+        Inverted: orange dots on dark
+        <code>radial-gradient(circle, #ff5f1f 1.5px, transparent 1.5px) / 8px</code>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

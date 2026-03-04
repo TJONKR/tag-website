@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Animation - TAG Element Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      z-index: 100;
+    }
+
+    .demo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 64px;
+      padding: 80px 24px;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    /* Terminal block */
+    .terminal {
+      width: 100%;
+      background: #0e0d0b;
+      border: 1px solid #2a2724;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #1a1816;
+      border-bottom: 1px solid #2a2724;
+    }
+
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2a2724;
+    }
+
+    .terminal-dot--red { background: #5e3030; }
+    .terminal-dot--yellow { background: #5e5430; }
+    .terminal-dot--green { background: #305e3a; }
+
+    .terminal-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+      margin-left: 8px;
+    }
+
+    .terminal-body {
+      padding: 20px 24px;
+      min-height: 200px;
+    }
+
+    .terminal-line {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #f0ebe3;
+      white-space: pre;
+      min-height: 1.8em;
+    }
+
+    .terminal-line .prompt-dollar {
+      color: #ff5f1f;
+    }
+
+    .terminal-line .prompt-arrow {
+      color: #5e5850;
+    }
+
+    .terminal-line .highlight {
+      color: #ff5f1f;
+    }
+
+    /* Blinking cursor */
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 16px;
+      background: #ff5f1f;
+      vertical-align: text-bottom;
+      animation: blink 0.8s step-end infinite;
+      margin-left: 1px;
+    }
+
+    .cursor--hidden {
+      visibility: hidden;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Large heading typing */
+    .heading-section {
+      text-align: center;
+      width: 100%;
+    }
+
+    .heading-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.12em;
+      margin-bottom: 24px;
+    }
+
+    .typed-heading {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(36px, 7vw, 72px);
+      color: #f0ebe3;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      min-height: 1.2em;
+      display: inline;
+    }
+
+    .typed-heading .cursor {
+      width: 4px;
+      height: 0.85em;
+      vertical-align: baseline;
+      position: relative;
+      top: 0.05em;
+    }
+
+    .typed-heading .accent {
+      color: #ff5f1f;
+    }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: #2a2724;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">typing animation</div>
+
+  <div class="demo-container">
+    <!-- Terminal -->
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-dot terminal-dot--red"></div>
+        <div class="terminal-dot terminal-dot--yellow"></div>
+        <div class="terminal-dot terminal-dot--green"></div>
+        <span class="terminal-title">tag-cli</span>
+      </div>
+      <div class="terminal-body" id="terminalBody">
+        <!-- Lines will be injected here -->
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Large heading -->
+    <div class="heading-section">
+      <div class="heading-label">Hero Headline</div>
+      <div>
+        <span class="typed-heading" id="headingText"></span><span class="cursor cursor--hidden" id="headingCursor"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Terminal typing configuration
+    const terminalLines = [
+      { prompt: '$ ', text: 'what are you building?', delay: 600 },
+      { prompt: '> ', text: 'connecting to tag.amsterdam...', delay: 400 },
+      { prompt: '> ', text: '427 builders online', delay: 300, highlight: '427' },
+      { prompt: '> ', text: '89 projects shipping', delay: 300, highlight: '89' },
+      { prompt: '> ', text: 'ready.', delay: 200, highlight: 'ready.' },
+    ]
+
+    const terminalBody = document.getElementById('terminalBody')
+    let currentTermLine = 0
+
+    function createTerminalLine(config) {
+      const lineEl = document.createElement('div')
+      lineEl.className = 'terminal-line'
+
+      // Add prompt instantly
+      const promptSpan = document.createElement('span')
+      promptSpan.className = config.prompt === '$ ' ? 'prompt-dollar' : 'prompt-arrow'
+      promptSpan.textContent = config.prompt
+      lineEl.appendChild(promptSpan)
+
+      // Text container
+      const textSpan = document.createElement('span')
+      textSpan.className = 'text-content'
+      lineEl.appendChild(textSpan)
+
+      // Cursor
+      const cursorSpan = document.createElement('span')
+      cursorSpan.className = 'cursor'
+      lineEl.appendChild(cursorSpan)
+
+      terminalBody.appendChild(lineEl)
+
+      return { lineEl, textSpan, cursorSpan, config }
+    }
+
+    function typeTerminalLine(lineData, callback) {
+      const { textSpan, cursorSpan, config } = lineData
+      const text = config.text
+      let charIndex = 0
+
+      // Determine highlight range
+      let highlightStart = -1
+      let highlightEnd = -1
+      if (config.highlight) {
+        highlightStart = text.indexOf(config.highlight)
+        highlightEnd = highlightStart + config.highlight.length
+      }
+
+      function typeChar() {
+        if (charIndex < text.length) {
+          const char = text[charIndex]
+
+          // Check if we're entering or in a highlight region
+          if (highlightStart !== -1 && charIndex >= highlightStart && charIndex < highlightEnd) {
+            // Find or create highlight span
+            let hlSpan = textSpan.querySelector('.highlight')
+            if (!hlSpan || charIndex === highlightStart) {
+              hlSpan = document.createElement('span')
+              hlSpan.className = 'highlight'
+              textSpan.appendChild(hlSpan)
+            }
+            hlSpan.textContent += char
+          } else {
+            textSpan.appendChild(document.createTextNode(char))
+          }
+
+          charIndex++
+
+          // Vary typing speed for realism
+          const baseSpeed = 35
+          const variance = Math.random() * 30
+          setTimeout(typeChar, baseSpeed + variance)
+        } else {
+          // Done typing this line
+          cursorSpan.classList.add('cursor--hidden')
+          if (callback) {
+            setTimeout(callback, config.delay || 300)
+          }
+        }
+      }
+
+      setTimeout(typeChar, 100)
+    }
+
+    function typeNextTerminalLine() {
+      if (currentTermLine < terminalLines.length) {
+        const lineData = createTerminalLine(terminalLines[currentTermLine])
+        currentTermLine++
+        typeTerminalLine(lineData, typeNextTerminalLine)
+      } else {
+        // All terminal lines done, start heading animation
+        setTimeout(startHeadingTyping, 800)
+      }
+    }
+
+    // Heading typing
+    const headingText = "Tag, you're it."
+    const headingEl = document.getElementById('headingText')
+    const headingCursor = document.getElementById('headingCursor')
+
+    function startHeadingTyping() {
+      headingCursor.classList.remove('cursor--hidden')
+      let charIndex = 0
+
+      // Define accent regions: "Tag" (0-2) and the period at the end
+      function typeHeadingChar() {
+        if (charIndex < headingText.length) {
+          const char = headingText[charIndex]
+
+          // "Tag" in accent color (first 3 chars)
+          if (charIndex < 3) {
+            let accentSpan = headingEl.querySelector('.accent')
+            if (!accentSpan) {
+              accentSpan = document.createElement('span')
+              accentSpan.className = 'accent'
+              headingEl.appendChild(accentSpan)
+            }
+            accentSpan.textContent += char
+          } else {
+            headingEl.appendChild(document.createTextNode(char))
+          }
+
+          charIndex++
+
+          // Slower typing for dramatic heading
+          const baseSpeed = 80
+          const variance = Math.random() * 50
+
+          // Pause after comma
+          const extraPause = (headingText[charIndex - 1] === ',') ? 400 : 0
+
+          setTimeout(typeHeadingChar, baseSpeed + variance + extraPause)
+        }
+        // Cursor keeps blinking at the end
+      }
+
+      typeHeadingChar()
+    }
+
+    // Start the terminal animation after a brief delay
+    setTimeout(typeNextTerminalLine, 600)
+  </script>
+</body>
+</html>

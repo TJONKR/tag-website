@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Torn Edges - TAG Brand Element</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    /* --- Section shared --- */
+    .section {
+      position: relative;
+      padding: 80px;
+    }
+
+    .section__heading {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 36px;
+      margin-bottom: 16px;
+    }
+
+    .section__text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: 16px;
+      color: #8a8279;
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    .section__label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+    }
+
+    /* --- Section 1: dark bg, torn bottom --- */
+    .section--dark {
+      background: #141210;
+    }
+
+    .section--mid {
+      background: #1e1c19;
+    }
+
+    /* Torn edge pattern 1 — jagged rip */
+    .torn-bottom-1 {
+      position: relative;
+    }
+
+    .torn-bottom-1::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 30px;
+      background: #1e1c19;
+      clip-path: polygon(
+        0% 60%,
+        1.5% 45%, 2.8% 70%, 4% 35%, 5.5% 65%, 6.5% 40%, 8% 75%,
+        9% 30%, 10.5% 55%, 12% 80%, 13% 25%, 14.5% 60%, 16% 40%,
+        17% 70%, 18.5% 35%, 20% 65%, 21% 45%, 22.5% 75%, 24% 30%,
+        25% 55%, 26.5% 80%, 28% 20%, 29% 50%, 30.5% 70%, 32% 35%,
+        33% 60%, 34.5% 45%, 36% 75%, 37% 25%, 38.5% 55%, 40% 65%,
+        41% 40%, 42.5% 80%, 44% 30%, 45% 60%, 46.5% 45%, 48% 70%,
+        49% 35%, 50.5% 55%, 52% 75%, 53% 20%, 54.5% 50%, 56% 65%,
+        57% 40%, 58.5% 80%, 60% 25%, 61% 55%, 62.5% 70%, 64% 35%,
+        65% 60%, 66.5% 45%, 68% 75%, 69% 30%, 70.5% 55%, 72% 80%,
+        73% 20%, 74.5% 50%, 76% 65%, 77% 40%, 78.5% 75%, 80% 35%,
+        81% 60%, 82.5% 45%, 84% 70%, 85% 25%, 86.5% 55%, 88% 80%,
+        89% 30%, 90.5% 60%, 92% 45%, 93% 75%, 94.5% 35%, 96% 65%,
+        97% 40%, 98.5% 70%, 100% 50%,
+        100% 100%, 0% 100%
+      );
+    }
+
+    /* Torn top pattern (matching) for section 2 */
+    .torn-top-1 {
+      position: relative;
+    }
+
+    .torn-top-1::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 0;
+      width: 100%;
+      height: 30px;
+      background: #141210;
+      clip-path: polygon(
+        0% 0%, 100% 0%,
+        100% 50%,
+        98.5% 70%, 97% 40%, 96% 65%, 94.5% 35%, 93% 75%, 92% 45%,
+        90.5% 60%, 89% 30%, 88% 80%, 86.5% 55%, 85% 25%, 84% 70%,
+        82.5% 45%, 81% 60%, 80% 35%, 78.5% 75%, 77% 40%, 76% 65%,
+        74.5% 50%, 73% 20%, 72% 80%, 70.5% 55%, 69% 30%, 68% 75%,
+        66.5% 45%, 65% 60%, 64% 35%, 62.5% 70%, 61% 55%, 60% 25%,
+        58.5% 80%, 57% 40%, 56% 65%, 54.5% 50%, 53% 20%, 52% 75%,
+        50.5% 55%, 49% 35%, 48% 70%, 46.5% 45%, 45% 60%, 44% 30%,
+        42.5% 80%, 41% 40%, 40% 65%, 38.5% 55%, 37% 25%, 36% 75%,
+        34.5% 45%, 33% 60%, 32% 35%, 30.5% 70%, 29% 50%, 28% 20%,
+        26.5% 80%, 25% 55%, 24% 30%, 22.5% 75%, 21% 45%, 20% 65%,
+        18.5% 35%, 17% 70%, 16% 40%, 14.5% 60%, 13% 25%, 12% 80%,
+        10.5% 55%, 9% 30%, 8% 75%, 6.5% 40%, 5.5% 65%, 4% 35%,
+        2.8% 70%, 1.5% 45%, 0% 60%
+      );
+    }
+
+    /* Torn edge pattern 2 — rougher, more organic */
+    .torn-bottom-2 {
+      position: relative;
+    }
+
+    .torn-bottom-2::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 35px;
+      background: #141210;
+      clip-path: polygon(
+        0% 40%,
+        2% 55%, 3% 30%, 5% 70%, 6% 20%, 8% 50%, 9% 65%,
+        11% 25%, 13% 75%, 14% 40%, 16% 60%, 17% 30%, 19% 80%,
+        21% 15%, 23% 55%, 24% 45%, 26% 70%, 28% 20%, 29% 60%,
+        31% 35%, 33% 75%, 34% 50%, 36% 25%, 38% 65%, 39% 40%,
+        41% 80%, 43% 10%, 44% 50%, 46% 60%, 48% 30%, 49% 70%,
+        51% 45%, 53% 20%, 54% 65%, 56% 35%, 58% 75%, 59% 50%,
+        61% 15%, 63% 55%, 64% 40%, 66% 80%, 68% 25%, 69% 60%,
+        71% 45%, 73% 70%, 74% 20%, 76% 55%, 78% 35%, 79% 75%,
+        81% 50%, 83% 10%, 84% 60%, 86% 30%, 88% 65%, 89% 45%,
+        91% 80%, 93% 20%, 94% 55%, 96% 40%, 98% 70%, 100% 35%,
+        100% 100%, 0% 100%
+      );
+    }
+
+    .torn-top-2 {
+      position: relative;
+    }
+
+    .torn-top-2::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 0;
+      width: 100%;
+      height: 35px;
+      background: #1e1c19;
+      clip-path: polygon(
+        0% 0%, 100% 0%,
+        100% 35%,
+        98% 70%, 96% 40%, 94% 55%, 93% 20%, 91% 80%, 89% 45%,
+        88% 65%, 86% 30%, 84% 60%, 83% 10%, 81% 50%, 79% 75%,
+        78% 35%, 76% 55%, 74% 20%, 73% 70%, 71% 45%, 69% 60%,
+        68% 25%, 66% 80%, 64% 40%, 63% 55%, 61% 15%, 59% 50%,
+        58% 75%, 56% 35%, 54% 65%, 53% 20%, 51% 45%, 49% 70%,
+        48% 30%, 46% 60%, 44% 50%, 43% 10%, 41% 80%, 39% 40%,
+        38% 65%, 36% 25%, 34% 50%, 33% 75%, 31% 35%, 29% 60%,
+        28% 20%, 26% 70%, 24% 45%, 23% 55%, 21% 15%, 19% 80%,
+        17% 30%, 16% 60%, 14% 40%, 13% 75%, 11% 25%, 9% 65%,
+        8% 50%, 6% 20%, 5% 70%, 3% 30%, 2% 55%, 0% 40%
+      );
+    }
+
+    /* --- Horizontal torn divider --- */
+    .torn-divider-section {
+      padding: 80px;
+      background: #141210;
+    }
+
+    .torn-divider-section h2 {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.1em;
+      margin-bottom: 40px;
+    }
+
+    .columns {
+      display: flex;
+      gap: 0;
+      align-items: stretch;
+    }
+
+    .column {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .column__heading {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .column__text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      color: #8a8279;
+      line-height: 1.6;
+    }
+
+    .torn-divider {
+      position: relative;
+      width: 40px;
+      flex-shrink: 0;
+      overflow: visible;
+    }
+
+    .torn-divider__strip {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 100%;
+      background: #2a2724;
+      clip-path: polygon(
+        40% 0%,
+        55% 2%, 30% 4%, 70% 6%, 25% 8%, 60% 10%,
+        35% 12%, 75% 14%, 20% 16%, 55% 18%, 40% 20%,
+        65% 22%, 30% 24%, 70% 26%, 45% 28%, 60% 30%,
+        25% 32%, 55% 34%, 40% 36%, 75% 38%, 30% 40%,
+        65% 42%, 35% 44%, 70% 46%, 20% 48%, 55% 50%,
+        40% 52%, 60% 54%, 30% 56%, 75% 58%, 45% 60%,
+        65% 62%, 25% 64%, 55% 66%, 35% 68%, 70% 70%,
+        40% 72%, 60% 74%, 30% 76%, 75% 78%, 45% 80%,
+        55% 82%, 20% 84%, 65% 86%, 35% 88%, 60% 90%,
+        40% 92%, 70% 94%, 30% 96%, 55% 98%, 45% 100%,
+        60% 100%,
+        70% 98%, 45% 96%, 75% 94%, 50% 92%, 65% 90%,
+        40% 88%, 80% 86%, 50% 84%, 70% 82%, 55% 80%,
+        75% 78%, 45% 76%, 65% 74%, 50% 72%, 80% 70%,
+        55% 68%, 70% 66%, 40% 64%, 75% 62%, 55% 60%,
+        65% 58%, 45% 56%, 80% 54%, 50% 52%, 70% 50%,
+        55% 48%, 75% 46%, 40% 44%, 65% 42%, 50% 40%,
+        80% 38%, 55% 36%, 70% 34%, 45% 32%, 75% 30%,
+        55% 28%, 65% 26%, 40% 24%, 80% 22%, 50% 20%,
+        70% 18%, 55% 16%, 75% 14%, 45% 12%, 60% 10%,
+        50% 8%, 80% 6%, 40% 4%, 65% 2%, 55% 0%
+      );
+    }
+
+    /* Accent-colored torn strip (like ripped tape) */
+    .torn-strip-accent {
+      margin: 40px 0;
+      position: relative;
+      height: 8px;
+      background: #ff5f1f;
+      clip-path: polygon(
+        0% 20%,
+        2% 60%, 4% 10%, 6% 80%, 8% 30%, 10% 70%,
+        12% 0%, 14% 50%, 16% 90%, 18% 20%, 20% 60%,
+        22% 10%, 24% 80%, 26% 40%, 28% 70%, 30% 0%,
+        32% 50%, 34% 90%, 36% 30%, 38% 60%, 40% 10%,
+        42% 80%, 44% 40%, 46% 70%, 48% 0%, 50% 50%,
+        52% 90%, 54% 30%, 56% 60%, 58% 10%, 60% 80%,
+        62% 40%, 64% 70%, 66% 0%, 68% 50%, 70% 90%,
+        72% 20%, 74% 60%, 76% 10%, 78% 80%, 80% 30%,
+        82% 70%, 84% 0%, 86% 50%, 88% 90%, 90% 20%,
+        92% 60%, 94% 10%, 96% 80%, 98% 30%, 100% 60%,
+        100% 80%,
+        98% 40%, 96% 100%, 94% 50%, 92% 90%, 90% 40%,
+        88% 100%, 86% 60%, 84% 30%, 82% 90%, 80% 50%,
+        78% 100%, 76% 40%, 74% 80%, 72% 50%, 70% 100%,
+        68% 60%, 66% 30%, 64% 90%, 62% 60%, 60% 100%,
+        58% 40%, 56% 80%, 54% 50%, 52% 100%, 50% 60%,
+        48% 30%, 46% 90%, 44% 60%, 42% 100%, 40% 40%,
+        38% 80%, 36% 50%, 34% 100%, 32% 60%, 30% 30%,
+        28% 90%, 26% 60%, 24% 100%, 22% 40%, 20% 80%,
+        18% 50%, 16% 100%, 14% 60%, 12% 30%, 10% 90%,
+        8% 50%, 6% 100%, 4% 40%, 2% 80%, 0% 50%
+      );
+    }
+  </style>
+</head>
+<body>
+  <div class="label">Torn Edges</div>
+
+  <!-- Section 1: Dark with torn bottom -->
+  <div class="section section--dark torn-bottom-1" style="padding-top: 60px;">
+    <div class="section__label">Section One</div>
+    <div class="section__heading">Build what matters.</div>
+    <div class="section__text">
+      TAG Amsterdam brings together builders, thinkers, and makers who are shaping the future with AI. No fluff, just craft.
+    </div>
+  </div>
+
+  <!-- Section 2: Mid with torn top and torn bottom (pattern 2) -->
+  <div class="section section--mid torn-top-1 torn-bottom-2" style="padding-top: 50px;">
+    <div class="section__label">Section Two</div>
+    <div class="section__heading">Ship every week.</div>
+    <div class="section__text">
+      Weekly demos, real feedback, actual progress. The rhythm that keeps builders accountable and projects moving forward.
+    </div>
+
+    <!-- Accent torn strip -->
+    <div class="torn-strip-accent"></div>
+
+    <div class="section__text" style="color: #5e5850; font-size: 14px;">
+      A torn accent strip, useful as a textured divider within a section.
+    </div>
+  </div>
+
+  <!-- Section 3: Dark with torn top (pattern 2) -->
+  <div class="section section--dark torn-top-2">
+    <div class="section__label">Section Three</div>
+    <div class="section__heading">Community over competition.</div>
+    <div class="section__text">
+      60+ builders collaborating in Amsterdam. Share knowledge, push boundaries, and launch together.
+    </div>
+  </div>
+
+  <!-- Horizontal torn divider between columns -->
+  <div class="torn-divider-section">
+    <h2>Horizontal Torn Divider (Between Columns)</h2>
+    <div class="columns">
+      <div class="column">
+        <div class="column__heading">For Builders</div>
+        <div class="column__text">
+          Weekly sessions, peer review, and a community that holds you accountable. Build your AI project with real support.
+        </div>
+      </div>
+
+      <div class="torn-divider">
+        <div class="torn-divider__strip"></div>
+      </div>
+
+      <div class="column">
+        <div class="column__heading">For Partners</div>
+        <div class="column__text">
+          Access a curated network of AI builders in Amsterdam. Sponsor sessions, co-create, or recruit from the community.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

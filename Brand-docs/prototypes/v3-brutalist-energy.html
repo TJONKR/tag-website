@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAG — To Achieve Greatness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================
+       RESET & BASE
+       ======================================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ========================================
+       GRAIN OVERLAY
+       ======================================== */
+    .grain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.04;
+    }
+
+    /* ========================================
+       SCANLINES MIXIN (via pseudo-elements)
+       ======================================== */
+    .scanlines::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.04) 2px,
+        rgba(0, 0, 0, 0.04) 3px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ========================================
+       FONTS
+       ======================================== */
+    .font-syne { font-family: 'Syne', sans-serif; font-weight: 800; }
+    .font-grotesk { font-family: 'Space Grotesk', sans-serif; }
+    .font-mono { font-family: 'Space Mono', monospace; }
+
+    /* ========================================
+       SCROLL REVEAL
+       ======================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-scale.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-100%);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(100%);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .reveal-up {
+      opacity: 0;
+      transform: translateY(60px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ========================================
+       1. HERO
+       ======================================== */
+    .hero {
+      position: relative;
+      height: 100vh;
+      background: #0e0d0b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-corner {
+      position: absolute;
+      top: 24px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+      z-index: 2;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-corner--left {
+      left: 24px;
+    }
+
+    .hero-corner--right {
+      right: 24px;
+    }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(200px, 30vw, 400px);
+      color: #f0ebe3;
+      line-height: 0.85;
+      letter-spacing: -0.02em;
+      text-align: center;
+      z-index: 2;
+      user-select: none;
+    }
+
+    .hero-divider {
+      width: 60px;
+      height: 2px;
+      background: #ff5f1f;
+      margin: 20px auto;
+      z-index: 2;
+    }
+
+    .hero-subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #5e5850;
+      text-align: center;
+      z-index: 2;
+    }
+
+    /* Marquee */
+    .hero-marquee {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      padding: 12px 0;
+      z-index: 2;
+    }
+
+    .hero-marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee-scroll 20s linear infinite;
+    }
+
+    .hero-marquee-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #2a2724;
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+    }
+
+    @keyframes marquee-scroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ========================================
+       2. SPLIT MANIFESTO
+       ======================================== */
+    .manifesto {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .manifesto-left {
+      background: #ff5f1f;
+      color: #0e0d0b;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .manifesto-left h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(80px, 10vw, 140px);
+      line-height: 0.9;
+    }
+
+    .manifesto-right {
+      background: #141210;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .manifesto-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff5f1f;
+      margin-bottom: 20px;
+    }
+
+    .manifesto-body {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: 20px;
+      color: #f0ebe3;
+      line-height: 1.6;
+      max-width: 400px;
+    }
+
+    /* ========================================
+       3. GRID OF PROGRAMS
+       ======================================== */
+    .programs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    .program-cell {
+      border: 2px solid #2a2724;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 50vh;
+      transition: box-shadow 0.3s ease;
+      cursor: default;
+    }
+
+    .program-cell:hover {
+      box-shadow: 0 0 30px rgba(255, 95, 31, 0.1) inset;
+    }
+
+    .program-cell--1 { background: #141210; }
+    .program-cell--2 { background: #1a1816; }
+    .program-cell--3 { background: #1a1816; }
+    .program-cell--4 {
+      background: #141210;
+      cursor: pointer;
+    }
+
+    .program-number {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(80px, 10vw, 120px);
+      color: #ff5f1f;
+      line-height: 1;
+    }
+
+    .program-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9b9589;
+      margin-top: auto;
+    }
+
+    .program-join {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(48px, 8vw, 80px);
+      color: #f0ebe3;
+      line-height: 1;
+    }
+
+    .program-join-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: #ff5f1f;
+      margin-top: 8px;
+    }
+
+    /* ========================================
+       4. BUILDERS
+       ======================================== */
+    .builders {
+      position: relative;
+      min-height: 100vh;
+      background: #141210;
+      padding: 80px 60px;
+    }
+
+    .builders-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(48px, 8vw, 72px);
+      color: #f0ebe3;
+      margin-bottom: 40px;
+    }
+
+    .builders-names {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 2;
+      color: #f0ebe3;
+      max-width: 800px;
+    }
+
+    .builders-names .slash {
+      color: #5e5850;
+    }
+
+    .builders-names .active-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ff5f1f;
+      margin-right: 6px;
+      vertical-align: middle;
+      position: relative;
+      top: -1px;
+    }
+
+    .builders-counter {
+      margin-top: 60px;
+    }
+
+    .builders-counter-number {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: clamp(64px, 12vw, 96px);
+      color: #f0ebe3;
+      line-height: 1;
+    }
+
+    .builders-counter-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 16px;
+      color: #9b9589;
+      margin-top: 8px;
+    }
+
+    /* ========================================
+       5. QUOTE
+       ======================================== */
+    .quote {
+      position: relative;
+      height: 100vh;
+      background: #0e0d0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quote-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(48px, 9vw, 120px);
+      text-align: center;
+      max-width: 90%;
+      line-height: 1.1;
+      color: #2a2724;
+      z-index: 2;
+    }
+
+    .quote-text .highlight {
+      color: #ff5f1f;
+      animation: energy-pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes energy-pulse {
+      from {
+        text-shadow: 0 0 20px rgba(255, 95, 31, 0.4);
+      }
+      to {
+        text-shadow: 0 0 60px rgba(255, 95, 31, 0.1);
+      }
+    }
+
+    /* ========================================
+       6. EVENTS
+       ======================================== */
+    .events {
+      background: #141210;
+    }
+
+    .event-block {
+      min-height: 150px;
+      border-top: 3px solid #2a2724;
+      display: flex;
+      align-items: center;
+      padding: 0 60px;
+      cursor: pointer;
+      transition: transform 0.3s ease, border-left 0.3s ease;
+      border-left: 0px solid transparent;
+    }
+
+    .event-block:hover {
+      border-left: 3px solid #ff5f1f;
+      transform: translateX(8px);
+    }
+
+    .event-block--alt {
+      background: #1a1816;
+    }
+
+    .event-date {
+      width: 120px;
+      flex-shrink: 0;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 20px;
+      color: #ff5f1f;
+    }
+
+    .event-title {
+      flex: 1;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(24px, 4vw, 36px);
+      color: #f0ebe3;
+    }
+
+    .event-type {
+      width: 200px;
+      text-align: right;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #9b9589;
+      flex-shrink: 0;
+    }
+
+    /* ========================================
+       7. CTA
+       ======================================== */
+    .cta {
+      position: relative;
+      height: 100vh;
+      background: #0e0d0b;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 60px;
+      overflow: hidden;
+    }
+
+    .cta-arrow {
+      position: absolute;
+      top: 60px;
+      right: 60px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 200px;
+      color: #2a2724;
+      line-height: 1;
+      user-select: none;
+      z-index: 1;
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .cta-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(80px, 12vw, 140px);
+      color: #f0ebe3;
+      line-height: 0.9;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      align-items: center;
+      margin-top: 24px;
+    }
+
+    .cta-button {
+      background: #ff5f1f;
+      color: #0e0d0b;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 18px;
+      padding: 20px 48px;
+      border-radius: 0;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .cta-button:hover {
+      background: #e8551b;
+    }
+
+    .cta-location {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+      white-space: nowrap;
+    }
+
+    /* ========================================
+       8. FOOTER
+       ======================================== */
+    .footer {
+      background: #0e0d0b;
+      border-top: 3px solid #2a2724;
+    }
+
+    .footer-row-1 {
+      padding: 24px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: #f0ebe3;
+    }
+
+    .footer-year {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+    }
+
+    .footer-row-2 {
+      padding: 16px 60px;
+      border-top: 1px solid #2a2724;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-socials {
+      display: flex;
+      gap: 8px;
+    }
+
+    .footer-social {
+      width: 24px;
+      height: 24px;
+      border: 1px solid #2a2724;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s ease;
+    }
+
+    .footer-social:hover {
+      border-color: #5e5850;
+    }
+
+    .footer-social svg {
+      width: 10px;
+      height: 10px;
+      fill: #5e5850;
+    }
+
+    .footer-location {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GRAIN OVERLAY -->
+  <svg class="grain" xmlns="http://www.w3.org/2000/svg">
+    <filter id="grain-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain-filter)"/>
+  </svg>
+
+  <!-- ========================================
+       1. HERO
+       ======================================== -->
+  <section class="hero scanlines">
+    <span class="hero-corner hero-corner--left">AMSTERDAM</span>
+    <span class="hero-corner hero-corner--right">EST. 2024</span>
+
+    <h1 class="hero-title">TAG</h1>
+    <div class="hero-divider"></div>
+    <p class="hero-subtitle">To Achieve Greatness</p>
+
+    <div class="hero-marquee">
+      <div class="hero-marquee-track">
+        <span class="hero-marquee-text">BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; </span>
+        <span class="hero-marquee-text">BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; BUILD &middot; SHIP &middot; DEMO &middot; REPEAT &middot; </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       2. SPLIT MANIFESTO
+       ======================================== -->
+  <section class="manifesto">
+    <div class="manifesto-left reveal-left">
+      <h2>WE<br>BUILD.</h2>
+    </div>
+    <div class="manifesto-right reveal-right">
+      <div class="manifesto-dot"></div>
+      <p class="manifesto-body">A community of builders, hackers, and creators. We meet every week. We ship every month. We don't do talk — we do work.</p>
+    </div>
+  </section>
+
+  <!-- ========================================
+       3. GRID OF PROGRAMS
+       ======================================== -->
+  <section class="programs">
+    <div class="program-cell program-cell--1 reveal-scale" style="transition-delay: 0ms;">
+      <div class="program-number">01</div>
+      <div class="program-label">Weekly Meetups</div>
+    </div>
+    <div class="program-cell program-cell--2 reveal-scale" style="transition-delay: 100ms;">
+      <div class="program-number">02</div>
+      <div class="program-label">Ship Sprints</div>
+    </div>
+    <div class="program-cell program-cell--3 reveal-scale" style="transition-delay: 200ms;">
+      <div class="program-number">03</div>
+      <div class="program-label">Demo Night</div>
+    </div>
+    <div class="program-cell program-cell--4 reveal-scale" style="transition-delay: 300ms;">
+      <div class="program-join">JOIN &rarr;</div>
+      <div class="program-join-sub">tag in</div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       4. BUILDERS
+       ======================================== -->
+  <section class="builders scanlines">
+    <h2 class="builders-title reveal">THE BUILDERS</h2>
+    <div class="builders-names reveal">
+      <span class="active-dot"></span>Boris de Wit <span class="slash"> / </span>
+      <span class="active-dot"></span>Caesar Schoorl <span class="slash"> / </span>
+      <span class="active-dot"></span>Kevin Muiser <span class="slash"> / </span>
+      <span class="active-dot"></span>Pieter de Kroon <span class="slash"> / </span>
+      <span class="active-dot"></span>Tim Robben <span class="slash"> / </span>
+      <span class="active-dot"></span>Tijs Nieuwboer <span class="slash"> / </span>
+      <span class="active-dot"></span>Thomas Termaat <span class="slash"> / </span>
+      <span class="active-dot"></span>Bram van Rijen <span class="slash"> / </span>
+      Thomas van Berg <span class="slash"> / </span>
+      Maarten Mulder
+    </div>
+    <div class="builders-counter reveal">
+      <div class="builders-counter-number" data-target="427">0+</div>
+      <div class="builders-counter-label">builders and counting</div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       5. QUOTE
+       ======================================== -->
+  <section class="quote scanlines">
+    <h2 class="quote-text reveal">WE'RE WHERE THE <span class="highlight">ENERGY</span> IS.</h2>
+  </section>
+
+  <!-- ========================================
+       6. EVENTS
+       ======================================== -->
+  <section class="events">
+    <div class="event-block reveal-up" style="transition-delay: 0ms;">
+      <div class="event-date">MAR 27</div>
+      <div class="event-title">Build Fast Earn Fast</div>
+      <div class="event-type">HACKATHON &rarr;</div>
+    </div>
+    <div class="event-block event-block--alt reveal-up" style="transition-delay: 100ms;">
+      <div class="event-date">APR 10</div>
+      <div class="event-title">Demo Night #4</div>
+      <div class="event-type">SHOWCASE &rarr;</div>
+    </div>
+    <div class="event-block reveal-up" style="transition-delay: 200ms;">
+      <div class="event-date">APR 24</div>
+      <div class="event-title">Ship Sprint Weekend</div>
+      <div class="event-type">BUILD &rarr;</div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       7. CTA
+       ======================================== -->
+  <section class="cta scanlines">
+    <div class="cta-arrow">&rarr;</div>
+    <div class="cta-content reveal">
+      <div class="cta-title">TAG IN.</div>
+      <div class="cta-row">
+        <button class="cta-button">Apply &rarr;</button>
+        <span class="cta-location">Amsterdam &middot; A Lab &middot; Every Thursday</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       8. FOOTER
+       ======================================== -->
+  <footer class="footer">
+    <div class="footer-row-1">
+      <div class="footer-logo">TAG</div>
+      <div class="footer-year">2026</div>
+    </div>
+    <div class="footer-row-2">
+      <div class="footer-socials">
+        <a class="footer-social" href="#" aria-label="X">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a class="footer-social" href="#" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a class="footer-social" href="#" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+      </div>
+      <div class="footer-location">Amsterdam, NL</div>
+    </div>
+  </footer>
+
+  <!-- ========================================
+       JAVASCRIPT
+       ======================================== -->
+  <script>
+    // ----------------------------------------
+    // IntersectionObserver for scroll reveals
+    // ----------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      const revealSelectors = [
+        '.reveal',
+        '.reveal-scale',
+        '.reveal-left',
+        '.reveal-right',
+        '.reveal-up'
+      ]
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      }, {
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+      })
+
+      revealSelectors.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
+          observer.observe(el)
+        })
+      })
+
+      // ----------------------------------------
+      // Counter animation (easeOutExpo)
+      // ----------------------------------------
+      const counterEl = document.querySelector('.builders-counter-number')
+      if (counterEl) {
+        const target = parseInt(counterEl.getAttribute('data-target'), 10)
+        let hasAnimated = false
+
+        const easeOutExpo = (t) => {
+          return t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+        }
+
+        const animateCounter = () => {
+          if (hasAnimated) return
+          hasAnimated = true
+
+          const duration = 2000
+          const startTime = performance.now()
+
+          const tick = (now) => {
+            const elapsed = now - startTime
+            const progress = Math.min(elapsed / duration, 1)
+            const easedProgress = easeOutExpo(progress)
+            const current = Math.floor(easedProgress * target)
+
+            counterEl.textContent = current + '+'
+
+            if (progress < 1) {
+              requestAnimationFrame(tick)
+            } else {
+              counterEl.textContent = target + '+'
+            }
+          }
+
+          requestAnimationFrame(tick)
+        }
+
+        const counterObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              animateCounter()
+              counterObserver.unobserve(entry.target)
+            }
+          })
+        }, {
+          threshold: 0.3
+        })
+
+        counterObserver.observe(counterEl)
+      }
+    })
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG - Combined Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0e0d0b;
+  }
+
+  /* ── Layer 1: Base background ── */
+  .base {
+    position: fixed;
+    inset: 0;
+    background: #0e0d0b;
+    z-index: 0;
+  }
+
+  /* ── Layer 2: Glowing orbs ── */
+  .orbs-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+  }
+
+  .orb-1 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle at center, rgba(255, 95, 31, 0.08) 0%, rgba(255, 95, 31, 0.02) 40%, transparent 70%);
+    filter: blur(80px);
+    top: 15%;
+    left: 10%;
+    animation: orb-drift-1 42s ease-in-out infinite;
+  }
+
+  .orb-2 {
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle at center, rgba(255, 95, 31, 0.07) 0%, rgba(255, 95, 31, 0.015) 40%, transparent 70%);
+    filter: blur(90px);
+    top: 40%;
+    right: 15%;
+    animation: orb-drift-2 50s ease-in-out infinite;
+  }
+
+  .orb-3 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle at center, rgba(255, 179, 71, 0.06) 0%, rgba(255, 179, 71, 0.015) 40%, transparent 70%);
+    filter: blur(75px);
+    bottom: 20%;
+    left: 30%;
+    animation: orb-drift-3 38s ease-in-out infinite;
+  }
+
+  .orb-4 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle at center, rgba(255, 179, 71, 0.06) 0%, rgba(255, 179, 71, 0.01) 40%, transparent 70%);
+    filter: blur(85px);
+    top: 5%;
+    right: 30%;
+    animation: orb-drift-4 55s ease-in-out infinite;
+  }
+
+  @keyframes orb-drift-1 {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(10vw, 5vh); }
+    50%  { transform: translate(3vw, -4vh); }
+    75%  { transform: translate(-6vw, 3vh); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes orb-drift-2 {
+    0%   { transform: translate(0, 0); }
+    30%  { transform: translate(-8vw, -4vh); }
+    60%  { transform: translate(-3vw, 6vh); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes orb-drift-3 {
+    0%   { transform: translate(0, 0) scale(1); }
+    40%  { transform: translate(8vw, -8vh) scale(1.1); }
+    70%  { transform: translate(-5vw, -3vh) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+
+  @keyframes orb-drift-4 {
+    0%   { transform: translate(0, 0); }
+    35%  { transform: translate(-12vw, 6vh); }
+    65%  { transform: translate(5vw, 10vh); }
+    100% { transform: translate(0, 0); }
+  }
+
+  /* ── Layer 3: Ember particles canvas ── */
+  #embers {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  /* ── Layer 4: Grain overlay ── */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.25;
+  }
+
+  /* ── Pulse rings (behind content) ── */
+  .pulse-container {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pulse-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 95, 31, 0.06);
+    opacity: 0;
+    animation: pulse-expand 6s ease-out infinite;
+  }
+
+  .pulse-ring:nth-child(1) { animation-delay: 0s; }
+  .pulse-ring:nth-child(2) { animation-delay: 1.5s; }
+  .pulse-ring:nth-child(3) { animation-delay: 3s; }
+  .pulse-ring:nth-child(4) { animation-delay: 4.5s; }
+
+  @keyframes pulse-expand {
+    0% {
+      width: 60px;
+      height: 60px;
+      opacity: 0.08;
+      border-width: 2px;
+    }
+    100% {
+      width: 1200px;
+      height: 1200px;
+      opacity: 0;
+      border-width: 0.5px;
+    }
+  }
+
+  /* ── Vignette ── */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 20%, rgba(14, 13, 11, 0.5) 70%, #0e0d0b 100%);
+    pointer-events: none;
+    z-index: 8;
+  }
+
+  /* ── Layer 5: Content ── */
+  .content {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .tag-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(80px, 15vw, 200px);
+    color: #f0ebe3;
+    letter-spacing: clamp(10px, 3vw, 30px);
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow:
+      0 0 100px rgba(255, 95, 31, 0.08),
+      0 0 200px rgba(255, 95, 31, 0.03);
+  }
+
+  .tagline {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    color: #9b9589;
+    letter-spacing: 2px;
+    margin-top: 16px;
+  }
+
+  .stats {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 13px;
+    color: #5e5850;
+    letter-spacing: 3px;
+    margin-top: 12px;
+    text-transform: lowercase;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 36px;
+    padding: 14px 32px;
+    background: #ff5f1f;
+    color: #141210;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    pointer-events: auto;
+    text-decoration: none;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  .cta:hover {
+    background: #e8541a;
+    transform: translateY(-1px);
+  }
+
+  .cta:active {
+    transform: translateY(0);
+  }
+
+  /* ── Marquee strip ── */
+  .marquee-strip {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 55;
+    overflow: hidden;
+    border-top: 1px solid rgba(240, 235, 227, 0.06);
+    background: rgba(14, 13, 11, 0.6);
+    backdrop-filter: blur(8px);
+    padding: 14px 0;
+    pointer-events: none;
+  }
+
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee-scroll 20s linear infinite;
+  }
+
+  .marquee-item {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: #3a3632;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    padding: 0 24px;
+    flex-shrink: 0;
+  }
+
+  .marquee-dot {
+    color: #ff5f1f;
+    opacity: 0.4;
+  }
+
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @media (max-width: 768px) {
+    .tagline {
+      font-size: 16px;
+    }
+    .stats {
+      font-size: 11px;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Layer 1: Base -->
+  <div class="base"></div>
+
+  <!-- Layer 2: Orbs -->
+  <div class="orbs-layer">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+  </div>
+
+  <!-- Pulse rings -->
+  <div class="pulse-container">
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+  </div>
+
+  <!-- Layer 3: Ember particles -->
+  <canvas id="embers"></canvas>
+
+  <!-- Vignette -->
+  <div class="vignette"></div>
+
+  <!-- Layer 5: Content -->
+  <div class="content">
+    <div class="tag-text">TAG</div>
+    <div class="tagline">The builder community</div>
+    <div class="stats">60 builders &middot; 51 projects &middot; amsterdam</div>
+    <a class="cta" href="#">Tag in &rarr;</a>
+  </div>
+
+  <!-- Marquee strip -->
+  <div class="marquee-strip">
+    <div class="marquee-track">
+      <span class="marquee-item">BUILD</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">SHIP</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">TAG</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">DEMO</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">HACK</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">LAUNCH</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">BUILD</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">SHIP</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">TAG</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">DEMO</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">HACK</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">LAUNCH</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">BUILD</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">SHIP</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">TAG</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">DEMO</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">HACK</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">LAUNCH</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">BUILD</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">SHIP</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">TAG</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">DEMO</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">HACK</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+      <span class="marquee-item">LAUNCH</span>
+      <span class="marquee-item marquee-dot">&middot;</span>
+    </div>
+  </div>
+
+  <!-- Layer 4: Grain -->
+  <svg class="grain" viewBox="0 0 512 512" preserveAspectRatio="none">
+    <filter id="grain-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain-filter)" />
+  </svg>
+
+  <script>
+    // ── Ember particle system ──
+    const canvas = document.getElementById('embers')
+    const ctx = canvas.getContext('2d')
+    let width, height
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      width = window.innerWidth
+      height = window.innerHeight
+      canvas.width = width * dpr
+      canvas.height = height * dpr
+      ctx.scale(dpr, dpr)
+    }
+
+    window.addEventListener('resize', resize)
+    resize()
+
+    // Particle class
+    class Ember {
+      constructor() {
+        this.reset()
+      }
+
+      reset() {
+        this.x = Math.random() * width
+        this.y = height + Math.random() * 100
+        this.size = 0.5 + Math.random() * 2.5
+        this.speedY = -(0.2 + Math.random() * 0.6)
+        this.speedX = (Math.random() - 0.5) * 0.3
+        this.opacity = 0.1 + Math.random() * 0.4
+        this.life = 0
+        this.maxLife = 300 + Math.random() * 400
+        this.wobbleSpeed = 0.01 + Math.random() * 0.02
+        this.wobbleAmp = 0.3 + Math.random() * 0.8
+
+        // Color variation — mostly orange, some amber
+        const r = Math.random()
+        if (r < 0.7) {
+          this.color = [255, 95, 31] // orange
+        } else if (r < 0.9) {
+          this.color = [255, 179, 71] // amber
+        } else {
+          this.color = [255, 140, 50] // in-between
+        }
+      }
+
+      update() {
+        this.life++
+        this.y += this.speedY
+        this.x += this.speedX + Math.sin(this.life * this.wobbleSpeed) * this.wobbleAmp
+
+        // Fade in and out
+        const lifeRatio = this.life / this.maxLife
+        let alpha = this.opacity
+        if (lifeRatio < 0.1) {
+          alpha *= lifeRatio / 0.1
+        } else if (lifeRatio > 0.7) {
+          alpha *= 1 - (lifeRatio - 0.7) / 0.3
+        }
+        this.currentAlpha = alpha
+
+        if (this.life >= this.maxLife || this.y < -20) {
+          this.reset()
+        }
+      }
+
+      draw(ctx) {
+        if (this.currentAlpha <= 0) return
+
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${this.currentAlpha})`
+        ctx.fill()
+
+        // Glow for larger particles
+        if (this.size > 1.5) {
+          ctx.beginPath()
+          ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${this.currentAlpha * 0.15})`
+          ctx.fill()
+        }
+      }
+    }
+
+    // Create particles
+    const embers = []
+    const PARTICLE_COUNT = 100
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const ember = new Ember()
+      // Stagger initial positions
+      ember.y = Math.random() * height
+      ember.life = Math.random() * ember.maxLife
+      embers.push(ember)
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, width, height)
+
+      embers.forEach((ember) => {
+        ember.update()
+        ember.draw(ctx)
+      })
+
+      requestAnimationFrame(render)
+    }
+
+    requestAnimationFrame(render)
+  </script>
+
+</body>
+</html>

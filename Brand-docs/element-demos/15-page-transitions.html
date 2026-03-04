@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Transitions - TAG Element Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      z-index: 200;
+    }
+
+    /* ===================== */
+    /* SECTION 1: CURTAIN    */
+    /* ===================== */
+    .demo-section {
+      padding: 80px 40px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.12em;
+      margin-bottom: 32px;
+    }
+
+    /* Curtain Transition Demo */
+    .curtain-demo {
+      border: 1px solid #2a2724;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: #1a1816;
+    }
+
+    .curtain-nav {
+      display: flex;
+      border-bottom: 1px solid #2a2724;
+      background: #1e1c19;
+      position: relative;
+      z-index: 10;
+    }
+
+    .curtain-nav-btn {
+      flex: 1;
+      padding: 14px 20px;
+      background: none;
+      border: none;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      color: #5e5850;
+      cursor: pointer;
+      transition: color 0.2s ease, background 0.2s ease;
+      position: relative;
+    }
+
+    .curtain-nav-btn:hover {
+      color: #f0ebe3;
+    }
+
+    .curtain-nav-btn.active {
+      color: #ff5f1f;
+      background: rgba(255, 95, 31, 0.05);
+    }
+
+    .curtain-nav-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #ff5f1f;
+    }
+
+    .curtain-nav-btn + .curtain-nav-btn {
+      border-left: 1px solid #2a2724;
+    }
+
+    .curtain-viewport {
+      position: relative;
+      height: 400px;
+      overflow: hidden;
+    }
+
+    /* The orange curtain overlay */
+    .curtain {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #ff5f1f;
+      z-index: 5;
+      transform: translateX(-100%);
+      will-change: transform;
+    }
+
+    .curtain.wipe-in {
+      animation: curtain-in 0.3s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    }
+
+    .curtain.wipe-out {
+      animation: curtain-out 0.3s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    }
+
+    @keyframes curtain-in {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(0%);
+      }
+    }
+
+    @keyframes curtain-out {
+      0% {
+        transform: translateX(0%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    /* Page panels */
+    .curtain-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .curtain-page.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(36px, 6vw, 64px);
+      color: #f0ebe3;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .page-title .accent {
+      color: #ff5f1f;
+    }
+
+    .page-subtitle {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: 16px;
+      color: #5e5850;
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.5;
+    }
+
+    .page-badge {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ff5f1f;
+      border: 1px solid #ff5f1f;
+      border-radius: 100px;
+      padding: 6px 14px;
+      margin-bottom: 20px;
+    }
+
+    .page-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 32px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 32px;
+      color: #f0ebe3;
+    }
+
+    .stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #5e5850;
+      margin-top: 4px;
+    }
+
+    /* ===================== */
+    /* SECTION 2: STAIR-STEP */
+    /* ===================== */
+    .stair-section {
+      margin-top: 80px;
+      padding-bottom: 80px;
+    }
+
+    .stair-demo {
+      border: 1px solid #2a2724;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: #1a1816;
+    }
+
+    .stair-nav {
+      display: flex;
+      border-bottom: 1px solid #2a2724;
+      background: #1e1c19;
+      position: relative;
+      z-index: 10;
+    }
+
+    .stair-nav-btn {
+      flex: 1;
+      padding: 14px 20px;
+      background: none;
+      border: none;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      color: #5e5850;
+      cursor: pointer;
+      transition: color 0.2s ease, background 0.2s ease;
+      position: relative;
+    }
+
+    .stair-nav-btn:hover {
+      color: #f0ebe3;
+    }
+
+    .stair-nav-btn.active {
+      color: #ff5f1f;
+      background: rgba(255, 95, 31, 0.05);
+    }
+
+    .stair-nav-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #ff5f1f;
+    }
+
+    .stair-nav-btn + .stair-nav-btn {
+      border-left: 1px solid #2a2724;
+    }
+
+    .stair-viewport {
+      position: relative;
+      height: 400px;
+      overflow: hidden;
+    }
+
+    /* Stair-step bars */
+    .stair-bars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+    }
+
+    .stair-bar {
+      flex: 1;
+      background: #ff5f1f;
+      transform: translateX(-100%);
+      will-change: transform;
+    }
+
+    .stair-bars.wipe-in .stair-bar {
+      animation: stair-bar-in 0.25s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    }
+
+    .stair-bars.wipe-out .stair-bar {
+      animation: stair-bar-out 0.25s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+    }
+
+    .stair-bars.wipe-in .stair-bar:nth-child(1) { animation-delay: 0ms; }
+    .stair-bars.wipe-in .stair-bar:nth-child(2) { animation-delay: 50ms; }
+    .stair-bars.wipe-in .stair-bar:nth-child(3) { animation-delay: 100ms; }
+    .stair-bars.wipe-in .stair-bar:nth-child(4) { animation-delay: 150ms; }
+    .stair-bars.wipe-in .stair-bar:nth-child(5) { animation-delay: 200ms; }
+
+    .stair-bars.wipe-out .stair-bar:nth-child(1) { animation-delay: 0ms; }
+    .stair-bars.wipe-out .stair-bar:nth-child(2) { animation-delay: 50ms; }
+    .stair-bars.wipe-out .stair-bar:nth-child(3) { animation-delay: 100ms; }
+    .stair-bars.wipe-out .stair-bar:nth-child(4) { animation-delay: 150ms; }
+    .stair-bars.wipe-out .stair-bar:nth-child(5) { animation-delay: 200ms; }
+
+    @keyframes stair-bar-in {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(0%);
+      }
+    }
+
+    @keyframes stair-bar-out {
+      0% {
+        transform: translateX(0%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .stair-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .stair-page.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">page transitions</div>
+
+  <!-- ================================ -->
+  <!-- CURTAIN WIPE TRANSITION          -->
+  <!-- ================================ -->
+  <div class="demo-section">
+    <div class="section-label">Transition 1 &mdash; Curtain Wipe</div>
+
+    <div class="curtain-demo">
+      <nav class="curtain-nav">
+        <button class="curtain-nav-btn active" data-curtain-page="0">Home</button>
+        <button class="curtain-nav-btn" data-curtain-page="1">Events</button>
+        <button class="curtain-nav-btn" data-curtain-page="2">Builders</button>
+      </nav>
+
+      <div class="curtain-viewport">
+        <div class="curtain" id="curtain"></div>
+
+        <div class="curtain-page active" data-page-index="0">
+          <div class="page-badge">Amsterdam</div>
+          <div class="page-title">Build things<br>that <span class="accent">matter.</span></div>
+          <div class="page-subtitle">TAG is where builders meet. Weekly sessions, monthly demos, real projects.</div>
+        </div>
+
+        <div class="curtain-page" data-page-index="1">
+          <div class="page-badge">Upcoming</div>
+          <div class="page-title">Demo <span class="accent">Night</span></div>
+          <div class="page-subtitle">March 20, 2026 at A Lab Amsterdam. 5-minute demos, real feedback, free pizza.</div>
+          <div class="page-stats">
+            <div class="stat">
+              <div class="stat-number">12</div>
+              <div class="stat-label">Speakers</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">200</div>
+              <div class="stat-label">Seats</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="curtain-page" data-page-index="2">
+          <div class="page-badge">Community</div>
+          <div class="page-title"><span class="accent">427</span> Builders</div>
+          <div class="page-subtitle">Designers, developers, founders, and makers shipping real things together.</div>
+          <div class="page-stats">
+            <div class="stat">
+              <div class="stat-number">89</div>
+              <div class="stat-label">Projects</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">52</div>
+              <div class="stat-label">Weeks</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">1</div>
+              <div class="stat-label">City</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================ -->
+  <!-- STAIR-STEP TRANSITION            -->
+  <!-- ================================ -->
+  <div class="demo-section stair-section">
+    <div class="section-label">Transition 2 &mdash; Stair-step Reveal</div>
+
+    <div class="stair-demo">
+      <nav class="stair-nav">
+        <button class="stair-nav-btn active" data-stair-page="0">Home</button>
+        <button class="stair-nav-btn" data-stair-page="1">Events</button>
+        <button class="stair-nav-btn" data-stair-page="2">Builders</button>
+      </nav>
+
+      <div class="stair-viewport">
+        <div class="stair-bars" id="stairBars">
+          <div class="stair-bar"></div>
+          <div class="stair-bar"></div>
+          <div class="stair-bar"></div>
+          <div class="stair-bar"></div>
+          <div class="stair-bar"></div>
+        </div>
+
+        <div class="stair-page active" data-stair-index="0">
+          <div class="page-badge">Amsterdam</div>
+          <div class="page-title">Ship it<br><span class="accent">live.</span></div>
+          <div class="page-subtitle">Stop planning. Start building. Show your work every week.</div>
+        </div>
+
+        <div class="stair-page" data-stair-index="1">
+          <div class="page-badge">Next Up</div>
+          <div class="page-title">Hack<br><span class="accent">Sprint</span></div>
+          <div class="page-subtitle">48 hours. One problem. Ship a working prototype or go home.</div>
+          <div class="page-stats">
+            <div class="stat">
+              <div class="stat-number">48</div>
+              <div class="stat-label">Hours</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">24</div>
+              <div class="stat-label">Teams</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stair-page" data-stair-index="2">
+          <div class="page-badge">Network</div>
+          <div class="page-title">Your<br><span class="accent">crew.</span></div>
+          <div class="page-subtitle">Find co-founders, collaborators, and people who actually ship.</div>
+          <div class="page-stats">
+            <div class="stat">
+              <div class="stat-number">30+</div>
+              <div class="stat-label">Startups</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">15</div>
+              <div class="stat-label">Studios</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========================
+    // CURTAIN WIPE TRANSITION
+    // ========================
+    const curtainNavBtns = document.querySelectorAll('.curtain-nav-btn')
+    const curtainPages = document.querySelectorAll('.curtain-page')
+    const curtain = document.getElementById('curtain')
+    let curtainAnimating = false
+    let currentCurtainPage = 0
+
+    curtainNavBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetIndex = parseInt(btn.dataset.curtainPage, 10)
+        if (targetIndex === currentCurtainPage || curtainAnimating) return
+
+        curtainAnimating = true
+
+        // Update nav active state
+        curtainNavBtns.forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+
+        // Phase 1: Curtain wipes in (covers current content)
+        curtain.className = 'curtain wipe-in'
+
+        curtain.addEventListener('animationend', function onWipeIn() {
+          curtain.removeEventListener('animationend', onWipeIn)
+
+          // Swap content while curtain covers everything
+          curtainPages.forEach(p => p.classList.remove('active'))
+          curtainPages[targetIndex].classList.add('active')
+          currentCurtainPage = targetIndex
+
+          // Phase 2: Curtain wipes out (reveals new content)
+          curtain.className = 'curtain wipe-out'
+
+          curtain.addEventListener('animationend', function onWipeOut() {
+            curtain.removeEventListener('animationend', onWipeOut)
+            curtain.className = 'curtain'
+            curtainAnimating = false
+          })
+        })
+      })
+    })
+
+    // ==========================
+    // STAIR-STEP TRANSITION
+    // ==========================
+    const stairNavBtns = document.querySelectorAll('.stair-nav-btn')
+    const stairPages = document.querySelectorAll('.stair-page')
+    const stairBars = document.getElementById('stairBars')
+    let stairAnimating = false
+    let currentStairPage = 0
+
+    stairNavBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetIndex = parseInt(btn.dataset.stairPage, 10)
+        if (targetIndex === currentStairPage || stairAnimating) return
+
+        stairAnimating = true
+
+        // Update nav active state
+        stairNavBtns.forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+
+        // Phase 1: Bars slide in (staggered)
+        stairBars.className = 'stair-bars wipe-in'
+
+        // Wait for last bar to finish (200ms delay + 250ms animation = 450ms)
+        setTimeout(() => {
+          // Swap content
+          stairPages.forEach(p => p.classList.remove('active'))
+          stairPages[targetIndex].classList.add('active')
+          currentStairPage = targetIndex
+
+          // Phase 2: Bars slide out
+          stairBars.className = 'stair-bars wipe-out'
+
+          // Wait for last bar to finish exiting
+          setTimeout(() => {
+            stairBars.className = 'stair-bars'
+            // Reset bar positions
+            const bars = stairBars.querySelectorAll('.stair-bar')
+            bars.forEach(bar => {
+              bar.style.transform = 'translateX(-100%)'
+            })
+            stairAnimating = false
+          }, 500)
+        }, 480)
+      })
+    })
+  </script>
+</body>
+</html>

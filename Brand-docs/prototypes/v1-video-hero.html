@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAG — To Achieve Greatness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ─────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── Grain Overlay (reusable) ────────────────── */
+    .grain {
+      position: relative;
+    }
+    .grain::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+    }
+
+    /* ── Typography Helpers ───────────────────────── */
+    .font-syne { font-family: 'Syne', sans-serif; font-weight: 800; }
+    .font-mono { font-family: 'Space Mono', monospace; font-weight: 400; }
+    .font-mono-bold { font-family: 'Space Mono', monospace; font-weight: 700; }
+    .font-grotesk { font-family: 'Space Grotesk', sans-serif; }
+
+    /* ══════════════════════════════════════════════
+       SECTION 1: VIDEO HERO
+       ══════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+    .hero-gradient {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(
+        to bottom,
+        rgba(14,13,11,0.15) 0%,
+        rgba(14,13,11,0.4) 50%,
+        rgba(14,13,11,0.85) 100%
+      );
+    }
+    .hero-grain {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+    }
+    .hero-content {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 60px;
+    }
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(80px, 10vw, 140px);
+      line-height: 0.9;
+      color: #f0ebe3;
+      letter-spacing: -0.02em;
+    }
+    .hero-subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #9b9589;
+      letter-spacing: 0.05em;
+      margin-top: 12px;
+    }
+
+    /* Progress bar */
+    .hero-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: rgba(42,39,36,0.5);
+      z-index: 4;
+    }
+    .hero-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #ff5f1f;
+      box-shadow: 0 0 8px rgba(255,95,31,0.6), 0 0 20px rgba(255,95,31,0.3);
+      transition: width 0.25s linear;
+    }
+
+    /* Video controls */
+    .hero-controls {
+      position: absolute;
+      bottom: 60px;
+      right: 60px;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .hero-control-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(240,235,227,0.3);
+      background: rgba(14,13,11,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.3s, background 0.3s;
+      backdrop-filter: blur(4px);
+    }
+    .hero-btn:hover {
+      border-color: rgba(240,235,227,0.6);
+      background: rgba(14,13,11,0.6);
+    }
+    .hero-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: #f0ebe3;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .hero-btn-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #9b9589;
+      white-space: nowrap;
+    }
+    .hero-timecode {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+    }
+
+    /* Mute button (bottom-left) */
+    .hero-mute {
+      position: absolute;
+      bottom: 60px;
+      left: 60px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Scroll indicator */
+    .hero-scroll {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* ══════════════════════════════════════════════
+       SECTION 2: MANIFESTO
+       ══════════════════════════════════════════════ */
+    .manifesto {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #141210;
+      overflow: hidden;
+    }
+    .manifesto-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .manifesto-text {
+      position: relative;
+      z-index: 3;
+      max-width: 700px;
+      padding: 40px 24px;
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: clamp(20px, 3vw, 32px);
+      line-height: 1.6;
+      color: #f0ebe3;
+    }
+    .manifesto-text .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .manifesto-text.visible .word {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .manifesto-text .word.accent {
+      color: #ff5f1f;
+    }
+
+    /* ══════════════════════════════════════════════
+       SECTION 3: WHAT WE DO
+       ══════════════════════════════════════════════ */
+    .what-we-do {
+      position: relative;
+      background: #141210;
+      padding: 120px 24px;
+    }
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #5e5850;
+      margin-bottom: 40px;
+      max-width: 960px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cards-row {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      max-width: 960px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: #1e1c19;
+      border: 1px solid #2a2724;
+      border-radius: 12px;
+      padding: 32px;
+      width: 280px;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .cards-row.visible .card:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0ms; }
+    .cards-row.visible .card:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 150ms; }
+    .cards-row.visible .card:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 300ms; }
+    .card-number {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 48px;
+      color: #ff5f1f;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: #f0ebe3;
+      margin-bottom: 8px;
+    }
+    .card-desc {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      color: #5e5850;
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════════════════════
+       SECTION 4: THE BUILDERS
+       ══════════════════════════════════════════════ */
+    .builders {
+      position: relative;
+      background: #0e0d0b;
+      padding: 120px 24px;
+      background-image: radial-gradient(circle, #2a2724 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+    .builders-top {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .builders-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #5e5850;
+      margin-bottom: 16px;
+    }
+    .builders-counter {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: clamp(80px, 15vw, 160px);
+      color: #f0ebe3;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .builders-counting {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 20px;
+      color: #ff5f1f;
+      margin-top: 12px;
+    }
+    .builders-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 32px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .builder-avatar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .builders-grid.visible .builder-avatar {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .builders-grid.visible .builder-avatar:nth-child(1) { transition-delay: 0ms; }
+    .builders-grid.visible .builder-avatar:nth-child(2) { transition-delay: 60ms; }
+    .builders-grid.visible .builder-avatar:nth-child(3) { transition-delay: 120ms; }
+    .builders-grid.visible .builder-avatar:nth-child(4) { transition-delay: 180ms; }
+    .builders-grid.visible .builder-avatar:nth-child(5) { transition-delay: 240ms; }
+    .builders-grid.visible .builder-avatar:nth-child(6) { transition-delay: 300ms; }
+    .builders-grid.visible .builder-avatar:nth-child(7) { transition-delay: 360ms; }
+    .builders-grid.visible .builder-avatar:nth-child(8) { transition-delay: 420ms; }
+    .avatar-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #1e1c19;
+      border: 1px solid #2a2724;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 16px;
+      color: #5e5850;
+    }
+    .avatar-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #f0ebe3;
+    }
+    .avatar-status {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+    }
+
+    /* ══════════════════════════════════════════════
+       SECTION 5: THE SIGNAL
+       ══════════════════════════════════════════════ */
+    .signal {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #141210;
+      overflow: hidden;
+    }
+    .signal-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .signal-hud {
+      position: absolute;
+      top: 40px;
+      right: 60px;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .signal-broadcasting {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #9b9589;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .signal-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ff5f1f;
+      animation: dotPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes dotPulse {
+      0%, 100% { opacity: 0.4; box-shadow: 0 0 4px rgba(255,95,31,0.3); }
+      50% { opacity: 1; box-shadow: 0 0 10px rgba(255,95,31,0.6); }
+    }
+    .signal-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 40px;
+    }
+    .signal-bar {
+      width: 4px;
+      background: #ff5f1f;
+      opacity: 0.6;
+      border-radius: 1px;
+      transition: height 0.15s ease;
+    }
+    .signal-quote {
+      position: relative;
+      z-index: 3;
+      max-width: 600px;
+      padding: 40px 24px;
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 400;
+      font-style: italic;
+      font-size: clamp(18px, 2.5vw, 28px);
+      line-height: 1.6;
+      color: #f0ebe3;
+    }
+
+    /* ══════════════════════════════════════════════
+       SECTION 6: EVENTS
+       ══════════════════════════════════════════════ */
+    .events {
+      position: relative;
+      background: #141210;
+      padding: 120px 24px;
+    }
+    .events-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .events-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #5e5850;
+      margin-bottom: 32px;
+    }
+    .event-row {
+      display: flex;
+      align-items: center;
+      padding: 24px 0;
+      border-bottom: 1px solid #2a2724;
+      gap: 24px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .events-container.visible .event-row:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0ms; }
+    .events-container.visible .event-row:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 100ms; }
+    .events-container.visible .event-row:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 200ms; }
+    .event-date {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      color: #ff5f1f;
+      white-space: nowrap;
+      min-width: 70px;
+    }
+    .event-title {
+      flex: 1;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(24px, 4vw, 36px);
+      color: #f0ebe3;
+    }
+    .event-type {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      border: 1px solid #2a2724;
+      padding: 4px 12px;
+      border-radius: 4px;
+      color: #9b9589;
+      white-space: nowrap;
+    }
+    .event-arrow {
+      color: #5e5850;
+      flex-shrink: 0;
+    }
+    .event-arrow svg {
+      width: 16px;
+      height: 16px;
+      stroke: #5e5850;
+      stroke-width: 1.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ══════════════════════════════════════════════
+       SECTION 7: TAG IN (CTA)
+       ══════════════════════════════════════════════ */
+    .cta {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0e0d0b;
+      overflow: hidden;
+    }
+    .cta-rings {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .cta-ring {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,95,31,0.15);
+      animation: ringPulse 3s ease-out infinite;
+    }
+    .cta-ring:nth-child(2) { animation-delay: 1s; }
+    .cta-ring:nth-child(3) { animation-delay: 2s; }
+    @keyframes ringPulse {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(3); opacity: 0; }
+    }
+    .cta-title {
+      position: relative;
+      z-index: 1;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(64px, 10vw, 96px);
+      color: #f0ebe3;
+      margin-bottom: 40px;
+    }
+    .cta-button {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      background: #ff5f1f;
+      color: #0e0d0b;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 500;
+      font-size: 16px;
+      padding: 16px 32px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      animation: buttonGlow 2s ease-in-out infinite;
+      transition: transform 0.2s ease;
+    }
+    .cta-button:hover {
+      transform: scale(1.04);
+    }
+    @keyframes buttonGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,95,31,0.3); }
+      50% { box-shadow: 0 0 40px rgba(255,95,31,0.1); }
+    }
+
+    /* ══════════════════════════════════════════════
+       SECTION 8: FOOTER
+       ══════════════════════════════════════════════ */
+    .footer {
+      background: #0e0d0b;
+      padding: 0 60px 40px;
+    }
+    .footer-border {
+      width: 100%;
+      height: 1px;
+      background: #2a2724;
+      margin-bottom: 40px;
+    }
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      color: #f0ebe3;
+    }
+    .footer-info {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+    }
+    .footer-socials {
+      display: flex;
+      gap: 12px;
+    }
+    .footer-social {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid #2a2724;
+      background: transparent;
+    }
+    .footer-copy {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+      margin-top: 24px;
+    }
+
+    /* ══════════════════════════════════════════════
+       RESPONSIVE
+       ══════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .hero-content { padding: 32px; }
+      .hero-controls { bottom: 32px; right: 32px; }
+      .hero-mute { bottom: 32px; left: 32px; }
+      .cards-row { flex-direction: column; align-items: center; }
+      .card { width: 100%; max-width: 340px; }
+      .event-row { flex-wrap: wrap; gap: 12px; }
+      .event-title { width: 100%; order: -1; font-size: clamp(20px, 5vw, 28px); }
+      .footer { padding: 0 24px 24px; }
+      .footer-row { flex-direction: column; gap: 16px; text-align: center; }
+      .signal-hud { right: 24px; top: 24px; }
+      .builders-grid { gap: 20px; }
+      .avatar-circle { width: 64px; height: 64px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 1: VIDEO HERO
+       ════════════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <video class="hero-video" id="heroVideo" autoplay muted loop playsinline>
+      <source src="../surface-demos/tag-video.mp4" type="video/mp4">
+    </video>
+    <div class="hero-gradient"></div>
+    <div class="hero-grain"></div>
+
+    <div class="hero-content">
+      <div class="hero-title">TAG</div>
+      <div class="hero-subtitle">Amsterdam</div>
+    </div>
+
+    <!-- Mute / Unmute (bottom-left) -->
+    <div class="hero-mute">
+      <button class="hero-btn" id="muteBtn" aria-label="Unmute video">
+        <svg id="muteIcon" viewBox="0 0 24 24">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="none"/>
+          <line x1="23" y1="9" x2="17" y2="15"/>
+          <line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+      </button>
+      <span class="hero-btn-label" id="muteLabel">Unmute</span>
+    </div>
+
+    <!-- Play/Pause + timecode (bottom-right) -->
+    <div class="hero-controls">
+      <div class="hero-control-group">
+        <span class="hero-btn-label" id="playLabel">Now playing</span>
+        <button class="hero-btn" id="playBtn" aria-label="Pause video">
+          <svg id="playIcon" viewBox="0 0 24 24">
+            <line x1="10" y1="6" x2="10" y2="18"/>
+            <line x1="14" y1="6" x2="14" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <span class="hero-timecode" id="timecode">00:00 / 00:00</span>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="hero-progress">
+      <div class="hero-progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="hero-scroll">scroll</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 2: MANIFESTO
+       ════════════════════════════════════════════ -->
+  <section class="manifesto grain" id="manifesto">
+    <canvas class="manifesto-canvas" id="emberCanvas"></canvas>
+    <div class="manifesto-text" id="manifestoText"></div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 3: WHAT WE DO
+       ════════════════════════════════════════════ -->
+  <section class="what-we-do grain" id="whatWeDo">
+    <div class="section-label">WHAT WE BUILD</div>
+    <div class="cards-row" id="cardsRow">
+      <div class="card">
+        <div class="card-number">01</div>
+        <div class="card-title">Weekly Meetups</div>
+        <div class="card-desc">Every Thursday at A Lab, Amsterdam. Builders share what they're working on.</div>
+      </div>
+      <div class="card">
+        <div class="card-number">02</div>
+        <div class="card-title">Ship Sprints</div>
+        <div class="card-desc">48-hour build challenges. Pick a problem. Ship a solution. Demo it live.</div>
+      </div>
+      <div class="card">
+        <div class="card-number">03</div>
+        <div class="card-title">Demo Night</div>
+        <div class="card-desc">Monthly showcase. 5-minute demos. Real feedback from real builders.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 4: THE BUILDERS
+       ════════════════════════════════════════════ -->
+  <section class="builders grain" id="builders">
+    <div class="builders-top">
+      <div class="builders-label">ACTIVE BUILDERS</div>
+      <div class="builders-counter" id="builderCount">0</div>
+      <div class="builders-counting">and counting</div>
+    </div>
+    <div class="builders-grid" id="buildersGrid">
+      <div class="builder-avatar">
+        <div class="avatar-circle">BW</div>
+        <div class="avatar-name">BW</div>
+        <div class="avatar-status">building...</div>
+      </div>
+      <div class="builder-avatar">
+        <div class="avatar-circle">CS</div>
+        <div class="avatar-name">CS</div>
+        <div class="avatar-status">building...</div>
+      </div>
+      <div class="builder-avatar">
+        <div class="avatar-circle">KM</div>
+        <div class="avatar-name">KM</div>
+        <div class="avatar-status">building...</div>
+      </div>
+      <div class="builder-avatar">
+        <div class="avatar-circle">PK</div>
+        <div class="avatar-name">PK</div>
+        <div class="avatar-status">building...</div>
+      </div>
+      <div class="builder-avatar">
+        <div class="avatar-circle">TR</div>
+        <div class="avatar-name">TR</div>
+        <div class="avatar-status">building...</div>
+      </div>
+      <div class="builder-avatar">
+        <div class="avatar-circle">TB</div>
+        <div class="avatar-name">TB</div>
+        <div class="avatar-status">building...</div>
+      </div>
+      <div class="builder-avatar">
+        <div class="avatar-circle">TN</div>
+        <div class="avatar-name">TN</div>
+        <div class="avatar-status">building...</div>
+      </div>
+      <div class="builder-avatar">
+        <div class="avatar-circle">TT</div>
+        <div class="avatar-name">TT</div>
+        <div class="avatar-status">building...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 5: THE SIGNAL
+       ════════════════════════════════════════════ -->
+  <section class="signal grain" id="signal">
+    <canvas class="signal-canvas" id="waveCanvas"></canvas>
+
+    <div class="signal-hud">
+      <div class="signal-broadcasting">
+        <div class="signal-dot"></div>
+        BROADCASTING
+      </div>
+      <div class="signal-bars" id="signalBars"></div>
+    </div>
+
+    <div class="signal-quote">
+      &ldquo;We're the cultural layer underneath the startup ecosystem. To attract the obsessed, creative, talented people before they're ready for their next step. We're where the energy is.&rdquo;
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 6: EVENTS
+       ════════════════════════════════════════════ -->
+  <section class="events grain" id="events">
+    <div class="events-container" id="eventsContainer">
+      <div class="events-label">UPCOMING</div>
+      <div class="event-row">
+        <span class="event-date">MAR 27</span>
+        <span class="event-title">Build Fast Earn Fast</span>
+        <span class="event-type">HACKATHON</span>
+        <span class="event-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </div>
+      <div class="event-row">
+        <span class="event-date">APR 10</span>
+        <span class="event-title">Demo Night #4</span>
+        <span class="event-type">SHOWCASE</span>
+        <span class="event-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </div>
+      <div class="event-row">
+        <span class="event-date">APR 24</span>
+        <span class="event-title">Ship Sprint Weekend</span>
+        <span class="event-type">BUILD</span>
+        <span class="event-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 7: TAG IN (CTA)
+       ════════════════════════════════════════════ -->
+  <section class="cta grain" id="cta">
+    <div class="cta-rings">
+      <div class="cta-ring"></div>
+      <div class="cta-ring"></div>
+      <div class="cta-ring"></div>
+    </div>
+    <div class="cta-title">Tag in.</div>
+    <a href="#" class="cta-button">Join the builders &rarr;</a>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 8: FOOTER
+       ════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-border"></div>
+    <div class="footer-row">
+      <div class="footer-logo">TAG</div>
+      <div class="footer-info">Amsterdam &middot; Est. 2024</div>
+      <div class="footer-socials">
+        <div class="footer-social"></div>
+        <div class="footer-social"></div>
+        <div class="footer-social"></div>
+      </div>
+    </div>
+    <div class="footer-copy">&copy; 2026 TAG</div>
+  </footer>
+
+
+  <!-- ════════════════════════════════════════════
+       JAVASCRIPT
+       ════════════════════════════════════════════ -->
+  <script>
+    // ── Video Controls ─────────────────────────────
+    (function () {
+      const video = document.getElementById('heroVideo')
+      const playBtn = document.getElementById('playBtn')
+      const playIcon = document.getElementById('playIcon')
+      const playLabel = document.getElementById('playLabel')
+      const muteBtn = document.getElementById('muteBtn')
+      const muteIcon = document.getElementById('muteIcon')
+      const muteLabel = document.getElementById('muteLabel')
+      const progressFill = document.getElementById('progressFill')
+      const timecode = document.getElementById('timecode')
+
+      let isPlaying = true
+
+      function formatTime(s) {
+        const m = Math.floor(s / 60)
+        const sec = Math.floor(s % 60)
+        return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0')
+      }
+
+      function updateProgress() {
+        if (video.duration) {
+          const pct = (video.currentTime / video.duration) * 100
+          progressFill.style.width = pct + '%'
+          timecode.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration)
+        }
+        requestAnimationFrame(updateProgress)
+      }
+      requestAnimationFrame(updateProgress)
+
+      playBtn.addEventListener('click', function () {
+        if (isPlaying) {
+          video.pause()
+          playLabel.textContent = 'Paused'
+          playIcon.innerHTML = '<polygon points="8 5 19 12 8 19" fill="none"/>'
+        } else {
+          video.play()
+          playLabel.textContent = 'Now playing'
+          playIcon.innerHTML = '<line x1="10" y1="6" x2="10" y2="18"/><line x1="14" y1="6" x2="14" y2="18"/>'
+        }
+        isPlaying = !isPlaying
+      })
+
+      muteBtn.addEventListener('click', function () {
+        video.muted = !video.muted
+        if (video.muted) {
+          muteLabel.textContent = 'Unmute'
+          muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="none"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>'
+        } else {
+          muteLabel.textContent = 'Muted'
+          muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="none"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14" fill="none"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" fill="none"/>'
+        }
+      })
+    })()
+
+
+    // ── Manifesto Word-by-Word ─────────────────────
+    (function () {
+      const text = "We don't wait for permission. We prototype fast, break things on purpose, and ship before it's comfortable."
+      const container = document.getElementById('manifestoText')
+      const words = text.split(' ')
+
+      words.forEach(function (word, i) {
+        const span = document.createElement('span')
+        span.className = 'word' + (word === 'ship' ? ' accent' : '')
+        span.textContent = word
+        span.style.transitionDelay = (i * 60) + 'ms'
+        container.appendChild(span)
+        // Add space after each word (except last)
+        if (i < words.length - 1) {
+          container.appendChild(document.createTextNode(' '))
+        }
+      })
+    })()
+
+
+    // ── Ember Particles (Manifesto background) ─────
+    (function () {
+      const canvas = document.getElementById('emberCanvas')
+      const ctx = canvas.getContext('2d')
+      let particles = []
+      const COUNT = 30
+
+      function resize() {
+        const rect = canvas.parentElement.getBoundingClientRect()
+        canvas.width = rect.width
+        canvas.height = rect.height
+      }
+
+      function createParticle() {
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: 1 + Math.random() * 2,
+          opacity: 0.3 + Math.random() * 0.3,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: -0.1 - Math.random() * 0.3,
+          life: Math.random()
+        }
+      }
+
+      function init() {
+        resize()
+        particles = []
+        for (let i = 0; i < COUNT; i++) particles.push(createParticle())
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        particles.forEach(function (p) {
+          p.x += p.vx
+          p.y += p.vy
+          p.life += 0.002
+          if (p.y < -10 || p.x < -10 || p.x > canvas.width + 10 || p.life > 1) {
+            Object.assign(p, createParticle())
+            p.y = canvas.height + 10
+          }
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(255,95,31,' + p.opacity + ')'
+          ctx.fill()
+        })
+        requestAnimationFrame(draw)
+      }
+
+      init()
+      draw()
+      window.addEventListener('resize', resize)
+    })()
+
+
+    // ── Waveform Canvas (Signal section) ───────────
+    (function () {
+      const canvas = document.getElementById('waveCanvas')
+      const ctx = canvas.getContext('2d')
+      let time = 0
+
+      function resize() {
+        const rect = canvas.parentElement.getBoundingClientRect()
+        canvas.width = rect.width
+        canvas.height = rect.height
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        const waves = [
+          { freq: 0.008, amp: 40, opacity: 0.1, phase: 0 },
+          { freq: 0.012, amp: 30, opacity: 0.2, phase: 2 },
+          { freq: 0.006, amp: 50, opacity: 0.3, phase: 4 }
+        ]
+
+        waves.forEach(function (w) {
+          ctx.beginPath()
+          ctx.strokeStyle = 'rgba(255,95,31,' + w.opacity + ')'
+          ctx.lineWidth = 1.5
+          for (let x = 0; x < canvas.width; x++) {
+            const y = canvas.height / 2 + Math.sin(x * w.freq + time * 0.5 + w.phase) * w.amp
+            if (x === 0) ctx.moveTo(x, y)
+            else ctx.lineTo(x, y)
+          }
+          ctx.stroke()
+        })
+
+        time += 0.02
+        requestAnimationFrame(draw)
+      }
+
+      resize()
+      draw()
+      window.addEventListener('resize', resize)
+    })()
+
+
+    // ── Signal Frequency Bars ──────────────────────
+    (function () {
+      const container = document.getElementById('signalBars')
+      const bars = []
+      for (let i = 0; i < 16; i++) {
+        const bar = document.createElement('div')
+        bar.className = 'signal-bar'
+        bar.style.height = (5 + Math.random() * 30) + 'px'
+        container.appendChild(bar)
+        bars.push(bar)
+      }
+
+      function animate() {
+        bars.forEach(function (bar) {
+          bar.style.height = (5 + Math.random() * 35) + 'px'
+        })
+        setTimeout(animate, 150)
+      }
+      animate()
+    })()
+
+
+    // ── Counter Animation (Builders) ───────────────
+    function animateCounter(el, target, duration) {
+      const start = performance.now()
+      function step(now) {
+        const elapsed = now - start
+        const progress = Math.min(elapsed / duration, 1)
+        // easeOutExpo
+        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
+        el.textContent = Math.floor(eased * target)
+        if (progress < 1) requestAnimationFrame(step)
+        else el.textContent = target
+      }
+      requestAnimationFrame(step)
+    }
+
+
+    // ── IntersectionObserver (Scroll Reveals) ──────
+    (function () {
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible')
+
+            // Trigger counter animation for builders section
+            if (entry.target.id === 'builderCount') {
+              animateCounter(entry.target, 427, 2000)
+            }
+
+            observer.unobserve(entry.target)
+          }
+        })
+      }, { threshold: 0.15 })
+
+      // Manifesto text (higher threshold)
+      const manifestoObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible')
+            manifestoObserver.unobserve(entry.target)
+          }
+        })
+      }, { threshold: 0.3 })
+
+      // Observe elements
+      const manifestoText = document.getElementById('manifestoText')
+      if (manifestoText) manifestoObserver.observe(manifestoText)
+
+      const cardsRow = document.getElementById('cardsRow')
+      if (cardsRow) observer.observe(cardsRow)
+
+      const builderCount = document.getElementById('builderCount')
+      if (builderCount) observer.observe(builderCount)
+
+      const buildersGrid = document.getElementById('buildersGrid')
+      if (buildersGrid) observer.observe(buildersGrid)
+
+      const eventsContainer = document.getElementById('eventsContainer')
+      if (eventsContainer) observer.observe(eventsContainer)
+    })()
+  </script>
+</body>
+</html>

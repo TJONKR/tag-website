@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG — Grain & Texture Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #141210;
+    color: #f0ebe3;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* ===================== GRAIN FILTER ===================== */
+  svg.grain-svg {
+    position: fixed;
+    width: 0;
+    height: 0;
+  }
+
+  .grain::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    filter: url(#grain);
+    opacity: 0.5;
+    background: transparent;
+  }
+
+  .grain-warm::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 40%, rgba(255, 95, 31, 0.04), transparent 70%);
+  }
+
+  /* ===================== LAYOUT ===================== */
+  .section {
+    position: relative;
+    padding: 80px 40px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .section-half {
+    min-height: 50vh;
+  }
+
+  .label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #5e5850;
+    margin-bottom: 12px;
+  }
+
+  .label-orange {
+    color: #ff5f1f;
+  }
+
+  /* ===================== DEMO 1: NO GRAIN ===================== */
+  .no-grain {
+    background: #141210;
+    border-bottom: 1px solid #2a2724;
+  }
+
+  /* ===================== DEMO 2: WITH GRAIN ===================== */
+  .with-grain {
+    background: #141210;
+    border-bottom: 1px solid #2a2724;
+  }
+
+  /* ===================== DEMO 3: GRAIN + WARM GLOW ===================== */
+  .with-grain-warm {
+    background: #141210;
+    border-bottom: 1px solid #2a2724;
+  }
+
+  /* ===================== TYPOGRAPHY ===================== */
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(48px, 10vw, 120px);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(36px, 6vw, 72px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .orange { color: #ff5f1f; }
+  .blue { color: #2b5cff; }
+  .muted { color: #5e5850; }
+  .secondary { color: #9b9589; }
+
+  p {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #9b9589;
+    max-width: 540px;
+  }
+
+  .mono {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+  }
+
+  /* ===================== COMPARISON GRID ===================== */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    width: 100%;
+  }
+
+  .compare-cell {
+    position: relative;
+    padding: 80px 40px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .compare-cell.bordered-right {
+    border-right: 1px solid #2a2724;
+  }
+
+  .compare-cell.bordered-bottom {
+    border-bottom: 1px solid #2a2724;
+  }
+
+  /* ===================== INTENSITY DEMO ===================== */
+  .intensity-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    width: 100%;
+    border-top: 1px solid #2a2724;
+    border-bottom: 1px solid #2a2724;
+  }
+
+  .intensity-cell {
+    position: relative;
+    padding: 60px 30px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+    border-right: 1px solid #2a2724;
+  }
+
+  .intensity-cell:last-child {
+    border-right: none;
+  }
+
+  .intensity-cell .grain-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    filter: url(#grain);
+    background: transparent;
+  }
+
+  .intensity-cell .warm-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 40%, rgba(255, 95, 31, 0.04), transparent 70%);
+  }
+
+  .grain-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 48px;
+    font-weight: 700;
+    color: #f0ebe3;
+    position: relative;
+    z-index: 3;
+  }
+
+  /* ===================== CARD DEMO ===================== */
+  .cards-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    background: #1e1c19;
+    border: 1px solid #2a2724;
+    border-radius: 8px;
+    padding: 24px;
+    width: 240px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover {
+    border-color: #3d3a35;
+  }
+
+  .card-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: #ff5f1f;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #f0ebe3;
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    color: #5e5850;
+    line-height: 1.5;
+  }
+
+  /* ===================== BUTTON DEMO ===================== */
+  .btn-orange {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ff5f1f;
+    color: #141210;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: background 0.2s;
+  }
+
+  .btn-orange:hover {
+    background: #e85519;
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: #f0ebe3;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    padding: 14px 28px;
+    border: 1px solid #3d3a35;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .btn-ghost:hover {
+    border-color: #ff5f1f;
+    color: #ff5f1f;
+  }
+
+  /* ===================== COLOR SWATCHES ===================== */
+  .swatches {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .swatch {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-end;
+    padding: 6px;
+    border: 1px solid #2a2724;
+  }
+
+  .swatch span {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+  }
+
+  /* ===================== DIVIDER ===================== */
+  .divider {
+    padding: 40px;
+    text-align: center;
+    border-bottom: 1px solid #2a2724;
+  }
+
+  .divider h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #3d3a35;
+  }
+
+  /* content z-index */
+  .content {
+    position: relative;
+    z-index: 3;
+  }
+
+  @media (max-width: 768px) {
+    .compare-grid { grid-template-columns: 1fr; }
+    .intensity-row { grid-template-columns: 1fr 1fr; }
+    .compare-cell.bordered-right { border-right: none; border-bottom: 1px solid #2a2724; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG GRAIN FILTER (hidden) -->
+<svg class="grain-svg">
+  <filter id="grain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.80" numOctaves="4" stitchTiles="stitch" />
+    <feColorMatrix type="saturate" values="0" />
+  </filter>
+</svg>
+
+<!-- ==================== INTRO ==================== -->
+<div class="section section-half" style="min-height: auto; padding: 60px 40px 20px;">
+  <div class="content">
+    <span class="label label-orange">TAG VISUAL EXPLORATION</span>
+    <h2>What grain does<br>and doesn't do.</h2>
+    <p>Open this file in your browser. Scroll down to compare flat vs grain vs warm grain — and see typography, colors, and cards in context.</p>
+  </div>
+</div>
+
+<!-- ==================== SIDE BY SIDE: FLAT vs GRAIN ==================== -->
+<div class="divider"><h3>Comparison: No Grain vs Grain vs Warm Grain</h3></div>
+
+<div class="compare-grid">
+  <!-- NO GRAIN -->
+  <div class="compare-cell bordered-right bordered-bottom" style="background: #141210;">
+    <div class="content">
+      <span class="label">No grain — flat</span>
+      <h2>TAG.</h2>
+      <p>Same background color, same type. Perfectly clean. Digital. Precise. This is the Linear/Vercel approach.</p>
+    </div>
+  </div>
+
+  <!-- WITH GRAIN -->
+  <div class="compare-cell bordered-bottom grain" style="background: #141210;">
+    <div class="content">
+      <span class="label">With grain — 50% opacity</span>
+      <h2>TAG.</h2>
+      <p>Same everything, but now the surface has texture. It feels physical. Like concrete. Like a wall you'd spray paint on. Less screen, more space.</p>
+    </div>
+  </div>
+
+  <!-- NO GRAIN — lighter bg -->
+  <div class="compare-cell bordered-right" style="background: #1e1c19;">
+    <div class="content">
+      <span class="label">No grain — elevated surface</span>
+      <h2>TAG.</h2>
+      <p>The elevated surface color (#1e1c19). Still flat, still digital.</p>
+    </div>
+  </div>
+
+  <!-- GRAIN + WARM GLOW -->
+  <div class="compare-cell grain grain-warm" style="background: #1e1c19;">
+    <div class="content">
+      <span class="label label-orange">Grain + warm glow — recommended</span>
+      <h2>TAG.</h2>
+      <p>Grain plus a very subtle warm orange radial glow underneath. This is the sweet spot — physical, warm, atmospheric. Amsterdam at night.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== GRAIN INTENSITY ==================== -->
+<div class="divider"><h3>Grain Intensity Scale</h3></div>
+
+<div class="intensity-row">
+  <div class="intensity-cell" style="background: #141210;">
+    <div class="content" style="text-align: center;">
+      <span class="label">0% — flat</span>
+      <div class="grain-value">0</div>
+    </div>
+  </div>
+
+  <div class="intensity-cell" style="background: #141210;">
+    <div class="grain-layer" style="opacity: 0.25;"></div>
+    <div class="content" style="text-align: center;">
+      <span class="label">Subtle</span>
+      <div class="grain-value">25</div>
+    </div>
+  </div>
+
+  <div class="intensity-cell" style="background: #141210;">
+    <div class="grain-layer" style="opacity: 0.50;"></div>
+    <div class="warm-layer"></div>
+    <div class="content" style="text-align: center;">
+      <span class="label label-orange">Recommended</span>
+      <div class="grain-value">50</div>
+    </div>
+  </div>
+
+  <div class="intensity-cell" style="background: #141210;">
+    <div class="grain-layer" style="opacity: 0.80;"></div>
+    <div class="content" style="text-align: center;">
+      <span class="label">Heavy</span>
+      <div class="grain-value">80</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TYPOGRAPHY IN CONTEXT ==================== -->
+<div class="divider"><h3>Typography</h3></div>
+
+<div class="section grain grain-warm" style="min-height: auto; padding: 80px 40px;">
+  <div class="content">
+    <span class="label label-orange">Syne 800 — Headlines</span>
+    <h1>Leave your<br><span class="orange">tag.</span></h1>
+
+    <div style="margin-top: 48px;">
+      <span class="label">Space Grotesk — Body</span>
+      <p style="font-size: 20px; color: #f0ebe3;">We're the cultural layer underneath the startup ecosystem. We attract the obsessed, creative, talented people before they're ready for their next step.</p>
+    </div>
+
+    <div style="margin-top: 48px;">
+      <span class="label">Space Mono — Data / Labels</span>
+      <p class="mono" style="color: #9b9589;">60 builders · 51+ projects · 2,000+ network · amsterdam</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== COLOR PALETTE ==================== -->
+<div class="divider"><h3>Color Palette</h3></div>
+
+<div class="section" style="min-height: auto; padding: 60px 40px;">
+  <div class="content">
+    <span class="label">Core palette</span>
+    <div class="swatches">
+      <div class="swatch" style="background: #141210;"><span style="color: #5e5850;">#141210</span></div>
+      <div class="swatch" style="background: #1e1c19;"><span style="color: #5e5850;">#1e1c19</span></div>
+      <div class="swatch" style="background: #2a2724;"><span style="color: #5e5850;">#2a2724</span></div>
+      <div class="swatch" style="background: #5e5850;"><span style="color: #9b9589;">#5e5850</span></div>
+      <div class="swatch" style="background: #9b9589;"><span style="color: #141210;">#9b9589</span></div>
+      <div class="swatch" style="background: #f0ebe3;"><span style="color: #141210;">#f0ebe3</span></div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <span class="label">Accents</span>
+      <div class="swatches">
+        <div class="swatch" style="background: #ff5f1f; border-color: #ff5f1f;"><span style="color: #141210;">#ff5f1f</span></div>
+        <div class="swatch" style="background: #2b5cff; border-color: #2b5cff;"><span style="color: #f0ebe3;">#2b5cff</span></div>
+        <div class="swatch" style="background: #ffb347; border-color: #ffb347;"><span style="color: #141210;">#ffb347</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CARDS + BUTTONS ==================== -->
+<div class="divider"><h3>Components on Grain</h3></div>
+
+<div class="section grain grain-warm" style="min-height: auto; padding: 80px 40px;">
+  <div class="content">
+    <span class="label label-orange">Event cards</span>
+    <div class="cards-row">
+      <div class="card">
+        <div class="card-date">MAR 07 2026</div>
+        <div class="card-title">TAG Night</div>
+        <div class="card-desc">Demos and drinks. Show what you shipped this week.</div>
+      </div>
+      <div class="card">
+        <div class="card-date">MAR 14 2026</div>
+        <div class="card-title">TAG Team</div>
+        <div class="card-desc">Collaborative build session. Bring a problem or join one.</div>
+      </div>
+      <div class="card">
+        <div class="card-date">MAR 21 2026</div>
+        <div class="card-title">TAG Drop</div>
+        <div class="card-desc">Launch party. Someone ships something real.</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 48px;">
+      <span class="label">Buttons</span>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <button class="btn-orange">Tag in →</button>
+        <button class="btn-ghost">See what's happening</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HERO MOCK ==================== -->
+<div class="divider"><h3>Hero Concept — Type Only</h3></div>
+
+<div class="section grain grain-warm" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+  <div class="content" style="max-width: 900px;">
+    <h1 style="font-size: clamp(64px, 14vw, 180px); margin-bottom: 32px;">TAG<span class="muted">.</span></h1>
+    <p style="font-size: 14px; max-width: none; color: #5e5850; font-family: 'Space Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase;">Amsterdam · Builders · Shipping daily</p>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG — Direction 2: Clean</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #faf9f6;
+    --black: #1a1a1a;
+    --mid: #999;
+    --light: #ddd;
+    --accent: #1a1a1a;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--black);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 3rem;
+    z-index: 100;
+    mix-blend-mode: difference;
+  }
+
+  nav .logo {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.25em;
+    color: white;
+  }
+
+  nav .nav-right {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: white;
+    opacity: 0.6;
+  }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .tag-word {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(8rem, 22vw, 20rem);
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: -0.03em;
+    line-height: 0.85;
+    color: var(--black);
+    animation: revealUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes revealUp {
+    from { transform: translateY(60px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .tag-expand {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    animation: revealUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+  }
+
+  .tag-expand span {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  .tag-expand span em {
+    font-style: normal;
+    color: var(--black);
+    font-weight: 500;
+  }
+
+  .hero-line {
+    width: 1px;
+    height: 80px;
+    background: var(--light);
+    margin: 3rem auto;
+    animation: revealUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+  }
+
+  .hero-copy {
+    max-width: 480px;
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    line-height: 1.6;
+    color: var(--black);
+    font-style: italic;
+    animation: revealUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
+  }
+
+  .hero-sub {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+    animation: revealUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.9s both;
+  }
+
+  /* Sections */
+  .section {
+    padding: 8rem 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 2rem;
+  }
+
+  .section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+  }
+
+  .section p {
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: #555;
+    max-width: 600px;
+    margin-bottom: 1.5rem;
+  }
+
+  .border-top {
+    border-top: 1px solid var(--light);
+  }
+
+  /* Grid of values */
+  .values-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 3rem;
+  }
+
+  .value-item h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    font-weight: 400;
+    margin-bottom: 0.6rem;
+  }
+
+  .value-item p {
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: var(--mid);
+    margin-bottom: 0;
+  }
+
+  /* CTA */
+  .cta-section {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    border-top: 1px solid var(--light);
+  }
+
+  .cta-section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-section p {
+    font-size: 0.85rem;
+    color: var(--mid);
+    margin-bottom: 2.5rem;
+  }
+
+  .btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--black);
+    padding: 1.1rem 3rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    background: #333;
+    transform: translateY(-2px);
+  }
+
+  .footer {
+    padding: 3rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--mid);
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 640px) {
+    .values-grid { grid-template-columns: 1fr; }
+    .tag-expand { flex-direction: column; gap: 0.5rem; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">TAG</div>
+  <div class="nav-right">Amsterdam</div>
+</nav>
+
+<section class="hero">
+  <div class="tag-word">Tag</div>
+  <div class="tag-expand">
+    <span><em>T</em>o</span>
+    <span><em>A</em>chieve</span>
+    <span><em>G</em>reatness</span>
+  </div>
+  <div class="hero-line"></div>
+  <div class="hero-copy">
+    The cultural layer underneath the startup ecosystem. A builder community in Amsterdam.
+  </div>
+  <div class="hero-sub">Where the obsessed, creative, and talented come before they're ready for their next step.</div>
+</section>
+
+<section class="section border-top">
+  <div class="section-label">The story</div>
+  <h2>What if the hackathon never ended?</h2>
+  <p>You know that feeling. Building something real, surrounded by people who get it. The energy. The competition. The fun.</p>
+  <p>But hackathons end. Monday comes. We made it permanent. A room in Amsterdam where builders show up every day and do what they do. Ship, share, push each other forward.</p>
+</section>
+
+<section class="section border-top">
+  <div class="section-label">The culture</div>
+  <h2>Leave your tag.</h2>
+  <div class="values-grid">
+    <div class="value-item">
+      <h3>Ship fast, learn faster</h3>
+      <p>The person who shipped three things this month is more respected than the person who's been planning one thing for six months.</p>
+    </div>
+    <div class="value-item">
+      <h3>Show your work</h3>
+      <p>Demos are the currency. "Let me show you" beats "let me tell you about" every time.</p>
+    </div>
+    <div class="value-item">
+      <h3>Help each other</h3>
+      <p>Someone's stuck on something you solved last week? You help. The people who give the most are the most valued.</p>
+    </div>
+    <div class="value-item">
+      <h3>Joy is the point</h3>
+      <p>This should be the most fun you have all week. Ambition and joy aren't opposites — they feed each other.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <h2>Are you building something?</h2>
+  <p>We're not asking for your pitch deck. We're asking one thing.</p>
+  <a href="#" class="btn">Tag in</a>
+</section>
+
+<div class="footer">
+  <span>© TAG Amsterdam 2026</span>
+  <span>60 builders · 2,000+ network · 51 projects shipped</span>
+</div>
+
+</body>
+</html>

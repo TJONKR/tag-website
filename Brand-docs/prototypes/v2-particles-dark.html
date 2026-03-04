@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG — Where Builders Gather</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  /* ========== RESET & BASE ========== */
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: #141210;
+    color: #f0ebe3;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ========== GRAIN OVERLAY ========== */
+  .grain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04;
+  }
+
+  /* ========== FONTS ========== */
+  .font-syne { font-family: 'Syne', sans-serif; font-weight: 800; }
+  .font-grotesk { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'Space Mono', monospace; }
+
+  /* ========== SECTION 1: PARTICLES HERO ========== */
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #141210;
+  }
+
+  .hero canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background: radial-gradient(ellipse at 50% 100%, rgba(255,95,31,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(20,18,16,0.3) 0%, transparent 80%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(120px, 20vw, 200px);
+    color: #f0ebe3;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .hero-subtitle {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #9b9589;
+    margin-top: 16px;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #5e5850;
+    animation: pulse-scroll 2s ease-in-out infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .scroll-indicator svg {
+    width: 16px;
+    height: 16px;
+    stroke: #5e5850;
+  }
+
+  @keyframes pulse-scroll {
+    0%, 100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 1; transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ========== SECTION 2: BOLD STATEMENT ========== */
+  .statement {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #141210;
+    padding: 60px;
+  }
+
+  .statement-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-align: center;
+    color: #f0ebe3;
+    transform: translateY(60px);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+  }
+
+  .statement-text.revealed {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .statement-text .accent {
+    color: #ff5f1f;
+  }
+
+  /* ========== SECTION 3: THE RHYTHM ========== */
+  .rhythm {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    width: 100%;
+  }
+
+  .rhythm-col {
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transform: translateY(40px);
+    opacity: 0;
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s ease;
+  }
+
+  .rhythm-col.revealed {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .rhythm-col:nth-child(1) { background: #141210; }
+  .rhythm-col:nth-child(2) { background: #1a1816; border-left: 1px solid #2a2724; border-right: 1px solid #2a2724; }
+  .rhythm-col:nth-child(3) { background: #141210; }
+
+  .rhythm-label {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #ff5f1f;
+  }
+
+  .rhythm-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 48px;
+    color: #f0ebe3;
+    margin-top: 16px;
+    line-height: 1.1;
+  }
+
+  .rhythm-body {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #9b9589;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  /* ========== SECTION 4: BUILDERS WALL ========== */
+  .builders {
+    position: relative;
+    background: #0e0d0b;
+    padding: 120px 60px;
+    overflow: hidden;
+  }
+
+  .builders::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, #2a2724 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .builders-inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .builders-label {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5e5850;
+    max-width: 960px;
+    margin: 0 auto 32px;
+    text-align: center;
+  }
+
+  .builders-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: 800px;
+    margin: 0 auto;
+    justify-content: center;
+  }
+
+  .builder-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #1e1c19;
+    border: 1px solid #2a2724;
+    border-radius: 24px;
+    padding: 8px 16px 8px 8px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .builder-tag.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .builder-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #2a2724;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    color: #9b9589;
+    flex-shrink: 0;
+  }
+
+  .builder-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    color: #f0ebe3;
+    white-space: nowrap;
+  }
+
+  .builder-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff5f1f;
+    flex-shrink: 0;
+  }
+
+  .builders-counter {
+    text-align: center;
+    margin-top: 80px;
+  }
+
+  .counter-number {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 96px;
+    color: #f0ebe3;
+    line-height: 1;
+  }
+
+  .counter-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    color: #ff5f1f;
+    margin-top: 8px;
+  }
+
+  /* ========== SECTION 5: QUOTE / CULTURE ========== */
+  .quote-section {
+    position: relative;
+    min-height: 80vh;
+    background: #0e0d0b;
+    display: flex;
+    align-items: center;
+    padding: 80px 60px;
+    overflow: hidden;
+  }
+
+  .quote-mark {
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 200px;
+    color: #ff5f1f;
+    opacity: 0.12;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .quote-content {
+    margin-left: 15%;
+    max-width: 600px;
+    position: relative;
+    z-index: 1;
+    transform: translateY(40px);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+  }
+
+  .quote-content.revealed {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .quote-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(18px, 2.5vw, 26px);
+    color: #f0ebe3;
+    line-height: 1.7;
+  }
+
+  .quote-attribution {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 11px;
+    color: #5e5850;
+    margin-top: 24px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ========== SECTION 6: UPCOMING EVENTS ========== */
+  .events {
+    background: #141210;
+    padding: 80px 0;
+  }
+
+  .events-label {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #ff5f1f;
+    padding-left: 60px;
+    margin-bottom: 32px;
+  }
+
+  .events-scroll {
+    overflow-x: auto;
+    padding: 0 60px;
+    display: flex;
+    gap: 24px;
+    scrollbar-width: thin;
+    scrollbar-color: #ff5f1f #2a2724;
+  }
+
+  .events-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .events-scroll::-webkit-scrollbar-track {
+    background: #2a2724;
+    border-radius: 3px;
+  }
+
+  .events-scroll::-webkit-scrollbar-thumb {
+    background: #ff5f1f;
+    border-radius: 3px;
+  }
+
+  .event-card {
+    min-width: 380px;
+    flex-shrink: 0;
+    background: #1e1c19;
+    border: 1px solid #2a2724;
+    border-radius: 12px;
+    padding: 32px;
+    transform: translateY(30px);
+    opacity: 0;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+  }
+
+  .event-card.revealed {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .event-date {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 13px;
+    color: #ff5f1f;
+  }
+
+  .event-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: #f0ebe3;
+    margin-top: 12px;
+    line-height: 1.2;
+  }
+
+  .event-desc {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #9b9589;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .event-badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid #2a2724;
+    padding: 4px 12px;
+    border-radius: 4px;
+    color: #9b9589;
+    margin-top: 20px;
+  }
+
+  /* ========== SECTION 7: CTA ========== */
+  .cta {
+    position: relative;
+    height: 100vh;
+    background: #0e0d0b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .pulse-ring {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border: 1px solid rgba(255, 95, 31, 0.2);
+    border-radius: 50%;
+    animation: pulse-radar 3s ease-out infinite;
+  }
+
+  .pulse-ring:nth-child(1) { animation-delay: 0s; }
+  .pulse-ring:nth-child(2) { animation-delay: 1s; }
+  .pulse-ring:nth-child(3) { animation-delay: 2s; }
+
+  @keyframes pulse-radar {
+    0% {
+      transform: scale(0.5);
+      opacity: 0.4;
+    }
+    100% {
+      transform: scale(3);
+      opacity: 0;
+    }
+  }
+
+  .cta-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(64px, 10vw, 96px);
+    color: #f0ebe3;
+    position: relative;
+    z-index: 2;
+    line-height: 1;
+  }
+
+  .cta-form {
+    display: flex;
+    margin-top: 32px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta-input {
+    background: #1e1c19;
+    border: 1px solid #2a2724;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    padding: 16px 20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    color: #f0ebe3;
+    width: 320px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .cta-input::placeholder {
+    color: #5e5850;
+  }
+
+  .cta-input:focus {
+    border-color: #ff5f1f;
+  }
+
+  .cta-button {
+    background: #ff5f1f;
+    border: 1px solid #ff5f1f;
+    border-radius: 0 8px 8px 0;
+    padding: 16px 24px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #0e0d0b;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    white-space: nowrap;
+  }
+
+  .cta-button:hover {
+    background: #e85518;
+  }
+
+  .cta-button:active {
+    transform: scale(0.98);
+  }
+
+  .cta-meta {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 11px;
+    color: #5e5850;
+    margin-top: 16px;
+    position: relative;
+    z-index: 2;
+    letter-spacing: 0.02em;
+  }
+
+  /* ========== SECTION 8: FOOTER ========== */
+  .footer {
+    background: #0e0d0b;
+    border-top: 1px solid #2a2724;
+    padding: 32px 60px;
+  }
+
+  .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    color: #f0ebe3;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+  }
+
+  .footer-links a {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    color: #9b9589;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-links a:hover {
+    color: #f0ebe3;
+  }
+
+  .footer-socials {
+    display: flex;
+    gap: 12px;
+  }
+
+  .social-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #2a2724;
+    transition: border-color 0.2s ease;
+    cursor: pointer;
+  }
+
+  .social-circle:hover {
+    border-color: #9b9589;
+  }
+
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-weight: 400;
+    font-size: 11px;
+    color: #5e5850;
+    text-align: center;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- GRAIN OVERLAY -->
+<svg class="grain" xmlns="http://www.w3.org/2000/svg">
+  <filter id="grain-filter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+  </filter>
+  <rect width="100%" height="100%" filter="url(#grain-filter)"/>
+</svg>
+
+<!-- ========== SECTION 1: PARTICLES HERO ========== -->
+<section class="hero" id="hero">
+  <canvas id="particles-canvas"></canvas>
+  <div class="hero-gradient"></div>
+  <div class="hero-content">
+    <h1 class="hero-title">TAG</h1>
+    <p class="hero-subtitle">where builders gather</p>
+  </div>
+  <div class="scroll-indicator">
+    <span>scroll</span>
+    <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 3v10M4 9l4 4 4-4"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ========== SECTION 2: BOLD STATEMENT ========== -->
+<section class="statement" id="statement">
+  <h2 class="statement-text" data-reveal>
+    We build things<br>that <span class="accent">matter.</span>
+  </h2>
+</section>
+
+<!-- ========== SECTION 3: THE RHYTHM ========== -->
+<section class="rhythm" id="rhythm">
+  <div class="rhythm-col" data-reveal data-delay="0">
+    <span class="rhythm-label">WEEKDAYS</span>
+    <h3 class="rhythm-title">Momentum</h3>
+    <p class="rhythm-body">People work on their own projects, share progress, help each other out, and slowly build things into something real.</p>
+  </div>
+  <div class="rhythm-col" data-reveal data-delay="150">
+    <span class="rhythm-label">WEEKENDS</span>
+    <h3 class="rhythm-title">Build Room</h3>
+    <p class="rhythm-body">The space is an open build room. People come to work on whatever they're obsessed with and see what happens when builders spend time together.</p>
+  </div>
+  <div class="rhythm-col" data-reveal data-delay="300">
+    <span class="rhythm-label">EVENTS</span>
+    <h3 class="rhythm-title">Demo Night</h3>
+    <p class="rhythm-body">Monthly showcase. 5-minute demos. Real feedback from real builders. No slides, no pitch decks — just working products.</p>
+  </div>
+</section>
+
+<!-- ========== SECTION 4: BUILDERS WALL ========== -->
+<section class="builders" id="builders">
+  <div class="builders-inner">
+    <p class="builders-label">THE BUILDERS</p>
+    <div class="builders-grid" id="builders-grid">
+      <!-- Builder tags injected by JS -->
+    </div>
+    <div class="builders-counter">
+      <div class="counter-number" id="counter" data-target="427">0+</div>
+      <div class="counter-label">builders and counting</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 5: QUOTE / CULTURE ========== -->
+<section class="quote-section" id="quote">
+  <div class="quote-mark">&ldquo;</div>
+  <div class="quote-content" data-reveal>
+    <p class="quote-text">&ldquo;We&rsquo;re the cultural layer underneath the startup ecosystem. To attract the obsessed, creative, talented people before they&rsquo;re ready for their next step.&rdquo;</p>
+    <p class="quote-attribution">&mdash; TAG, Amsterdam</p>
+  </div>
+</section>
+
+<!-- ========== SECTION 6: UPCOMING EVENTS ========== -->
+<section class="events" id="events">
+  <p class="events-label">NEXT UP</p>
+  <div class="events-scroll" id="events-scroll">
+    <div class="event-card" data-reveal data-delay="0">
+      <p class="event-date">MAR 27, 2026</p>
+      <h4 class="event-title">Build Fast Earn Fast</h4>
+      <p class="event-desc">Where builders become founders in 48 hours.</p>
+      <span class="event-badge">Hackathon</span>
+    </div>
+    <div class="event-card" data-reveal data-delay="100">
+      <p class="event-date">APR 10, 2026</p>
+      <h4 class="event-title">Demo Night #4</h4>
+      <p class="event-desc">5-minute demos. Real feedback. No slides.</p>
+      <span class="event-badge">Showcase</span>
+    </div>
+    <div class="event-card" data-reveal data-delay="200">
+      <p class="event-date">APR 24, 2026</p>
+      <h4 class="event-title">Ship Sprint Weekend</h4>
+      <p class="event-desc">Pick a problem. Ship a solution. Demo it live.</p>
+      <span class="event-badge">Build</span>
+    </div>
+    <div class="event-card" data-reveal data-delay="300">
+      <p class="event-date">MAY 08, 2026</p>
+      <h4 class="event-title">TAG Conference</h4>
+      <p class="event-desc">Speakers, panels, and live builds. The full TAG experience.</p>
+      <span class="event-badge">Conference</span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 7: CTA ========== -->
+<section class="cta" id="cta">
+  <div class="pulse-ring"></div>
+  <div class="pulse-ring"></div>
+  <div class="pulse-ring"></div>
+  <h2 class="cta-title">Tag in.</h2>
+  <form class="cta-form" onsubmit="event.preventDefault()">
+    <input type="text" class="cta-input" placeholder="what are you building?">
+    <button type="submit" class="cta-button">Tag in &rarr;</button>
+  </form>
+  <p class="cta-meta">Amsterdam &middot; Every Thursday &middot; A Lab</p>
+</section>
+
+<!-- ========== SECTION 8: FOOTER ========== -->
+<footer class="footer">
+  <div class="footer-row">
+    <div class="footer-logo">TAG</div>
+    <nav class="footer-links">
+      <a href="#statement">About</a>
+      <a href="#events">Events</a>
+      <a href="#builders">Builders</a>
+    </nav>
+    <div class="footer-socials">
+      <div class="social-circle"></div>
+      <div class="social-circle"></div>
+      <div class="social-circle"></div>
+    </div>
+  </div>
+  <p class="footer-copy">&copy; 2026 TAG &middot; Amsterdam</p>
+</footer>
+
+<script>
+// ========================================
+// PARTICLES CANVAS
+// ========================================
+(function() {
+  const canvas = document.getElementById('particles-canvas')
+  const ctx = canvas.getContext('2d')
+  let width, height
+  let mouseX = -9999
+  let mouseY = -9999
+  const PARTICLE_COUNT = 60
+  const REPEL_RADIUS = 120
+  const REPEL_FORCE = 2
+  const particles = []
+
+  const colors = [
+    '#ff5f1f',
+    '#ff5f1f',
+    '#ff5f1f',
+    '#ff8c5a',
+    '#ff8c5a',
+    '#f0ebe3',
+  ]
+
+  function resize() {
+    width = canvas.width = window.innerWidth
+    height = canvas.height = window.innerHeight
+  }
+
+  function createParticle() {
+    return {
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: 1 + Math.random() * 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: -(Math.random() * 0.2 + 0.05),
+      baseAlpha: 0.3 + Math.random() * 0.7,
+      glowSize: 4 + Math.random() * 8,
+    }
+  }
+
+  function init() {
+    resize()
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(createParticle())
+    }
+  }
+
+  function update() {
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i]
+
+      // Mouse repulsion
+      const dx = p.x - mouseX
+      const dy = p.y - mouseY
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      if (dist < REPEL_RADIUS && dist > 0) {
+        const force = (REPEL_RADIUS - dist) / REPEL_RADIUS * REPEL_FORCE
+        p.vx += (dx / dist) * force * 0.1
+        p.vy += (dy / dist) * force * 0.1
+      }
+
+      // Apply velocity with damping
+      p.x += p.vx
+      p.y += p.vy
+      p.vx *= 0.99
+      p.vy *= 0.99
+
+      // Slight upward drift
+      p.vy -= 0.002
+
+      // Wrap around edges
+      if (p.y < -20) {
+        p.y = height + 20
+        p.x = Math.random() * width
+      }
+      if (p.y > height + 20) {
+        p.y = -20
+      }
+      if (p.x < -20) p.x = width + 20
+      if (p.x > width + 20) p.x = -20
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height)
+
+    // Warm glow at bottom center
+    const glow = ctx.createRadialGradient(width / 2, height, 0, width / 2, height, height * 0.6)
+    glow.addColorStop(0, 'rgba(255, 95, 31, 0.04)')
+    glow.addColorStop(1, 'transparent')
+    ctx.fillStyle = glow
+    ctx.fillRect(0, 0, width, height)
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i]
+
+      ctx.save()
+      ctx.globalAlpha = p.baseAlpha
+      ctx.shadowBlur = p.glowSize
+      ctx.shadowColor = p.color
+      ctx.fillStyle = p.color
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.restore()
+    }
+  }
+
+  function animate() {
+    update()
+    draw()
+    requestAnimationFrame(animate)
+  }
+
+  window.addEventListener('resize', resize)
+
+  canvas.addEventListener('mousemove', function(e) {
+    const rect = canvas.getBoundingClientRect()
+    mouseX = e.clientX - rect.left
+    mouseY = e.clientY - rect.top
+  })
+
+  canvas.addEventListener('mouseleave', function() {
+    mouseX = -9999
+    mouseY = -9999
+  })
+
+  init()
+  animate()
+})();
+
+// ========================================
+// BUILDERS GRID
+// ========================================
+(function() {
+  const builders = [
+    { name: 'Boris de Wit', initials: 'BW' },
+    { name: 'Caesar Schoorl', initials: 'CS' },
+    { name: 'Kevin Muiser', initials: 'KM' },
+    { name: 'Pieter de Kroon', initials: 'PK' },
+    { name: 'Tim Robben', initials: 'TR' },
+    { name: 'Thomas van Berg', initials: 'TB' },
+    { name: 'Tijs Nieuwboer', initials: 'TN' },
+    { name: 'Thomas Termaat', initials: 'TT' },
+    { name: 'Maarten Mulder', initials: 'MM' },
+    { name: 'Bram van Rijen', initials: 'BR' },
+  ]
+
+  const grid = document.getElementById('builders-grid')
+
+  builders.forEach(function(b, i) {
+    const tag = document.createElement('div')
+    tag.className = 'builder-tag'
+    tag.setAttribute('data-reveal', '')
+    tag.setAttribute('data-delay', String(i * 80))
+    tag.innerHTML =
+      '<div class="builder-avatar">' + b.initials + '</div>' +
+      '<span class="builder-name">' + b.name + '</span>' +
+      '<span class="builder-dot"></span>'
+    grid.appendChild(tag)
+  })
+})();
+
+// ========================================
+// INTERSECTION OBSERVER — SCROLL REVEALS
+// ========================================
+(function() {
+  const revealElements = document.querySelectorAll('[data-reveal]')
+
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        const el = entry.target
+        const delay = parseInt(el.getAttribute('data-delay') || '0', 10)
+        setTimeout(function() {
+          el.classList.add('revealed')
+        }, delay)
+        observer.unobserve(el)
+      }
+    })
+  }, {
+    threshold: 0.2,
+    rootMargin: '0px 0px -40px 0px'
+  })
+
+  revealElements.forEach(function(el) {
+    observer.observe(el)
+  })
+})();
+
+// ========================================
+// COUNTER ANIMATION
+// ========================================
+(function() {
+  const counterEl = document.getElementById('counter')
+  const target = parseInt(counterEl.getAttribute('data-target'), 10)
+  let hasRun = false
+
+  function easeOutExpo(t) {
+    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+  }
+
+  function animateCounter() {
+    if (hasRun) return
+    hasRun = true
+
+    const duration = 2000
+    const start = performance.now()
+
+    function tick(now) {
+      const elapsed = now - start
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = easeOutExpo(progress)
+      const current = Math.floor(eased * target)
+      counterEl.textContent = current + '+'
+
+      if (progress < 1) {
+        requestAnimationFrame(tick)
+      } else {
+        counterEl.textContent = target + '+'
+      }
+    }
+
+    requestAnimationFrame(tick)
+  }
+
+  const counterObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        animateCounter()
+        counterObserver.unobserve(entry.target)
+      }
+    })
+  }, {
+    threshold: 0.3
+  })
+
+  counterObserver.observe(counterEl)
+})();
+</script>
+
+</body>
+</html>

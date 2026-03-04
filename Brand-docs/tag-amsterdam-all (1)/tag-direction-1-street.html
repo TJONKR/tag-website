@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAG — Direction 1: Street</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f0ece4;
+    --accent: #ff3d00;
+    --grey: #888;
+  }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 2rem;
+  }
+
+  /* Spray paint drip effect on the edges */
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 40px;
+    width: 3px;
+    height: 70vh;
+    background: linear-gradient(to bottom, var(--accent), var(--accent) 80%, transparent);
+    opacity: 0.4;
+  }
+
+  .tag-main {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(10rem, 25vw, 22rem);
+    letter-spacing: 0.02em;
+    line-height: 0.85;
+    position: relative;
+    animation: glitchIn 0.8s ease-out;
+  }
+
+  .tag-main span:nth-child(1) { color: var(--white); }
+  .tag-main span:nth-child(2) { color: var(--accent); position: relative; top: -0.03em; }
+  .tag-main span:nth-child(3) { color: var(--white); }
+
+  /* Glitch shadow */
+  .tag-main::after {
+    content: 'TAG';
+    position: absolute;
+    top: 4px; left: 6px;
+    font-size: inherit;
+    font-family: inherit;
+    letter-spacing: inherit;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 61, 0, 0.3);
+    z-index: -1;
+  }
+
+  @keyframes glitchIn {
+    0% { transform: translateX(-100vw) skewX(-20deg); opacity: 0; }
+    60% { transform: translateX(10px) skewX(2deg); opacity: 1; }
+    80% { transform: translateX(-5px) skewX(-1deg); }
+    100% { transform: translateX(0) skewX(0); }
+  }
+
+  .subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-top: 1.5rem;
+    animation: fadeUp 1s ease-out 0.5s both;
+  }
+
+  .acronym {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+    color: var(--white);
+    margin-top: 3rem;
+    letter-spacing: 0.15em;
+    animation: fadeUp 1s ease-out 0.8s both;
+  }
+
+  .acronym em {
+    font-style: normal;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  @keyframes fadeUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: var(--accent);
+    margin: 3rem auto;
+    animation: fadeUp 1s ease-out 1s both;
+  }
+
+  .pitch {
+    max-width: 520px;
+    text-align: center;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--grey);
+    animation: fadeUp 1s ease-out 1.2s both;
+  }
+
+  .cta {
+    margin-top: 3rem;
+    animation: fadeUp 1s ease-out 1.4s both;
+  }
+
+  .cta a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--accent);
+    padding: 1rem 2.5rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+
+  .cta a:hover {
+    background: var(--white);
+    transform: skewX(-2deg);
+  }
+
+  /* Corner marks */
+  .corner {
+    position: fixed;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey);
+    opacity: 0.5;
+  }
+  .corner.tl { top: 2rem; left: 2rem; }
+  .corner.tr { top: 2rem; right: 2rem; }
+  .corner.bl { bottom: 2rem; left: 2rem; }
+  .corner.br { bottom: 2rem; right: 2rem; }
+
+  .scroll-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .scroll-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 0.9;
+    margin-bottom: 2rem;
+    color: var(--white);
+  }
+
+  .scroll-section h2 span {
+    color: var(--accent);
+  }
+
+  .scroll-section p {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--grey);
+    margin-bottom: 1.5rem;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 3rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: left;
+  }
+
+  .stat .number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat .label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-top: 0.3rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="corner tl">Amsterdam</div>
+<div class="corner tr">Est. 2024</div>
+<div class="corner bl">Builders</div>
+<div class="corner br">52.3676° N</div>
+
+<section class="hero">
+  <div class="tag-main">
+    <span>T</span><span>A</span><span>G</span>
+  </div>
+  <div class="subtitle">To Achieve Greatness</div>
+  <div class="divider"></div>
+  <div class="pitch">
+    The cultural layer underneath the startup ecosystem.<br>
+    A builder community in Amsterdam.
+  </div>
+  <div class="cta">
+    <a href="#">Are you building something?</a>
+  </div>
+</section>
+
+<section class="scroll-section">
+  <h2>What if the hackathon <span>never ended?</span></h2>
+  <p>You know that feeling. Building something real. Surrounded by people who get it. The energy, the competition, the fun. You ship, you show, you maybe win.</p>
+  <p>But hackathons end. Monday comes.</p>
+  <p>We made it permanent.</p>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="number">60</div>
+      <div class="label">Builders at HQ</div>
+    </div>
+    <div class="stat">
+      <div class="number">2K+</div>
+      <div class="label">In the network</div>
+    </div>
+    <div class="stat">
+      <div class="number">51</div>
+      <div class="label">Projects shipped</div>
+    </div>
+    <div class="stat">
+      <div class="number">6</div>
+      <div class="label">Hackathons / yr</div>
+    </div>
+  </div>
+</section>
+
+<section class="scroll-section">
+  <h2>Leave <span>your tag.</span></h2>
+  <p>Ship fast, learn faster. Show your work. Help each other. Joy is the point.</p>
+  <p>We don't ask for your pitch deck. We don't ask about your runway. We ask one thing: are you building something?</p>
+  <div class="cta" style="animation: none;">
+    <a href="#">Tag in →</a>
+  </div>
+</section>
+
+</body>
+</html>

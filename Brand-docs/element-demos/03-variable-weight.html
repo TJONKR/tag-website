@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Variable Font Weight - TAG Brand Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400..800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .label {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      z-index: 10;
+    }
+
+    .demo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 40px 80px;
+    }
+
+    .section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 0;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      font-weight: 400;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      margin-bottom: 40px;
+    }
+
+    .variable-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 12vw;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      cursor: default;
+      user-select: none;
+    }
+
+    .variable-text span {
+      display: inline-block;
+      font-variation-settings: 'wght' 400;
+      transition: font-variation-settings 0.15s ease-out;
+    }
+
+    .wave-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 10vw;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      user-select: none;
+      color: #ff5f1f;
+    }
+
+    .wave-text span {
+      display: inline-block;
+      font-variation-settings: 'wght' 400;
+    }
+
+    .divider {
+      width: 40px;
+      height: 2px;
+      background: #ff5f1f;
+      opacity: 0.4;
+      margin: 20px 0;
+    }
+
+    .hint {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #5e5850;
+      margin-top: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">03 / variable font weight &mdash; cursor proximity &amp; wave</div>
+
+  <div class="demo-container">
+    <div class="section">
+      <div class="section-label">Mouse proximity &rarr; weight</div>
+      <div class="variable-text" id="interactiveText"></div>
+      <div class="hint">hover &amp; move cursor over the text</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-label">Autonomous sine wave</div>
+      <div class="wave-text" id="waveText"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- Interactive text: weight by cursor proximity ---
+    const TEXT_1 = 'TAG AMSTERDAM'
+    const interactiveEl = document.getElementById('interactiveText')
+
+    // Split into spans
+    TEXT_1.split('').forEach((char, i) => {
+      const span = document.createElement('span')
+      if (char === ' ') {
+        span.innerHTML = '&nbsp;'
+        span.style.width = '0.25em'
+      } else {
+        span.textContent = char
+      }
+      span.dataset.index = i
+      interactiveEl.appendChild(span)
+    })
+
+    const interactiveSpans = interactiveEl.querySelectorAll('span')
+    let mouseX = -1000
+    let mouseY = -1000
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX
+      mouseY = e.clientY
+    })
+
+    function updateInteractiveWeights() {
+      interactiveSpans.forEach((span) => {
+        const rect = span.getBoundingClientRect()
+        const charCenterX = rect.left + rect.width / 2
+        const charCenterY = rect.top + rect.height / 2
+
+        const dx = mouseX - charCenterX
+        const dy = mouseY - charCenterY
+        const distance = Math.sqrt(dx * dx + dy * dy)
+
+        // Max influence radius in pixels
+        const maxRadius = 250
+        const proximity = Math.max(0, 1 - distance / maxRadius)
+
+        // Map proximity to weight: 400 (far) to 800 (close)
+        const weight = 400 + proximity * 400
+
+        span.style.fontVariationSettings = `'wght' ${weight}`
+
+        // Also subtly shift color closer to accent when heavy
+        const brightness = 0.94 + proximity * 0.06
+        if (proximity > 0.3) {
+          const orangeAmount = (proximity - 0.3) / 0.7
+          const r = Math.round(240 + (255 - 240) * orangeAmount)
+          const g = Math.round(235 - (235 - 95) * orangeAmount * 0.3)
+          const b = Math.round(227 - (227 - 31) * orangeAmount * 0.3)
+          span.style.color = `rgb(${r}, ${g}, ${b})`
+        } else {
+          span.style.color = '#f0ebe3'
+        }
+      })
+
+      requestAnimationFrame(updateInteractiveWeights)
+    }
+
+    requestAnimationFrame(updateInteractiveWeights)
+
+    // --- Wave text: autonomous sine wave ---
+    const TEXT_2 = 'BUILDERS'
+    const waveEl = document.getElementById('waveText')
+
+    TEXT_2.split('').forEach((char, i) => {
+      const span = document.createElement('span')
+      span.textContent = char
+      span.dataset.index = i
+      waveEl.appendChild(span)
+    })
+
+    const waveSpans = waveEl.querySelectorAll('span')
+    let startTime = performance.now()
+
+    function updateWave(timestamp) {
+      const elapsed = (timestamp - startTime) / 1000 // seconds
+
+      waveSpans.forEach((span, i) => {
+        // Traveling sine wave
+        const frequency = 1.2
+        const speed = 3
+        const phase = i * 0.6
+        const sineVal = Math.sin(elapsed * speed - phase)
+
+        // Map sine [-1, 1] to weight [400, 800]
+        const weight = 600 + sineVal * 200
+
+        span.style.fontVariationSettings = `'wght' ${weight}`
+
+        // Subtle vertical shift for extra visual punch
+        const yOffset = sineVal * -3
+        span.style.transform = `translateY(${yOffset}px)`
+      })
+
+      requestAnimationFrame(updateWave)
+    }
+
+    requestAnimationFrame(updateWave)
+  </script>
+</body>
+</html>

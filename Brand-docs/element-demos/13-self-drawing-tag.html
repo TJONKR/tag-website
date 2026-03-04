@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Drawing Tag Mark - TAG Element Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      z-index: 100;
+    }
+
+    .demo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 64px;
+      padding: 60px 40px;
+    }
+
+    .mark-section {
+      text-align: center;
+    }
+
+    .mark-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.12em;
+      margin-bottom: 24px;
+    }
+
+    .svg-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Self-drawing stroke animation */
+    .draw-path {
+      fill: none;
+      stroke: #ff5f1f;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .swoosh-path {
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: draw-stroke 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .tag-letter {
+      fill: none;
+      stroke: #ff5f1f;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .tag-t {
+      stroke-dasharray: 300;
+      stroke-dashoffset: 300;
+      animation: draw-letter-t 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+    }
+
+    .tag-a {
+      stroke-dasharray: 350;
+      stroke-dashoffset: 350;
+      animation: draw-letter-a 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.8s forwards;
+    }
+
+    .tag-g {
+      stroke-dasharray: 400;
+      stroke-dashoffset: 400;
+      animation: draw-letter-g 0.9s cubic-bezier(0.4, 0, 0.2, 1) 1.3s forwards;
+    }
+
+    .tag-dot {
+      stroke-dasharray: 20;
+      stroke-dashoffset: 20;
+      animation: draw-dot 0.3s cubic-bezier(0.4, 0, 0.2, 1) 2s forwards;
+    }
+
+    .tag-underline {
+      stroke-dasharray: 250;
+      stroke-dashoffset: 250;
+      animation: draw-underline 0.6s cubic-bezier(0.4, 0, 0.2, 1) 2.2s forwards;
+    }
+
+    @keyframes draw-stroke {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes draw-letter-t {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes draw-letter-a {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes draw-letter-g {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes draw-dot {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes draw-underline {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    /* Replay states */
+    .reset .swoosh-path {
+      animation: none;
+      stroke-dashoffset: 600;
+    }
+
+    .reset .tag-t {
+      animation: none;
+      stroke-dashoffset: 300;
+    }
+
+    .reset .tag-a {
+      animation: none;
+      stroke-dashoffset: 350;
+    }
+
+    .reset .tag-g {
+      animation: none;
+      stroke-dashoffset: 400;
+    }
+
+    .reset .tag-dot {
+      animation: none;
+      stroke-dashoffset: 20;
+    }
+
+    .reset .tag-underline {
+      animation: none;
+      stroke-dashoffset: 250;
+    }
+
+    .replay-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ff5f1f;
+      color: #141210;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+      letter-spacing: 0.02em;
+      margin-top: 48px;
+    }
+
+    .replay-btn:hover {
+      background: #e85518;
+      transform: translateY(-1px);
+    }
+
+    .replay-btn:active {
+      transform: translateY(0);
+    }
+
+    .replay-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: #2a2724;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">self-drawing tag mark</div>
+
+  <div class="demo-container" id="demo">
+    <!-- Swoosh mark -->
+    <div class="mark-section">
+      <div class="mark-label">Tag Mark &mdash; Swoosh</div>
+      <div class="svg-container">
+        <svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+          <!-- A confident, graffiti-style swoosh mark -->
+          <path class="draw-path swoosh-path"
+            d="M 30 110
+               C 40 105, 50 60, 80 45
+               C 110 30, 130 55, 150 50
+               C 170 45, 175 25, 200 30
+               C 225 35, 210 70, 230 65
+               C 250 60, 255 35, 270 40
+               L 275 42
+               M 260 38
+               C 255 50, 240 80, 200 90
+               C 160 100, 120 85, 80 95
+               C 60 100, 45 115, 35 118" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- TAG text drawn as SVG -->
+    <div class="mark-section">
+      <div class="mark-label">Tag Wordmark &mdash; Hand-drawn</div>
+      <div class="svg-container">
+        <svg width="360" height="120" viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg">
+          <!-- T: crossbar then stem -->
+          <path class="tag-letter tag-t"
+            d="M 20 22
+               C 25 20, 55 18, 75 22
+               M 47 20
+               C 46 35, 48 60, 46 85
+               C 45 90, 47 92, 46 95" />
+
+          <!-- A: two strokes up then crossbar -->
+          <path class="tag-letter tag-a"
+            d="M 95 95
+               C 96 80, 105 45, 115 25
+               C 118 20, 122 18, 125 20
+               C 130 25, 140 55, 148 95
+               M 102 65
+               C 110 62, 130 60, 142 65" />
+
+          <!-- G: arc curve with inward hook -->
+          <path class="tag-letter tag-g"
+            d="M 220 35
+               C 210 25, 185 18, 172 30
+               C 160 42, 162 70, 170 85
+               C 178 100, 200 102, 215 92
+               C 225 85, 222 68, 220 60
+               L 195 60" />
+
+          <!-- Dot after G -->
+          <circle class="tag-letter tag-dot" cx="240" cy="93" r="4"
+            fill="none" stroke="#ff5f1f" stroke-width="3" />
+
+          <!-- Underline swoosh -->
+          <path class="tag-letter tag-underline"
+            d="M 25 108
+               C 60 105, 140 100, 200 103
+               C 240 105, 245 107, 250 104" />
+        </svg>
+      </div>
+    </div>
+
+    <button class="replay-btn" id="replayBtn" onclick="replay()">
+      <svg class="replay-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M2 8a6 6 0 0 1 10.2-4.2L14 2v4h-4l1.8-1.8A4.5 4.5 0 1 0 12.5 8" />
+      </svg>
+      Replay
+    </button>
+  </div>
+
+  <script>
+    function replay() {
+      const demo = document.getElementById('demo')
+
+      // Add reset class to kill animations and reset offsets
+      demo.classList.add('reset')
+
+      // Force reflow so the browser registers the reset state
+      void demo.offsetWidth
+
+      // Remove reset class to re-trigger all animations
+      demo.classList.remove('reset')
+    }
+  </script>
+</body>
+</html>

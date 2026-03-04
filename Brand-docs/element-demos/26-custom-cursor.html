@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Cursor - TAG Brand Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #141210;
+      color: #f0ebe3;
+      min-height: 100vh;
+      font-family: 'Space Grotesk', sans-serif;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    .label {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    /* Custom cursor */
+    .cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      background: #ff5f1f;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .cursor-dot.hovering {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    .cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ff5f1f;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    }
+
+    .cursor-ring.hovering {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 95, 31, 0.08);
+    }
+
+    .cursor-ring.card-hover {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 95, 31, 0.12);
+      border-color: #ff5f1f;
+    }
+
+    /* Layout */
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 80px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #5e5850;
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 12px 28px;
+      border-radius: 6px;
+      border: none;
+      cursor: none;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn--primary {
+      background: #ff5f1f;
+      color: #141210;
+    }
+
+    .btn--primary:hover {
+      background: #e8551b;
+    }
+
+    .btn--ghost {
+      background: transparent;
+      color: #f0ebe3;
+      border: 1px solid #3d3a35;
+    }
+
+    .btn--ghost:hover {
+      border-color: #ff5f1f;
+      color: #ff5f1f;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .links-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #5e5850;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .text-link {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      color: #ff5f1f;
+      text-decoration: none;
+      cursor: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+    }
+
+    .text-link:hover {
+      text-decoration: underline;
+    }
+
+    .text-link .arrow {
+      transition: transform 0.2s;
+    }
+
+    .text-link:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: #1e1c19;
+      border: 1px solid #2a2724;
+      border-radius: 10px;
+      padding: 28px;
+      cursor: none;
+      transition: border-color 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card:hover {
+      border-color: #ff5f1f;
+    }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .card-desc {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      color: #5e5850;
+      line-height: 1.5;
+    }
+
+    .card-meta {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: #ff5f1f;
+      margin-top: auto;
+      padding-top: 8px;
+    }
+
+    .interactive { cursor: none; }
+  </style>
+</head>
+<body>
+  <div class="label">custom cursor</div>
+
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <div class="content">
+    <div class="hero">
+      <h1>Move your cursor<br>around the page</h1>
+      <p>The dot follows instantly. The ring follows with a smooth delay. Hover over interactive elements to see the effect change.</p>
+    </div>
+
+    <div class="buttons">
+      <a class="btn btn--primary interactive" href="#">Tag in</a>
+      <a class="btn btn--ghost interactive" href="#">See events</a>
+      <a class="btn btn--ghost interactive" href="#">Explore projects</a>
+    </div>
+
+    <div class="links">
+      <div class="links-title">Quick links</div>
+      <a class="text-link interactive" href="#">About TAG Amsterdam <span class="arrow">&rarr;</span></a>
+      <a class="text-link interactive" href="#">View all builders <span class="arrow">&rarr;</span></a>
+      <a class="text-link interactive" href="#">Past events <span class="arrow">&rarr;</span></a>
+      <a class="text-link interactive" href="#">Github <span class="arrow">&rarr;</span></a>
+    </div>
+
+    <div class="cards">
+      <div class="card interactive" data-cursor="card">
+        <div class="card-title">Build Night #47</div>
+        <div class="card-desc">Monthly build night at TAG Amsterdam. Bring your project and build alongside other makers.</div>
+        <div class="card-meta">Mar 15 &middot; 18:00</div>
+      </div>
+      <div class="card interactive" data-cursor="card">
+        <div class="card-title">AI Hackathon</div>
+        <div class="card-desc">48-hour hackathon focused on voice AI. Teams of 2-4. Live demos and prizes.</div>
+        <div class="card-meta">Mar 22 &middot; 09:00</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dot = document.getElementById('cursorDot')
+    const ring = document.getElementById('cursorRing')
+
+    let mouseX = 0
+    let mouseY = 0
+    let ringX = 0
+    let ringY = 0
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX
+      mouseY = e.clientY
+      dot.style.left = mouseX + 'px'
+      dot.style.top = mouseY + 'px'
+    })
+
+    const animateRing = () => {
+      const speed = 0.12
+      ringX += (mouseX - ringX) * speed
+      ringY += (mouseY - ringY) * speed
+      ring.style.left = ringX + 'px'
+      ring.style.top = ringY + 'px'
+      requestAnimationFrame(animateRing)
+    }
+
+    animateRing()
+
+    const interactives = document.querySelectorAll('.interactive')
+
+    interactives.forEach((el) => {
+      el.addEventListener('mouseenter', () => {
+        dot.classList.add('hovering')
+        if (el.dataset.cursor === 'card') {
+          ring.classList.add('card-hover')
+        } else {
+          ring.classList.add('hovering')
+        }
+      })
+
+      el.addEventListener('mouseleave', () => {
+        dot.classList.remove('hovering')
+        ring.classList.remove('hovering')
+        ring.classList.remove('card-hover')
+      })
+    })
+
+    /* Hide cursors when mouse leaves the window */
+    document.addEventListener('mouseleave', () => {
+      dot.style.opacity = '0'
+      ring.style.opacity = '0'
+    })
+
+    document.addEventListener('mouseenter', () => {
+      dot.style.opacity = ''
+      ring.style.opacity = ''
+    })
+  </script>
+</body>
+</html>
