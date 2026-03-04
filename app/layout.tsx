@@ -1,15 +1,14 @@
 import { Toaster } from 'sonner'
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Funnel_Display, Plus_Jakarta_Sans } from 'next/font/google'
-import { ThemeProvider } from '@components/theme-provider'
+import { Syne, Space_Grotesk, Space_Mono } from 'next/font/google'
 
 import './globals.css'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://aiambuilders.com'),
-  title: 'AI.AM Builders',
+  title: 'TAG — To Achieve Greatness',
   description:
-    'AI Amsterdam Builders is a community that brings together top AI creators and builders to collaborate, share knowledge, and build high-level AI solutions.',
+    'A community of builders, hackers, and creators in Amsterdam. We meet every week. We ship every month. We show what we built — then we do it again.',
   icons: {
     icon: '/images/Subtract.svg',
     apple: '/images/Subtract.svg',
@@ -20,51 +19,26 @@ export const viewport = {
   maximumScale: 1,
 }
 
-const geist = Geist({
+const syne = Syne({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-geist',
+  variable: '--font-syne',
+  weight: ['800'],
 })
 
-const geistMono = Geist_Mono({
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-geist-mono',
+  variable: '--font-grotesk',
+  weight: ['400', '500', '600'],
 })
 
-const funnelDisplay = Funnel_Display({
+const spaceMono = Space_Mono({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-funnel-display',
-  weight: ['400', '500', '600', '700'],
+  variable: '--font-mono',
+  weight: ['400', '700'],
 })
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-plus-jakarta',
-  weight: ['400', '500', '600', '700'],
-})
-
-const LIGHT_THEME_COLOR = 'hsl(0 0% 100%)'
-const DARK_THEME_COLOR = 'hsl(240deg 10% 3.92%)'
-const THEME_COLOR_SCRIPT = `\
-(function() {
-  var html = document.documentElement;
-  var meta = document.querySelector('meta[name="theme-color"]');
-  if (!meta) {
-    meta = document.createElement('meta');
-    meta.setAttribute('name', 'theme-color');
-    document.head.appendChild(meta);
-  }
-  function updateThemeColor() {
-    var isDark = html.classList.contains('dark');
-    meta.setAttribute('content', isDark ? '${DARK_THEME_COLOR}' : '${LIGHT_THEME_COLOR}');
-  }
-  var observer = new MutationObserver(updateThemeColor);
-  observer.observe(html, { attributes: true, attributeFilter: ['class'] });
-  updateThemeColor();
-})();`
 
 export default async function RootLayout({
   children,
@@ -74,26 +48,11 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      suppressHydrationWarning
-      className={`${geist.variable} ${geistMono.variable} ${funnelDisplay.variable} ${plusJakartaSans.variable}`}
+      className={`dark ${syne.variable} ${spaceGrotesk.variable} ${spaceMono.variable}`}
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: THEME_COLOR_SCRIPT,
-          }}
-        />
-      </head>
       <body className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Toaster position="top-center" />
-          {children}
-        </ThemeProvider>
+        <Toaster position="top-center" />
+        {children}
       </body>
     </html>
   )

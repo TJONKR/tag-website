@@ -1,23 +1,29 @@
 import {
-  Header,
-  Hero,
-  CoworkingSpace,
-  BuilderCollective,
-  JoinUs,
+  GrainOverlay,
+  HeroVideo,
+  Manifesto,
+  Programs,
+  Builders,
+  Quote,
+  Events,
+  Cta,
   Footer,
 } from '@components/landing'
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
-      <Header />
+    <>
+      <GrainOverlay />
       <main>
-        <Hero />
-        <CoworkingSpace />
-        <BuilderCollective />
-        <JoinUs />
+        <HeroVideo />
+        <Manifesto />
+        <Programs />
+        <Quote />
+        <Builders />
+        <Events />
+        <Cta />
+        <Footer />
       </main>
-      <Footer />
-    </div>
+    </>
   )
 }

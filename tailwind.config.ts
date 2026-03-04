@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss';
+import type { Config } from 'tailwindcss'
 
 const config: Config = {
   darkMode: ['class'],
@@ -11,10 +11,10 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-geist)'],
-        mono: ['var(--font-geist-mono)'],
-        funnel: ['var(--font-funnel-display)'],
-        jakarta: ['var(--font-plus-jakarta)'],
+        sans: ['var(--font-grotesk)'],
+        mono: ['var(--font-mono)'],
+        syne: ['var(--font-syne)'],
+        grotesk: ['var(--font-grotesk)'],
       },
       screens: {
         'toast-mobile': '600px',
@@ -75,9 +75,19 @@ const config: Config = {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        tag: {
+          orange: '#ff5f1f',
+          bg: '#141210',
+          'bg-deep': '#0e0d0b',
+          card: '#1a1816',
+          text: '#f0ebe3',
+          muted: '#9b9589',
+          dim: '#5e5850',
+          border: '#2a2724',
+        },
       },
     },
   },
   plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
-};
-export default config;
+}
+export default config
