@@ -12,7 +12,7 @@ export const Manifesto = () => {
     >
       <p className="reveal max-w-[640px] font-grotesk text-[clamp(20px,3vw,32px)] leading-[1.6] text-tag-text">
         For the <span className="text-tag-orange">obsessed</span>, creative and talented people
-        who create. Every single day.
+        who commit. Every single day.
       </p>
       <hr className="reveal mx-auto my-10 h-[3px] w-12 border-none bg-tag-orange" />
       <p className="reveal max-w-[520px] font-grotesk text-lg leading-relaxed text-tag-muted">

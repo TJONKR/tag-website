@@ -3,6 +3,7 @@
 import Link from 'next/link'
 
 import { useScrollReveal } from '@hooks/use-scroll-reveal'
+import { DotGrid } from './dot-grid'
 
 export const Cta = () => {
   const ref = useScrollReveal()
@@ -10,8 +11,12 @@ export const Cta = () => {
   return (
     <section
       ref={ref}
-      className="scanlines relative flex h-screen flex-col justify-end overflow-hidden bg-tag-bg-deep p-[60px] max-md:p-8"
+      className="relative flex h-screen flex-col justify-end overflow-hidden bg-tag-bg-deep p-[60px] max-md:p-8"
+      style={{ cursor: 'crosshair' }}
     >
+      {/* Dot grid background */}
+      <DotGrid />
+
       {/* Decorative arrow */}
       <div className="absolute right-[60px] top-[60px] z-[1] select-none font-syne text-[200px] leading-none text-tag-border">
         &rarr;
