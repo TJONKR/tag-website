@@ -1,3 +1,12 @@
+import Link from 'next/link'
+
+const footerLinks = [
+  { label: 'Space', href: '/space' },
+  { label: 'Events', href: '/events' },
+  { label: 'Ecosystem', href: '/ecosystem' },
+  { label: 'Join', href: '/join' },
+]
+
 export const Footer = () => {
   return (
     <footer className="border-t-[3px] border-tag-border bg-tag-bg-deep">
@@ -7,7 +16,20 @@ export const Footer = () => {
         <div className="font-mono text-[11px] text-tag-dim">2026</div>
       </div>
 
-      {/* Row 2: Socials + Location */}
+      {/* Row 2: Nav links */}
+      <div className="flex items-center gap-6 border-t border-tag-border px-[60px] py-4 max-md:px-8">
+        {footerLinks.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="font-mono text-[11px] uppercase tracking-[0.08em] text-tag-dim transition-colors hover:text-tag-text"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+
+      {/* Row 3: Socials + Location */}
       <div className="flex items-center justify-between border-t border-tag-border px-[60px] py-4 max-md:px-8">
         <div className="flex gap-2">
           {/* X (Twitter) */}

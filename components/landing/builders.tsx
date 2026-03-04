@@ -60,8 +60,8 @@ export const Builders = () => {
 
   return (
     <section id="builders" ref={sectionRef} className="scanlines relative overflow-hidden">
-      {/* Full card grid as background — 8 cols × 3 rows on desktop */}
-      <div className="grid grid-cols-8 max-lg:grid-cols-6 max-md:grid-cols-4 max-sm:grid-cols-3">
+      {/* Full card grid as background — 6 cols × 3 rows on desktop */}
+      <div className="grid grid-cols-6 max-lg:grid-cols-4 max-md:grid-cols-3 max-sm:grid-cols-2">
         {gridBuilders.map((builder, i) => (
           <BuilderCard key={builder.slug} builder={builder} index={i} />
         ))}

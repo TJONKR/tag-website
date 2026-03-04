@@ -13,7 +13,7 @@ export const AuthForm = ({ action, children, defaultEmail = '' }: AuthFormProps)
   return (
     <Form action={action} className="flex flex-col gap-4 px-4 sm:px-16">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="email" className="font-normal text-zinc-600 dark:text-zinc-400">
+        <Label htmlFor="email" className="font-normal text-tag-muted">
           Email Address
         </Label>
 
@@ -31,7 +31,7 @@ export const AuthForm = ({ action, children, defaultEmail = '' }: AuthFormProps)
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="password" className="font-normal text-zinc-600 dark:text-zinc-400">
+        <Label htmlFor="password" className="font-normal text-tag-muted">
           Password
         </Label>
 

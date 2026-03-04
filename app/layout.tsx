@@ -2,6 +2,8 @@ import { Toaster } from 'sonner'
 import type { Metadata } from 'next'
 import { Syne, Space_Grotesk, Space_Mono } from 'next/font/google'
 
+import { StickyNav } from '@components/navigation'
+
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -52,6 +54,7 @@ export default async function RootLayout({
     >
       <body className="antialiased">
         <Toaster position="top-center" />
+        <StickyNav />
         {children}
       </body>
     </html>

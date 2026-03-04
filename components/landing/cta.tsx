@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import { useScrollReveal } from '@hooks/use-scroll-reveal'
 
 export const Cta = () => {
@@ -20,13 +22,17 @@ export const Cta = () => {
         <div className="font-syne text-[clamp(80px,12vw,140px)] leading-[0.9] text-tag-text">
           TAG IN.
         </div>
+        <p className="mt-4 max-w-[600px] font-grotesk text-lg leading-relaxed text-tag-muted">
+          Europe has the talent. What we&apos;re missing is the irrational belief that we deserve to
+          win. This is where that belief starts.
+        </p>
         <div className="mt-6 flex items-center gap-4">
-          <a
-            href="#"
+          <Link
+            href="/join"
             className="whitespace-nowrap bg-tag-orange px-12 py-5 font-grotesk text-lg font-medium text-tag-bg-deep transition-colors hover:bg-[#e8551b]"
           >
             Apply &rarr;
-          </a>
+          </Link>
           <span className="whitespace-nowrap font-mono text-[11px] text-tag-dim">
             Amsterdam &middot; A Lab &middot; Every Thursday
           </span>

@@ -49,21 +49,21 @@ export default function Page() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+    <div className="flex min-h-screen items-center justify-center bg-tag-bg p-6">
       <div className="flex w-full max-w-md flex-col gap-12 overflow-hidden rounded-2xl">
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign Up</h3>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">
+          <h3 className="text-xl font-semibold text-tag-text">Sign Up</h3>
+          <p className="text-sm text-tag-muted">
             Create your account to get started
           </p>
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign up</SubmitButton>
-          <p className="mt-4 text-center text-sm text-gray-600 dark:text-zinc-400">
+          <p className="mt-4 text-center text-sm text-tag-muted">
             {'Already have an account? '}
             <Link
               href="/login"
-              className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
+              className="font-semibold text-tag-text hover:underline"
             >
               Sign in
             </Link>

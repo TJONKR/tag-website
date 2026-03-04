@@ -15,7 +15,9 @@
     "ui:add": "pnpm dlx shadcn@latest add",
     "test": "pnpm exec playwright test",
     "test:e2e": "pnpm exec playwright test --project=e2e",
-    "test:routes": "pnpm exec playwright test --project=routes"
+    "test:routes": "pnpm exec playwright test --project=routes",
+    "add-builder": "tsx scripts/add-builder.ts",
+    "batch-scrape": "tsx scripts/batch-scrape.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.16",
@@ -66,6 +68,7 @@
     "zod": "^3.25.68"
   },
   "devDependencies": {
+    "@inquirer/prompts": "^8.3.0",
     "@playwright/test": "^1.50.1",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^22.18.0",
@@ -79,6 +82,7 @@
     "postcss": "^8",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.19.1",
     "typescript": "^5.6.3"
