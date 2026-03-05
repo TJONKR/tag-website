@@ -12,8 +12,13 @@ export const metadata: Metadata = {
   description:
     'A community of builders, hackers, and creators in Amsterdam. We meet every week. We ship every month. We show what we built — then we do it again.',
   icons: {
-    icon: '/images/Subtract.svg',
-    apple: '/images/Subtract.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: '/apple-icon.png',
   },
 }
 
