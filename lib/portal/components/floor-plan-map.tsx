@@ -67,25 +67,29 @@ const deskClusters: DeskCluster[] = [
   // Top row — 3 flex
   makeDeskCluster('A', 'Flex', 'flex', 1, 1, 5, 4),
   makeDeskCluster('B', 'Flex', 'flex', 8, 1, 5, 4),
-  makeDeskCluster('C', 'Flex', 'flex', 15, 1, 4, 4),
+  makeDeskCluster('C', 'Flex', 'flex', 15, 1, 5, 4),
 
   // Middle row
-  makeDeskCluster('D', 'Flex', 'flex', 8, 10, 5, 4),
-  makeDeskCluster('E', 'Flex', 'flex', 15, 7, 4, 4),
+  makeDeskCluster('D', 'Flex', 'flex', 8, 10, 5, 6, 6),
+  makeDeskCluster('E', 'Flex', 'flex', 15, 10, 5, 4),
+
+  // Bottom-left — small flex above Lerai
+  makeDeskCluster('F', 'Flex', 'flex', 1, 14, 5, 4, 2),
 
   // Bottom row
-  makeDeskCluster('F', 'Lerai', 'company', 1, 15, 5, 5, 6, 'Lerai'),
-  makeDeskCluster('G', 'De Franse Kamer', 'company', 15, 16, 4, 4, 4, 'De Franse Kamer'),
+  makeDeskCluster('G', 'Lerai', 'company', 1, 20, 5, 4, 4, 'Lerai'),
+  makeDeskCluster('H', 'De Franse Kamer', 'company', 15, 20, 5, 4, 4, 'De Franse Kamer'),
 ]
 
 const staticZones: StaticZone[] = [
   { id: 'TV', label: 'TV Corner', type: 'amenity', x: 8, y: 6, w: 5, h: 3 },
   { id: 'MR', label: 'Meeting Room', type: 'meeting', x: 1, y: 7, w: 5, h: 6 },
-  { id: 'PT', label: 'Pool Table', type: 'amenity', x: 8, y: 16, w: 5, h: 3 },
+  { id: 'PT', label: 'Pool Table', type: 'amenity', x: 8, y: 17, w: 5, h: 3 },
+  { id: 'LA', label: 'Lunch Area', type: 'amenity', x: 8, y: 21, w: 5, h: 3 },
 ]
 
-const TOTAL_W = 20
-const TOTAL_H = 22
+const TOTAL_W = 21
+const TOTAL_H = 26
 
 const clusterStyles = {
   flex: {
@@ -182,7 +186,7 @@ export const FloorPlanMap = () => {
             </div>
 
             {/* Entrance right side */}
-            <div className="absolute -right-px top-[18%] flex items-center">
+            <div className="absolute -right-px top-[24%] flex items-center">
               <span
                 className="mr-1 font-mono text-[9px] uppercase tracking-[0.2em] text-tag-muted"
                 style={{ writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}
@@ -266,7 +270,11 @@ export const FloorPlanMap = () => {
                   <div
                     className={cn(
                       'grid flex-1 gap-[3px] p-1.5 md:gap-1 md:p-2',
-                      cluster.desks.length > 4 ? 'grid-cols-3' : 'grid-cols-2'
+                      cluster.desks.length > 4 && cluster.desks.length % 3 === 0
+                        ? 'grid-cols-2'
+                        : cluster.desks.length > 4
+                          ? 'grid-cols-3'
+                          : 'grid-cols-2'
                     )}
                   >
                     {cluster.desks.map((desk) => {
@@ -334,10 +342,10 @@ export const FloorPlanMap = () => {
         <span>TAG — Floor plan</span>
         <div className="flex gap-6">
           <span>
-            <span className="text-tag-text/60">20</span> flex
+            <span className="text-tag-text/60">24</span> flex
           </span>
           <span>
-            <span className="text-tag-orange/60">10</span> reserved
+            <span className="text-tag-orange/60">8</span> reserved
           </span>
         </div>
         <span>Rev. 02</span>

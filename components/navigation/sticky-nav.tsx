@@ -18,6 +18,7 @@ const navLinks = [
 export const StickyNav = () => {
   const pathname = usePathname()
   const isHome = pathname === '/'
+  const isPortal = pathname.startsWith('/portal')
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
 
@@ -32,6 +33,8 @@ export const StickyNav = () => {
     onScroll()
     return () => window.removeEventListener('scroll', onScroll)
   }, [isHome])
+
+  if (isPortal) return null
 
   const visible = isHome ? scrolled : true
 

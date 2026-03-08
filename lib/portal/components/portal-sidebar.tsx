@@ -2,17 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  Calendar,
-  Clock,
-  Mail,
-  Map,
-  Menu,
-  ScrollText,
-  Wifi,
-  X,
-} from 'lucide-react'
-import { useState } from 'react'
+import { Calendar, Map, ScrollText } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { portalNavGroups } from '@lib/portal/data'
@@ -20,75 +10,71 @@ import { portalNavGroups } from '@lib/portal/data'
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   calendar: Calendar,
   'scroll-text': ScrollText,
-  wifi: Wifi,
-  clock: Clock,
-  mail: Mail,
   map: Map,
 }
 
+const allItems = portalNavGroups.flatMap((group) => group.items)
+
 export const PortalSidebar = () => {
   const pathname = usePathname()
-  const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
     <>
-      {/* Mobile toggle */}
-      <button
-        onClick={() => setMobileOpen(!mobileOpen)}
-        className="fixed left-4 top-20 z-50 rounded-md border border-tag-border bg-tag-bg p-2 md:hidden"
-        aria-label="Toggle menu"
-      >
-        {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-      </button>
+      {/* Desktop top nav */}
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-tag-border bg-tag-bg">
+        <div className="mx-auto flex h-14 w-full max-w-4xl items-center px-6 md:px-10">
+          <Link href="/" className="font-syne text-xl font-extrabold text-tag-text">
+            TAG
+          </Link>
 
-      {/* Backdrop */}
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 md:hidden"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
+          <div className="ml-auto hidden items-center gap-6 md:flex">
+            {allItems.map((item) => {
+              const Icon = iconMap[item.icon]
+              const isActive = pathname === item.href
 
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          'fixed left-0 top-14 z-40 flex h-[calc(100vh-3.5rem)] w-64 flex-col border-r border-tag-border bg-tag-bg transition-transform md:translate-x-0',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        <nav className="flex-1 space-y-6 px-3 pt-4">
-          {portalNavGroups.map((group) => (
-            <div key={group.label}>
-              <span className="px-3 font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
-                {group.label}
-              </span>
-              <div className="mt-2 space-y-0.5">
-                {group.items.map((item) => {
-                  const Icon = iconMap[item.icon]
-                  const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.1em] transition-colors',
+                    isActive ? 'text-tag-orange' : 'text-tag-muted hover:text-tag-text'
+                  )}
+                >
+                  {Icon && <Icon className="size-3.5" />}
+                  {item.label}
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      </nav>
 
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={cn(
-                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
-                        isActive
-                          ? 'bg-tag-orange/10 text-tag-orange'
-                          : 'text-tag-muted hover:bg-tag-card hover:text-tag-text'
-                      )}
-                    >
-                      {Icon && <Icon className="size-4 shrink-0" />}
-                      {item.label}
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </nav>
-      </aside>
+      {/* Mobile bottom nav */}
+      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-tag-border bg-tag-bg md:hidden">
+        <div className="flex h-14 items-stretch">
+          {allItems.map((item) => {
+            const Icon = iconMap[item.icon]
+            const isActive = pathname === item.href
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex flex-1 flex-col items-center justify-center gap-1 transition-colors',
+                  isActive ? 'text-tag-orange' : 'text-tag-muted'
+                )}
+              >
+                {Icon && <Icon className="size-5" />}
+                <span className="font-mono text-[10px] uppercase tracking-[0.05em]">
+                  {item.label}
+                </span>
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
     </>
   )
 }

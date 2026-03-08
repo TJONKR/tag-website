@@ -2,24 +2,11 @@ import type { Facility, HouseRule, NavGroup, OpeningHours, Room } from './types'
 
 export const portalNavGroups: NavGroup[] = [
   {
-    label: 'Community',
+    label: 'Portal',
     items: [
       { label: 'Events', href: '/portal/events', icon: 'calendar' },
-      { label: 'Contact', href: '/portal/contact', icon: 'mail' },
-    ],
-  },
-  {
-    label: 'Space',
-    items: [
-      { label: 'Floor Plan', href: '/portal/floor-plan', icon: 'map' },
-      { label: 'Facilities', href: '/portal/facilities', icon: 'wifi' },
-      { label: 'Opening Hours', href: '/portal/opening-hours', icon: 'clock' },
-    ],
-  },
-  {
-    label: 'Info',
-    items: [
-      { label: 'House Rules', href: '/portal/house-rules', icon: 'scroll-text' },
+      { label: 'Space', href: '/portal/space', icon: 'map' },
+      { label: 'Info', href: '/portal/info', icon: 'scroll-text' },
     ],
   },
 ]
@@ -60,7 +47,7 @@ export const houseRules: HouseRule[] = [
 export const facilities: Facility[] = [
   {
     name: 'WiFi',
-    description: 'Network: TAG-Members | Password available on location',
+    description: `Network: ${process.env.NEXT_PUBLIC_WIFI_SSID ?? '—'} | Password: ${process.env.NEXT_PUBLIC_WIFI_PASSWORD ?? '—'}`,
     icon: 'wifi',
   },
   {
