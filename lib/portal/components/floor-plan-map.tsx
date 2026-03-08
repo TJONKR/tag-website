@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { cn } from '@lib/utils'
 
 type ZoneType = 'flex' | 'company' | 'meeting' | 'amenity'
@@ -126,8 +126,51 @@ const staticStyles = {
 
 export const FloorPlanMap = () => {
   const [hoveredDesk, setHoveredDesk] = useState<Desk | null>(null)
+  const [lastDesk, setLastDesk] = useState<Desk | null>(null)
   const [hoveredCluster, setHoveredCluster] = useState<string | null>(null)
   const [hoveredStatic, setHoveredStatic] = useState<string | null>(null)
+
+  const displayDesk = hoveredDesk ?? lastDesk
+  const [visibleElements, setVisibleElements] = useState<Set<string>>(new Set())
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    const audio = new Audio('/audio/scan.mp3')
+    audio.volume = 0.1
+    audio.play().catch(() => {})
+
+    const allIds = [
+      ...staticZones.map((z) => z.id),
+      ...deskClusters.map((c) => c.id),
+    ]
+    // Shuffle for glitch effect
+    const shuffled = [...allIds].sort(() => Math.random() - 0.5)
+
+    shuffled.forEach((id, i) => {
+      // Fast stagger: 15-50ms between each
+      const delay = i * (15 + Math.random() * 35)
+      setTimeout(() => {
+        setVisibleElements((prev) => new Set([...prev, id]))
+      }, delay)
+      // Glitch: briefly hide and re-show some elements
+      if (Math.random() > 0.5) {
+        const flickDelay = delay + 60 + Math.random() * 40
+        setTimeout(() => {
+          setVisibleElements((prev) => {
+            const next = new Set(prev)
+            next.delete(id)
+            return next
+          })
+        }, flickDelay)
+        setTimeout(() => {
+          setVisibleElements((prev) => new Set([...prev, id]))
+        }, flickDelay + 30 + Math.random() * 30)
+      }
+    })
+
+    const totalTime = shuffled.length * 50 + 150
+    setTimeout(() => setLoaded(true), totalTime)
+  }, [])
 
   return (
     <div className="space-y-4">
@@ -203,6 +246,7 @@ export const FloorPlanMap = () => {
             {staticZones.map((zone) => {
               const styles = staticStyles[zone.type as 'meeting' | 'amenity']
               const isHovered = hoveredStatic === zone.id
+              const isVisible = loaded || visibleElements.has(zone.id)
 
               return (
                 <div
@@ -210,9 +254,12 @@ export const FloorPlanMap = () => {
                   onMouseEnter={() => setHoveredStatic(zone.id)}
                   onMouseLeave={() => setHoveredStatic(null)}
                   className={cn(
-                    'absolute flex cursor-default items-center justify-center border transition-all duration-300',
+                    'absolute flex cursor-default items-center justify-center border transition-all',
                     styles.base,
-                    isHovered && styles.hover
+                    isHovered && styles.hover,
+                    isVisible
+                      ? 'opacity-100 duration-150'
+                      : 'translate-x-[4px] skew-x-[-2deg] scale-[1.02] opacity-0 duration-75'
                   )}
                   style={{
                     left: `${(zone.x / TOTAL_W) * 100}%`,
@@ -238,14 +285,18 @@ export const FloorPlanMap = () => {
             {deskClusters.map((cluster) => {
               const styles = clusterStyles[cluster.type as 'flex' | 'company']
               const isClusterHovered = hoveredCluster === cluster.id
+              const isVisible = loaded || visibleElements.has(cluster.id)
 
               return (
                 <div
                   key={cluster.id}
                   className={cn(
-                    'absolute flex flex-col border transition-all duration-300',
+                    'absolute flex flex-col border transition-all',
                     styles.zone,
-                    isClusterHovered && styles.zoneHover
+                    isClusterHovered && styles.zoneHover,
+                    isVisible
+                      ? 'opacity-100 duration-150'
+                      : '-translate-y-[4px] skew-y-[2deg] scale-[0.97] opacity-0 duration-75'
                   )}
                   style={{
                     left: `${(cluster.x / TOTAL_W) * 100}%`,
@@ -291,6 +342,7 @@ export const FloorPlanMap = () => {
                           key={desk.id}
                           onMouseEnter={() => {
                             setHoveredDesk(desk)
+                            setLastDesk(desk)
                             setHoveredCluster(cluster.id)
                           }}
                           onMouseLeave={() => {
@@ -324,20 +376,20 @@ export const FloorPlanMap = () => {
         >
           <div className="flex items-center gap-3 rounded border border-tag-dim/20 bg-tag-bg/95 px-4 py-2 font-mono text-xs shadow-2xl backdrop-blur-sm">
             <span className="uppercase tracking-wider text-tag-dim">
-              Desk {hoveredDesk?.id}
+              Desk {displayDesk?.id}
             </span>
             <div className="h-3 w-px bg-tag-dim/20" />
             <span
               className={cn(
-                hoveredDesk?.type === 'company' ? 'text-tag-orange' : 'text-tag-text'
+                displayDesk?.type === 'company' ? 'text-tag-orange' : 'text-tag-text'
               )}
             >
-              {hoveredDesk?.company ?? 'Flex workspace'}
+              {displayDesk?.company ?? 'Flex workspace'}
             </span>
             <div
               className={cn(
                 'size-1.5 rounded-full',
-                hoveredDesk?.type === 'company' ? 'bg-tag-orange' : 'bg-emerald-500'
+                displayDesk?.type === 'company' ? 'bg-tag-orange' : 'bg-emerald-500'
               )}
             />
           </div>
