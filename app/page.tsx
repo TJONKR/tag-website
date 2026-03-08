@@ -9,8 +9,11 @@ import {
   Cta,
   Footer,
 } from '@components/landing'
+import { getUpcomingEvents } from '@lib/events/queries'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const events = await getUpcomingEvents()
+
   return (
     <>
       <GrainOverlay />
@@ -20,7 +23,7 @@ export default function HomePage() {
         <Programs />
         <Quote />
         <Builders />
-        <Events />
+        <Events events={events} />
         <Cta />
         <Footer />
       </main>
