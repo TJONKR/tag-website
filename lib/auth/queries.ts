@@ -18,7 +18,7 @@ export async function getSession() {
 async function fetchProfile(supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>, userId: string) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('role, name')
+    .select('role, name, avatar_url, created_at')
     .eq('id', userId)
     .single()
 
@@ -29,6 +29,8 @@ async function fetchProfile(supabase: Awaited<ReturnType<typeof createServerSupa
   return {
     role: (data?.role as UserRole) ?? 'rookie',
     name: (data?.name as string | null) ?? null,
+    avatar_url: (data?.avatar_url as string | null) ?? null,
+    created_at: (data?.created_at as string) ?? new Date().toISOString(),
   }
 }
 
@@ -48,6 +50,8 @@ export async function getOptionalUser(): Promise<AuthUser | null> {
     email: user.email || '',
     name: profile.name,
     role: profile.role,
+    avatar_url: profile.avatar_url,
+    created_at: profile.created_at,
   }
 }
 
@@ -70,5 +74,7 @@ export async function getUser(): Promise<AuthUser> {
     email: user.email || '',
     name: profile.name,
     role: profile.role,
+    avatar_url: profile.avatar_url,
+    created_at: profile.created_at,
   }
 }

@@ -10,6 +10,11 @@ export interface TagEvent {
   created_by: string | null
 }
 
+export interface EventAttendee {
+  user_id: string
+  name: string | null
+}
+
 export function formatDateDisplay(dateIso: string): string {
   const date = new Date(dateIso + 'T00:00:00')
   const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']

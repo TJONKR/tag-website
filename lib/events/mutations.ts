@@ -41,3 +41,25 @@ export const deleteEvent = async (id: string) => {
 
   if (error) throw new Error(error.message)
 }
+
+export const addAttendance = async (eventId: string, userId: string) => {
+  const supabase = await createServerSupabaseClient()
+
+  const { error } = await supabase
+    .from('event_attendance')
+    .insert({ event_id: eventId, user_id: userId })
+
+  if (error) throw new Error(error.message)
+}
+
+export const removeAttendance = async (eventId: string, userId: string) => {
+  const supabase = await createServerSupabaseClient()
+
+  const { error } = await supabase
+    .from('event_attendance')
+    .delete()
+    .eq('event_id', eventId)
+    .eq('user_id', userId)
+
+  if (error) throw new Error(error.message)
+}

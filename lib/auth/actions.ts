@@ -135,6 +135,60 @@ export async function updateName(
   }
 }
 
+export async function updateAvatar(
+  formData: FormData
+): Promise<{ status: 'success' | 'failed'; url?: string }> {
+  try {
+    const supabase = await createServerSupabaseClient()
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { status: 'failed' }
+
+    const file = formData.get('avatar') as File
+    if (!file || file.size === 0) return { status: 'failed' }
+
+    if (file.size > 2 * 1024 * 1024) return { status: 'failed' }
+
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const path = `${user.id}/avatar.${ext}`
+
+    // Remove old avatar files (different extensions)
+    const { data: existing } = await supabase.storage.from('avatars').list(user.id)
+    if (existing?.length) {
+      await supabase.storage
+        .from('avatars')
+        .remove(existing.map((f) => `${user.id}/${f.name}`))
+    }
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true })
+
+    if (uploadError) throw uploadError
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('avatars').getPublicUrl(path)
+
+    // Append cache-bust to force refresh
+    const avatarUrl = `${publicUrl}?v=${Date.now()}`
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ avatar_url: avatarUrl })
+      .eq('id', user.id)
+
+    if (updateError) throw updateError
+
+    return { status: 'success', url: avatarUrl }
+  } catch {
+    return { status: 'failed' }
+  }
+}
+
 export async function signOutAction(): Promise<void> {
   const supabase = await createServerSupabaseClient()
   await supabase.auth.signOut()

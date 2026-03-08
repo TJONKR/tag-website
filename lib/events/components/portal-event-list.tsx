@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@components/confirm-dialog'
 import { formatDateDisplay } from '@lib/events/types'
 import type { TagEvent } from '@lib/events/types'
 import { EventFormDialog } from './event-form-dialog'
+import { AttendanceDialog } from './attendance-dialog'
 
 interface PortalEventListProps {
   upcoming: TagEvent[]
@@ -67,6 +68,9 @@ const PortalEventRow = ({
       </div>
       {isAdmin && (
         <div className="ml-3 flex shrink-0 items-center gap-1">
+          {muted && (
+            <AttendanceDialog eventId={event.id} eventTitle={event.title} />
+          )}
           <EventFormDialog
             event={event}
             trigger={

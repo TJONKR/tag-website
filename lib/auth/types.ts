@@ -5,6 +5,8 @@ export interface AuthUser {
   email: string
   name: string | null
   role: UserRole
+  avatar_url: string | null
+  created_at: string
 }
 
 export interface LoginActionState {
