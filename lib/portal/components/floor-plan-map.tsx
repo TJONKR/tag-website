@@ -191,16 +191,7 @@ export const FloorPlanMap = () => {
       </div>
 
       {/* Blueprint */}
-      <div className="relative overflow-hidden rounded border border-tag-dim/15 bg-tag-bg-deep">
-        {/* Grid background */}
-        <div
-          className="absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)',
-            backgroundSize: '20px 20px',
-          }}
-        />
+      <div className="relative overflow-hidden rounded border border-tag-dim/15 bg-tag-bg-deep/80">
 
         {/* Floor area */}
         <div className="relative p-4 md:p-6">
