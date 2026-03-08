@@ -6,7 +6,7 @@ export const portalNavGroups: NavGroup[] = [
     items: [
       { label: 'Events', href: '/portal/events', icon: 'calendar' },
       { label: 'Space', href: '/portal/space', icon: 'map' },
-      { label: 'Info', href: '/portal/info', icon: 'scroll-text' },
+      { label: 'Profile', href: '/portal/profile', icon: 'user' },
     ],
   },
 ]
@@ -25,17 +25,7 @@ export const houseRules: HouseRule[] = [
   {
     title: 'Guests',
     description:
-      'Guests are welcome, but always register them with the community manager. You are responsible for your guests.',
-  },
-  {
-    title: 'No food at workstations',
-    description:
-      'Eat in the kitchen or lounge area. Drinks with lids are allowed at your workstation.',
-  },
-  {
-    title: 'Keys & access',
-    description:
-      'Never share your access code or key with others. Report any loss to the community manager immediately.',
+      'Guests are welcome — you are responsible for your guests.',
   },
   {
     title: 'Safety',

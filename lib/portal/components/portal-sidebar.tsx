@@ -2,15 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, Map, ScrollText } from 'lucide-react'
+import { Calendar, Map, User } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { portalNavGroups } from '@lib/portal/data'
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   calendar: Calendar,
-  'scroll-text': ScrollText,
   map: Map,
+  user: User,
 }
 
 const allItems = portalNavGroups.flatMap((group) => group.items)

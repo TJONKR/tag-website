@@ -35,16 +35,23 @@ export default function LoginPage() {
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
-          <p className="mt-4 text-center text-sm text-tag-muted">
-            {"Don't have an account? "}
+          <div className="mt-4 flex flex-col items-center gap-2 text-sm text-tag-muted">
             <Link
-              href="/register"
-              className="font-semibold text-tag-text hover:underline"
+              href="/forgot-password"
+              className="text-tag-muted hover:text-tag-text hover:underline"
             >
-              Sign up
+              Forgot password?
             </Link>
-            {' for free.'}
-          </p>
+            <p>
+              {"Don't have an account? "}
+              <Link
+                href="/register"
+                className="font-semibold text-tag-text hover:underline"
+              >
+                Sign up
+              </Link>
+            </p>
+          </div>
         </AuthForm>
         <Suspense fallback={null}>
           <LoginRedirectEffects state={state} setIsSuccessful={setIsSuccessful} />
@@ -84,7 +91,7 @@ function LoginRedirectEffects({
 
       setTimeout(() => {
         router.refresh()
-        const dest = searchParams.get('redirect') || '/'
+        const dest = searchParams.get('redirect') || '/portal'
         router.push(dest)
       }, 1000)
     }

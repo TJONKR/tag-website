@@ -1,6 +1,11 @@
 import { PortalSidebar } from '@lib/portal/components'
+import { getUser } from '@lib/auth/queries'
 
-export default function PortalLayout({ children }: { children: React.ReactNode }) {
+export const dynamic = 'force-dynamic'
+
+export default async function PortalLayout({ children }: { children: React.ReactNode }) {
+  await getUser()
+
   return (
     <div className="min-h-screen bg-tag-bg pt-14">
       <PortalSidebar />

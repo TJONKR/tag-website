@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Syne, Space_Grotesk, Space_Mono } from 'next/font/google'
 
 import { StickyNav } from '@components/navigation'
+import { getOptionalUser } from '@lib/auth/queries'
 
 import './globals.css'
 
@@ -52,6 +53,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const user = await getOptionalUser()
+
   return (
     <html
       lang="en"
@@ -59,7 +62,7 @@ export default async function RootLayout({
     >
       <body className="antialiased">
         <Toaster position="top-center" />
-        <StickyNav />
+        <StickyNav isLoggedIn={!!user} />
         {children}
       </body>
     </html>
