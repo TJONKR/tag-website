@@ -10,21 +10,27 @@ export interface NavGroup {
 }
 
 export interface HouseRule {
+  id: string
   title: string
   description: string
+  sort_order: number
 }
 
 export interface Facility {
+  id: string
   name: string
   description: string
   icon: string
+  sort_order: number
 }
 
 export interface OpeningHours {
+  id: string
   day: string
   hours: string
-  building?: string
-  note?: string
+  building: string
+  note: string | null
+  sort_order: number
 }
 
 export interface ContactInfo {

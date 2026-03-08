@@ -6,6 +6,7 @@ import { Pencil, Plus, Sparkles, Trash2, X } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { toast } from '@components/toast'
+import { ConfirmDialog } from '@components/confirm-dialog'
 
 import { formatDateDisplay } from '@lib/events/types'
 import type { TagEvent } from '@lib/events/types'
@@ -30,7 +31,6 @@ const PortalEventRow = ({
   const [deleting, setDeleting] = useState(false)
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this event?')) return
     setDeleting(true)
     try {
       const res = await fetch(`/api/events/${event.id}`, { method: 'DELETE' })
@@ -78,14 +78,20 @@ const PortalEventRow = ({
               </button>
             }
           />
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-destructive"
-            aria-label="Delete event"
-          >
-            <Trash2 className="size-3.5" />
-          </button>
+          <ConfirmDialog
+            trigger={
+              <button
+                disabled={deleting}
+                className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-destructive"
+                aria-label="Delete event"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
+            }
+            title="Delete event?"
+            description="This action cannot be undone."
+            onConfirm={handleDelete}
+          />
         </div>
       )}
     </div>
