@@ -7,7 +7,12 @@ import { AvatarUpload } from '@lib/auth/components/avatar-upload'
 import { getUser } from '@lib/auth/queries'
 import { getUserAttendedEvents } from '@lib/events/queries'
 import { formatDateDisplay } from '@lib/events/types'
-import { pricingTiers } from '@lib/space/data'
+import { getMembershipStatus } from '@lib/membership/queries'
+import {
+  MembershipCard,
+  UpgradeCard,
+  ManageSubscription,
+} from '@lib/membership/components'
 import type { UserRole } from '@lib/auth/types'
 
 const roleConfig: Record<UserRole, { label: string; icon: typeof Check; color: string }> = {
@@ -39,17 +44,19 @@ function formatMemberSince(dateStr: string): string {
 
 export default async function ProfilePage() {
   const user = await getUser()
-  const attendedEvents = await getUserAttendedEvents(user.id)
+  const [attendedEvents, membershipStatus] = await Promise.all([
+    getUserAttendedEvents(user.id),
+    getMembershipStatus(user.id, user.role),
+  ])
   const config = roleConfig[user.role]
   const Icon = config.icon
   const isBuilder = user.role === 'builder' || user.role === 'operator'
-  const builderTier = pricingTiers.find((t) => t.name === 'Builder')
 
   return (
     <>
       <PortalHeader title="Profile" description="Your account and membership details." />
 
-      {/* Membership card */}
+      {/* Profile header card */}
       <div
         className={`rounded-lg border bg-tag-card p-6 ${isBuilder ? 'border-tag-orange' : 'border-tag-border'}`}
       >
@@ -84,25 +91,24 @@ export default async function ProfilePage() {
             </div>
           </div>
         </div>
-
-        {isBuilder && builderTier && (
-          <ul className="mt-6 grid gap-2 sm:grid-cols-2">
-            {builderTier.features.map((feature) => (
-              <li key={feature} className="flex items-center gap-2 text-sm text-tag-muted">
-                <Check className="size-3.5 shrink-0 text-tag-orange" />
-                {feature}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {!isBuilder && (
-          <p className="mt-4 text-sm text-tag-muted">
-            As a rookie you can drop by for events. Want a permanent desk?{' '}
-            <span className="text-tag-text">Reach out to a community manager.</span>
-          </p>
-        )}
       </div>
+
+      {/* Membership status */}
+      <div className="mt-6">
+        <MembershipCard status={membershipStatus} />
+      </div>
+
+      {membershipStatus.canUpgrade && (
+        <div className="mt-4">
+          <UpgradeCard />
+        </div>
+      )}
+
+      {membershipStatus.subscription?.status === 'active' && (
+        <div className="mt-4">
+          <ManageSubscription />
+        </div>
+      )}
 
       {/* Attended events */}
       {attendedEvents.length > 0 && (

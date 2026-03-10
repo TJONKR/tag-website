@@ -6,7 +6,7 @@ import {
   updateProfileRoleFromWebhook,
 } from '@lib/membership/mutations'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         if (session.subscription && session.customer) {
-          const subscription = await stripe.subscriptions.retrieve(
+          const subscription = await getStripe().subscriptions.retrieve(
             session.subscription as string
           )
           await handleSubscriptionChange(subscription)
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         const invoice = event.data.object as Stripe.Invoice
         const subId = invoice.parent?.subscription_details?.subscription
         if (subId && typeof subId === 'string') {
-          const subscription = await stripe.subscriptions.retrieve(subId)
+          const subscription = await getStripe().subscriptions.retrieve(subId)
           await handleSubscriptionChange(subscription)
         }
         break

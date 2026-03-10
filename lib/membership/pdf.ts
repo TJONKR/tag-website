@@ -1,9 +1,14 @@
-import ReactPDF from '@react-pdf/renderer'
-import React from 'react'
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  renderToBuffer,
+} from '@react-pdf/renderer'
+import { createElement } from 'react'
 
 import { contractSections, CONTRACT_VERSION } from './contract-template'
-
-const { Document, Page, Text, View, StyleSheet, renderToBuffer } = ReactPDF
 
 const styles = StyleSheet.create({
   page: {
@@ -54,29 +59,29 @@ export async function generateContractPdf(
   memberEmail: string,
   signedAt: Date
 ): Promise<Buffer> {
-  const doc = React.createElement(
+  const doc = createElement(
     Document,
     null,
-    React.createElement(
+    createElement(
       Page,
       { size: 'A4', style: styles.page },
-      React.createElement(Text, { style: styles.header }, 'TAG Builder Membership Agreement'),
-      React.createElement(Text, { style: styles.subheader }, `Version ${CONTRACT_VERSION}`),
+      createElement(Text, { style: styles.header }, 'TAG Builder Membership Agreement'),
+      createElement(Text, { style: styles.subheader }, `Version ${CONTRACT_VERSION}`),
       ...contractSections.map((section) =>
-        React.createElement(
+        createElement(
           View,
           { key: section.title },
-          React.createElement(Text, { style: styles.sectionTitle }, section.title),
-          React.createElement(Text, { style: styles.sectionContent }, section.content)
+          createElement(Text, { style: styles.sectionTitle }, section.title),
+          createElement(Text, { style: styles.sectionContent }, section.content)
         )
       ),
-      React.createElement(
+      createElement(
         View,
         { style: styles.signature },
-        React.createElement(Text, { style: styles.signatureLabel }, 'Signed by'),
-        React.createElement(Text, { style: styles.signatureValue }, memberName || memberEmail),
-        React.createElement(Text, { style: styles.signatureLabel }, `Email: ${memberEmail}`),
-        React.createElement(
+        createElement(Text, { style: styles.signatureLabel }, 'Signed by'),
+        createElement(Text, { style: styles.signatureValue }, memberName || memberEmail),
+        createElement(Text, { style: styles.signatureLabel }, `Email: ${memberEmail}`),
+        createElement(
           Text,
           { style: styles.signatureLabel },
           `Date: ${signedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`

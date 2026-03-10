@@ -2,7 +2,7 @@ import Stripe from 'stripe'
 
 import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function createOrGetStripeCustomer(
   userId: string,
@@ -20,7 +20,7 @@ export async function createOrGetStripeCustomer(
     return profile.stripe_customer_id
   }
 
-  const customer = await stripe.customers.create({
+  const customer = await getStripe().customers.create({
     email,
     metadata: { supabase_user_id: userId },
   })
@@ -37,7 +37,7 @@ export async function createCheckoutSession(
   customerId: string,
   userId: string
 ): Promise<string> {
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     customer: customerId,
     mode: 'subscription',
     line_items: [
@@ -59,7 +59,7 @@ export async function createCheckoutSession(
 export async function createBillingPortalSession(
   customerId: string
 ): Promise<string> {
-  const session = await stripe.billingPortal.sessions.create({
+  const session = await getStripe().billingPortal.sessions.create({
     customer: customerId,
     return_url: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/portal/profile`,
   })

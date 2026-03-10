@@ -26,9 +26,9 @@ export const MembershipCard = ({ status }: MembershipCardProps) => {
           }`}
         >
           {isBuilder ? (
-            <Check className="h-5 w-5" />
+            <Check className="size-5" />
           ) : (
-            <Star className="h-5 w-5" />
+            <Star className="size-5" />
           )}
         </div>
         <div>

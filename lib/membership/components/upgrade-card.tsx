@@ -15,7 +15,7 @@ export const UpgradeCard = () => {
       <div className="rounded-lg border-2 border-dashed border-tag-orange/30 bg-tag-orange/5 p-6">
         <div className="flex items-start gap-4">
           <div className="rounded-lg bg-tag-orange/10 p-2">
-            <Rocket className="h-5 w-5 text-tag-orange" />
+            <Rocket className="size-5 text-tag-orange" />
           </div>
           <div className="flex-1">
             <h3 className="font-syne text-lg font-bold text-tag-text">

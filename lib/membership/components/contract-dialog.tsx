@@ -74,7 +74,7 @@ export const ContractDialog = ({ open, onOpenChange }: ContractDialogProps) => {
               type="checkbox"
               checked={accepted}
               onChange={(e) => setAccepted(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-tag-border accent-tag-orange"
+              className="mt-1 size-4 rounded border-tag-border accent-tag-orange"
             />
             <span className="text-sm text-tag-muted">
               I have read and agree to the TAG Builder Membership Agreement.
