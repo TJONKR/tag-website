@@ -27,7 +27,7 @@ async function fetchProfile(supabase: Awaited<ReturnType<typeof createServerSupa
   }
 
   return {
-    role: (data?.role as UserRole) ?? 'rookie',
+    role: (data?.role as UserRole) ?? 'fan',
     name: (data?.name as string | null) ?? null,
     avatar_url: (data?.avatar_url as string | null) ?? null,
     created_at: (data?.created_at as string) ?? new Date().toISOString(),

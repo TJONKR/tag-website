@@ -60,14 +60,13 @@ export async function register(
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: { name },
+      },
     })
 
     if (error) {
       throw error
-    }
-
-    if (data.user) {
-      await supabase.from('profiles').update({ name }).eq('id', data.user.id)
     }
 
     return { status: 'success' }

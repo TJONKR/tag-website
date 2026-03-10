@@ -8,7 +8,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const user = await getOptionalUser()
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'operator') {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 
@@ -34,7 +34,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   try {
     const user = await getOptionalUser()
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'operator') {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 

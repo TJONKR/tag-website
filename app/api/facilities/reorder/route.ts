@@ -7,7 +7,7 @@ export async function PUT(req: Request) {
   try {
     const user = await getOptionalUser()
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'operator') {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 

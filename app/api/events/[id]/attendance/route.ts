@@ -19,7 +19,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   try {
     const user = await getOptionalUser()
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'operator') {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 
@@ -43,7 +43,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   try {
     const user = await getOptionalUser()
 
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'operator') {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 

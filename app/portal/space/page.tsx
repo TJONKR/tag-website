@@ -21,7 +21,7 @@ export default async function SpacePage() {
         facilities={facilities}
         openingHours={openingHours}
         houseRules={houseRules}
-        isAdmin={user.role === 'admin'}
+        isAdmin={user.role === 'operator'}
       />
     </>
   )

@@ -10,7 +10,7 @@ export default async function EventsPage() {
   return (
     <>
       <PortalHeader title="Events" description="Upcoming events, workshops and meetups at TAG." />
-      <PortalEventList upcoming={upcoming} past={past} isAdmin={user.role === 'admin'} />
+      <PortalEventList upcoming={upcoming} past={past} isAdmin={user.role === 'operator'} />
     </>
   )
 }

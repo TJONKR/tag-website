@@ -11,8 +11,8 @@ import { pricingTiers } from '@lib/space/data'
 import type { UserRole } from '@lib/auth/types'
 
 const roleConfig: Record<UserRole, { label: string; icon: typeof Check; color: string }> = {
-  rookie: {
-    label: 'Rookie',
+  fan: {
+    label: 'Fan',
     icon: Star,
     color: 'text-tag-muted',
   },
@@ -21,8 +21,8 @@ const roleConfig: Record<UserRole, { label: string; icon: typeof Check; color: s
     icon: Check,
     color: 'text-tag-orange',
   },
-  admin: {
-    label: 'Community Manager',
+  operator: {
+    label: 'Operator',
     icon: Shield,
     color: 'text-tag-orange',
   },
@@ -42,7 +42,7 @@ export default async function ProfilePage() {
   const attendedEvents = await getUserAttendedEvents(user.id)
   const config = roleConfig[user.role]
   const Icon = config.icon
-  const isBuilder = user.role === 'builder' || user.role === 'admin'
+  const isBuilder = user.role === 'builder' || user.role === 'operator'
   const builderTier = pricingTiers.find((t) => t.name === 'Builder')
 
   return (
