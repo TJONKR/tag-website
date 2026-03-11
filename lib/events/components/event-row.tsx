@@ -1,6 +1,7 @@
 import { cn } from '@lib/utils'
 
-import type { TagEvent } from '@lib/events/data'
+import { formatDateDisplay } from '@lib/events/types'
+import type { TagEvent } from '@lib/events/types'
 
 interface EventRowProps {
   event: TagEvent
@@ -21,7 +22,7 @@ export const EventRow = ({ event, muted = false }: EventRowProps) => {
           muted ? 'text-tag-dim' : 'text-tag-orange'
         )}
       >
-        {event.date}
+        {formatDateDisplay(event.date_iso)}
       </div>
       <div className="flex flex-1 flex-col gap-1">
         <span className="font-syne text-[clamp(20px,3vw,28px)] text-tag-text">

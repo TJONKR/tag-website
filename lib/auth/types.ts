@@ -1,9 +1,12 @@
-export type UserType = 'guest' | 'regular'
+export type UserRole = 'fan' | 'builder' | 'operator'
 
 export interface AuthUser {
   id: string
   email: string
-  type: UserType
+  name: string | null
+  role: UserRole
+  avatar_url: string | null
+  created_at: string
 }
 
 export interface LoginActionState {

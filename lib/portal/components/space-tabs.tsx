@@ -1,0 +1,848 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import {
+  Building,
+  Coffee,
+  GripVertical,
+  Hash,
+  Pencil,
+  Plus,
+  ScrollText,
+  Trash2,
+  User,
+  Users,
+  Wifi,
+} from 'lucide-react'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
+import { cn } from '@lib/utils'
+import { toast } from '@components/toast'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@components/ui/dialog'
+import { Input } from '@components/ui/input'
+import { Label } from '@components/ui/label'
+import { Textarea } from '@components/ui/textarea'
+import { Button } from '@components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@components/ui/select'
+
+import { ConfirmDialog } from '@components/confirm-dialog'
+import { FloorPlanMap } from './floor-plan-map'
+import type { Facility, HouseRule, OpeningHours } from '@lib/portal/types'
+
+const tabs = [
+  { key: 'floor-plan', label: 'Floor Plan' },
+  { key: 'facilities', label: 'Facilities' },
+  { key: 'hours', label: 'Opening Hours' },
+  { key: 'house-rules', label: 'House Rules' },
+  { key: 'contact', label: 'Contact' },
+] as const
+
+type Tab = (typeof tabs)[number]['key']
+
+const FACILITY_ICONS = [
+  { value: 'building', label: 'General', icon: Building },
+  { value: 'wifi', label: 'WiFi', icon: Wifi },
+  { value: 'users', label: 'Meeting', icon: Users },
+  { value: 'coffee', label: 'Kitchen', icon: Coffee },
+] as const
+
+const facilityIconMap: Record<string, React.ComponentType<{ className?: string }>> =
+  Object.fromEntries(FACILITY_ICONS.map((i) => [i.value, i.icon]))
+
+const communityManagers = [
+  { name: 'Pieter de Kroon' },
+  { name: 'Tijs Nieuwboer' },
+  { name: 'Kevin Muiser' },
+]
+
+// --- Generic CRUD helpers ---
+
+async function apiSubmit(url: string, method: string, body: Record<string, unknown>) {
+  const res = await fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    const data = await res.json()
+    throw new Error(data.errors?.[0]?.message || 'Something went wrong')
+  }
+}
+
+async function apiDelete(url: string) {
+  const res = await fetch(url, { method: 'DELETE' })
+  if (!res.ok) throw new Error('Failed to delete')
+}
+
+// --- Form Dialogs ---
+
+const FacilityFormDialog = ({
+  facility,
+  trigger,
+}: {
+  facility?: Facility
+  trigger: React.ReactNode
+}) => {
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const isEdit = !!facility
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    const form = new FormData(e.currentTarget)
+    try {
+      const body = {
+        name: form.get('name') as string,
+        description: form.get('description') as string,
+        icon: form.get('icon') as string,
+        sort_order: facility?.sort_order ?? 999,
+      }
+      const url = isEdit ? `/api/facilities/${facility.id}` : '/api/facilities'
+      await apiSubmit(url, isEdit ? 'PUT' : 'POST', body)
+      setOpen(false)
+      toast({ type: 'success', description: isEdit ? 'Facility updated' : 'Facility added' })
+      router.refresh()
+    } catch (err) {
+      toast({
+        type: 'error',
+        description: err instanceof Error ? err.message : 'Something went wrong',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="border-tag-border bg-tag-bg text-tag-text sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="font-syne">
+            {isEdit ? 'Edit Facility' : 'Add Facility'}
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              name="name"
+              defaultValue={facility?.name}
+              required
+              className="border-tag-border bg-tag-card"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              name="description"
+              defaultValue={facility?.description}
+              required
+              className="border-tag-border bg-tag-card"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Icon</Label>
+            <Select name="icon" defaultValue={facility?.icon || 'building'}>
+              <SelectTrigger className="border-tag-border bg-tag-card">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="border-tag-border bg-tag-bg">
+                {FACILITY_ICONS.map((i) => {
+                  const Icon = i.icon
+                  return (
+                    <SelectItem key={i.value} value={i.value}>
+                      <span className="flex items-center gap-2">
+                        <Icon className="size-3.5" />
+                        {i.label}
+                      </span>
+                    </SelectItem>
+                  )
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="border-tag-border"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-tag-orange hover:bg-[#e8551b]"
+            >
+              {loading ? 'Saving...' : isEdit ? 'Save' : 'Add'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const HouseRuleFormDialog = ({
+  rule,
+  trigger,
+}: {
+  rule?: HouseRule
+  trigger: React.ReactNode
+}) => {
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const isEdit = !!rule
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    const form = new FormData(e.currentTarget)
+    try {
+      const body = {
+        title: form.get('title') as string,
+        description: form.get('description') as string,
+        sort_order: rule?.sort_order ?? 999,
+      }
+      const url = isEdit ? `/api/house-rules/${rule.id}` : '/api/house-rules'
+      await apiSubmit(url, isEdit ? 'PUT' : 'POST', body)
+      setOpen(false)
+      toast({ type: 'success', description: isEdit ? 'Rule updated' : 'Rule added' })
+      router.refresh()
+    } catch (err) {
+      toast({
+        type: 'error',
+        description: err instanceof Error ? err.message : 'Something went wrong',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="border-tag-border bg-tag-bg text-tag-text sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="font-syne">{isEdit ? 'Edit Rule' : 'Add Rule'}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              name="title"
+              defaultValue={rule?.title}
+              required
+              className="border-tag-border bg-tag-card"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              name="description"
+              defaultValue={rule?.description}
+              required
+              className="border-tag-border bg-tag-card"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="border-tag-border"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-tag-orange hover:bg-[#e8551b]"
+            >
+              {loading ? 'Saving...' : isEdit ? 'Save' : 'Add'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const OpeningHoursFormDialog = ({
+  entry,
+  trigger,
+}: {
+  entry: OpeningHours
+  trigger: React.ReactNode
+}) => {
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    const form = new FormData(e.currentTarget)
+    try {
+      const body = {
+        day: entry.day,
+        hours: form.get('hours') as string,
+        building: form.get('building') as string,
+        note: (form.get('note') as string) || null,
+        sort_order: entry.sort_order,
+      }
+      await apiSubmit(`/api/opening-hours/${entry.id}`, 'PUT', body)
+      setOpen(false)
+      toast({ type: 'success', description: 'Hours updated' })
+      router.refresh()
+    } catch (err) {
+      toast({
+        type: 'error',
+        description: err instanceof Error ? err.message : 'Something went wrong',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="border-tag-border bg-tag-bg text-tag-text sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="font-syne">Edit {entry.day}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="hours">TAG hours</Label>
+            <Input
+              id="hours"
+              name="hours"
+              defaultValue={entry.hours}
+              placeholder="e.g. 04:00 – 23:59"
+              className="border-tag-border bg-tag-card"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="building">Building hours</Label>
+            <Input
+              id="building"
+              name="building"
+              defaultValue={entry.building}
+              placeholder="e.g. 08:00 – 17:00"
+              className="border-tag-border bg-tag-card"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="note">Note (optional)</Label>
+            <Input
+              id="note"
+              name="note"
+              defaultValue={entry.note ?? ''}
+              placeholder="e.g. Available on request"
+              className="border-tag-border bg-tag-card"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="border-tag-border"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-tag-orange hover:bg-[#e8551b]"
+            >
+              {loading ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// --- Delete button ---
+
+const DeleteButton = ({ url, label }: { url: string; label: string }) => {
+  const router = useRouter()
+  const [deleting, setDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      await apiDelete(url)
+      toast({ type: 'success', description: `${label} deleted` })
+      router.refresh()
+    } catch {
+      toast({ type: 'error', description: `Failed to delete ${label.toLowerCase()}` })
+      setDeleting(false)
+    }
+  }
+
+  return (
+    <ConfirmDialog
+      trigger={
+        <button
+          disabled={deleting}
+          className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-destructive"
+          aria-label={`Delete ${label.toLowerCase()}`}
+        >
+          <Trash2 className="size-3.5" />
+        </button>
+      }
+      title={`Delete ${label.toLowerCase()}?`}
+      description="This action cannot be undone."
+      onConfirm={handleDelete}
+    />
+  )
+}
+
+const AdminActions = ({ children }: { children: React.ReactNode }) => (
+  <div className="ml-auto flex shrink-0 items-center gap-1 pl-3">{children}</div>
+)
+
+// --- Sortable items ---
+
+const SortableFacilityCard = ({
+  facility,
+  isAdmin,
+}: {
+  facility: Facility
+  isAdmin: boolean
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: facility.id,
+    disabled: !isAdmin,
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  const Icon = facilityIconMap[facility.icon]
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'rounded-lg border border-tag-border bg-tag-card p-5 transition-colors hover:border-tag-dim',
+        isDragging && 'z-10 shadow-lg opacity-90'
+      )}
+    >
+      <div className="flex items-start gap-3">
+        {isAdmin && (
+          <button
+            {...attributes}
+            {...listeners}
+            className="mt-0.5 cursor-grab touch-none text-tag-dim hover:text-tag-muted active:cursor-grabbing"
+            aria-label="Drag to reorder"
+          >
+            <GripVertical className="size-4" />
+          </button>
+        )}
+        {Icon && (
+          <div className="mt-0.5 text-tag-orange">
+            <Icon className="size-4" />
+          </div>
+        )}
+        <div className="flex-1">
+          <h3 className="font-medium text-tag-text">{facility.name}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-tag-muted">{facility.description}</p>
+        </div>
+        {isAdmin && (
+          <AdminActions>
+            <FacilityFormDialog
+              facility={facility}
+              trigger={
+                <button
+                  className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
+                  aria-label="Edit facility"
+                >
+                  <Pencil className="size-3.5" />
+                </button>
+              }
+            />
+            <DeleteButton url={`/api/facilities/${facility.id}`} label="Facility" />
+          </AdminActions>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const SortableHouseRuleCard = ({
+  rule,
+  isAdmin,
+}: {
+  rule: HouseRule
+  isAdmin: boolean
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: rule.id,
+    disabled: !isAdmin,
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'rounded-lg border border-tag-border bg-tag-card p-5 transition-colors hover:border-tag-dim',
+        isDragging && 'z-10 shadow-lg opacity-90'
+      )}
+    >
+      <div className="flex items-start gap-3">
+        {isAdmin && (
+          <button
+            {...attributes}
+            {...listeners}
+            className="mt-0.5 cursor-grab touch-none text-tag-dim hover:text-tag-muted active:cursor-grabbing"
+            aria-label="Drag to reorder"
+          >
+            <GripVertical className="size-4" />
+          </button>
+        )}
+        <div className="mt-0.5 text-tag-orange">
+          <ScrollText className="size-4" />
+        </div>
+        <div className="flex-1">
+          <h3 className="font-medium text-tag-text">{rule.title}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-tag-muted">{rule.description}</p>
+        </div>
+        {isAdmin && (
+          <AdminActions>
+            <HouseRuleFormDialog
+              rule={rule}
+              trigger={
+                <button
+                  className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
+                  aria-label="Edit rule"
+                >
+                  <Pencil className="size-3.5" />
+                </button>
+              }
+            />
+            <DeleteButton url={`/api/house-rules/${rule.id}`} label="Rule" />
+          </AdminActions>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// --- Main component ---
+
+interface SpaceTabsProps {
+  facilities: Facility[]
+  openingHours: OpeningHours[]
+  houseRules: HouseRule[]
+  isAdmin: boolean
+}
+
+export const SpaceTabs = ({
+  facilities: initialFacilities,
+  openingHours,
+  houseRules: initialRules,
+  isAdmin,
+}: SpaceTabsProps) => {
+  const [activeTab, setActiveTab] = useState<Tab>('floor-plan')
+  const [facilities, setFacilities] = useState(initialFacilities)
+  const [houseRules, setHouseRules] = useState(initialRules)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
+  const handleFacilityDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = facilities.findIndex((f) => f.id === active.id)
+    const newIndex = facilities.findIndex((f) => f.id === over.id)
+    const reordered = arrayMove(facilities, oldIndex, newIndex)
+    setFacilities(reordered)
+
+    try {
+      await apiSubmit('/api/facilities/reorder', 'PUT', {
+        ids: reordered.map((f) => f.id),
+      })
+    } catch {
+      setFacilities(facilities)
+      toast({ type: 'error', description: 'Failed to reorder' })
+    }
+  }
+
+  const handleRuleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = houseRules.findIndex((r) => r.id === active.id)
+    const newIndex = houseRules.findIndex((r) => r.id === over.id)
+    const reordered = arrayMove(houseRules, oldIndex, newIndex)
+    setHouseRules(reordered)
+
+    try {
+      await apiSubmit('/api/house-rules/reorder', 'PUT', {
+        ids: reordered.map((r) => r.id),
+      })
+    } catch {
+      setHouseRules(houseRules)
+      toast({ type: 'error', description: 'Failed to reorder' })
+    }
+  }
+
+  return (
+    <>
+      {/* Tabs */}
+      <div className="mb-6 flex gap-1 overflow-x-auto rounded-lg border border-tag-border bg-tag-card p-1">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={cn(
+              'shrink-0 flex-1 rounded-md px-3 py-2 font-mono text-xs uppercase tracking-[0.1em] transition-colors',
+              activeTab === tab.key
+                ? 'bg-tag-orange/10 text-tag-orange'
+                : 'text-tag-muted hover:text-tag-text'
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Floor Plan */}
+      {activeTab === 'floor-plan' && <FloorPlanMap />}
+
+      {/* Facilities */}
+      {activeTab === 'facilities' && (
+        <div className="grid gap-4">
+          {isAdmin && (
+            <div className="flex justify-end">
+              <FacilityFormDialog
+                trigger={
+                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
+                    <Plus className="size-3" />
+                    Add Facility
+                  </button>
+                }
+              />
+            </div>
+          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleFacilityDragEnd}
+          >
+            <SortableContext
+              items={facilities.map((f) => f.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {facilities.map((facility) => (
+                <SortableFacilityCard
+                  key={facility.id}
+                  facility={facility}
+                  isAdmin={isAdmin}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        </div>
+      )}
+
+      {/* Opening Hours */}
+      {activeTab === 'hours' && (
+        <>
+          <div className="rounded-lg border border-tag-border bg-tag-card">
+            <div className="flex items-center border-b border-tag-border px-5 py-3">
+              <span className="flex-1 text-xs font-medium uppercase tracking-wide text-tag-dim" />
+              <span className="w-36 text-right text-xs font-medium uppercase tracking-wide text-tag-dim">
+                TAG
+              </span>
+              <span className="w-36 text-right text-xs font-medium uppercase tracking-wide text-tag-dim">
+                The Hubb
+              </span>
+              {isAdmin && <span className="w-16" />}
+            </div>
+            {openingHours.map((entry, i) => (
+              <div
+                key={entry.id}
+                className={cn(
+                  'flex items-center px-5 py-4',
+                  i !== openingHours.length - 1 && 'border-b border-tag-border'
+                )}
+              >
+                <div className="flex-1">
+                  <span className="font-medium text-tag-text">{entry.day}</span>
+                  {entry.note && (
+                    <p className="mt-0.5 text-xs text-tag-muted">{entry.note}</p>
+                  )}
+                </div>
+                <span
+                  className={cn(
+                    'w-36 text-right font-mono text-sm',
+                    entry.hours === 'Closed' ? 'text-tag-dim' : 'text-tag-orange'
+                  )}
+                >
+                  {entry.hours}
+                </span>
+                <span
+                  className={cn(
+                    'w-36 text-right font-mono text-sm',
+                    entry.building === 'Closed' ? 'text-tag-dim' : 'text-tag-muted'
+                  )}
+                >
+                  {entry.building}
+                </span>
+                {isAdmin && (
+                  <AdminActions>
+                    <OpeningHoursFormDialog
+                      entry={entry}
+                      trigger={
+                        <button
+                          className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
+                          aria-label="Edit hours"
+                        >
+                          <Pencil className="size-3.5" />
+                        </button>
+                      }
+                    />
+                  </AdminActions>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 rounded-lg border border-tag-border bg-tag-card p-5">
+            <h3 className="font-medium text-tag-text">Building Access — The Hubb</h3>
+            <p className="mt-2 text-sm leading-relaxed text-tag-muted">
+              TAG is located inside The Hubb. The front door of the building is open from{' '}
+              <span className="font-mono text-tag-orange">08:00 – 17:00</span> on weekdays. Outside
+              these hours you can continue working, but the doors will be locked. You can be let in
+              by other members or contact a community manager in advance.
+            </p>
+          </div>
+        </>
+      )}
+
+      {/* House Rules */}
+      {activeTab === 'house-rules' && (
+        <div className="grid gap-4">
+          {isAdmin && (
+            <div className="flex justify-end">
+              <HouseRuleFormDialog
+                trigger={
+                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
+                    <Plus className="size-3" />
+                    Add Rule
+                  </button>
+                }
+              />
+            </div>
+          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleRuleDragEnd}
+          >
+            <SortableContext
+              items={houseRules.map((r) => r.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {houseRules.map((rule) => (
+                <SortableHouseRuleCard key={rule.id} rule={rule} isAdmin={isAdmin} />
+              ))}
+            </SortableContext>
+          </DndContext>
+        </div>
+      )}
+
+      {/* Contact */}
+      {activeTab === 'contact' && (
+        <>
+          <div className="rounded-lg border border-tag-border bg-tag-card p-5">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 text-tag-orange">
+                <Hash className="size-4" />
+              </div>
+              <div>
+                <h3 className="font-medium text-tag-text">Slack</h3>
+                <p className="mt-1 text-sm leading-relaxed text-tag-muted">
+                  We use Slack for general communication. Ask a community manager to add you to our
+                  workspace.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <h2 className="mb-4 mt-10 font-syne text-xl font-bold text-tag-text">
+            Community Managers
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {communityManagers.map((manager) => (
+              <div
+                key={manager.name}
+                className="flex items-center gap-3 rounded-lg border border-tag-border bg-tag-card p-4"
+              >
+                <div className="flex size-9 items-center justify-center rounded-full bg-tag-orange/10">
+                  <User className="size-4 text-tag-orange" />
+                </div>
+                <span className="font-medium text-tag-text">{manager.name}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </>
+  )
+}

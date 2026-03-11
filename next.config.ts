@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       {
         hostname: 'media.licdn.com',
       },
+      {
+        hostname: 'cjvpeuxpwwwvxpjptslz.supabase.co',
+      },
     ],
   },
 };

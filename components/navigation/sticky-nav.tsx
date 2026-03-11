@@ -15,9 +15,14 @@ const navLinks = [
   { label: 'Join', href: '/join' },
 ]
 
-export const StickyNav = () => {
+interface StickyNavProps {
+  isLoggedIn?: boolean
+}
+
+export const StickyNav = ({ isLoggedIn = false }: StickyNavProps) => {
   const pathname = usePathname()
   const isHome = pathname === '/'
+  const isPortal = pathname.startsWith('/portal')
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
 
@@ -32,6 +37,8 @@ export const StickyNav = () => {
     onScroll()
     return () => window.removeEventListener('scroll', onScroll)
   }, [isHome])
+
+  if (isPortal) return null
 
   const visible = isHome ? scrolled : true
 
@@ -66,6 +73,14 @@ export const StickyNav = () => {
               {link.label}
             </Link>
           ))}
+          {isLoggedIn && (
+            <Link
+              href="/portal"
+              className="font-mono text-[12px] uppercase tracking-[0.1em] text-tag-orange transition-colors hover:text-tag-text"
+            >
+              Portal
+            </Link>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -103,6 +118,15 @@ export const StickyNav = () => {
                   {link.label}
                 </Link>
               ))}
+              {isLoggedIn && (
+                <Link
+                  href="/portal"
+                  onClick={() => setOpen(false)}
+                  className="border-t border-tag-border px-6 py-4 font-mono text-[13px] uppercase tracking-[0.1em] text-tag-orange transition-colors hover:text-tag-text"
+                >
+                  Portal
+                </Link>
+              )}
             </div>
           </SheetContent>
         </Sheet>

@@ -3,13 +3,18 @@
 import { useEffect, useRef, useCallback } from 'react'
 
 import { useScrollReveal } from '@hooks/use-scroll-reveal'
-import { gridBuilders, COUNTER_TARGET } from '@lib/builders/data'
+import { gridBuilders } from '@lib/builders/data'
 
 import { BuilderCard } from './builder-card'
 
 const easeOutExpo = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t))
 
-export const Builders = () => {
+interface BuildersProps {
+  memberCount?: number
+}
+
+export const Builders = ({ memberCount = 0 }: BuildersProps) => {
+  const counterTarget = memberCount > 0 ? memberCount : gridBuilders.length
   const sectionRef = useScrollReveal()
   const counterRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
@@ -27,16 +32,16 @@ export const Builders = () => {
     const tick = (now: number) => {
       const elapsed = now - startTime
       const progress = Math.min(elapsed / duration, 1)
-      const current = Math.floor(easeOutExpo(progress) * COUNTER_TARGET)
+      const current = Math.floor(easeOutExpo(progress) * counterTarget)
       el.textContent = current + '+'
       if (progress < 1) {
         requestAnimationFrame(tick)
       } else {
-        el.textContent = COUNTER_TARGET + '+'
+        el.textContent = counterTarget + '+'
       }
     }
     requestAnimationFrame(tick)
-  }, [])
+  }, [counterTarget])
 
   useEffect(() => {
     const el = counterRef.current

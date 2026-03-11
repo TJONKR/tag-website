@@ -2,13 +2,17 @@
 
 import { useState } from 'react'
 
-import { getUpcomingEvents, getPastEvents } from '@lib/events/data'
 import { EventRow } from '@lib/events/components/event-row'
 
-export const EventList = () => {
+import type { TagEvent } from '@lib/events/types'
+
+interface EventListProps {
+  upcoming: TagEvent[]
+  past: TagEvent[]
+}
+
+export const EventList = ({ upcoming, past }: EventListProps) => {
   const [showPast, setShowPast] = useState(false)
-  const upcoming = getUpcomingEvents()
-  const past = getPastEvents()
 
   return (
     <section>

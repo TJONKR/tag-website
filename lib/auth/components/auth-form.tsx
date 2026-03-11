@@ -22,7 +22,7 @@ export const AuthForm = ({ action, children, defaultEmail = '' }: AuthFormProps)
           name="email"
           className="text-md bg-muted md:text-sm"
           type="email"
-          placeholder="user@acme.com"
+          placeholder="you@example.com"
           autoComplete="email"
           required
           autoFocus

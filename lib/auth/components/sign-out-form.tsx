@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { LogOut } from 'lucide-react'
 
 import { signOutAction } from '@lib/auth/actions'
 
@@ -20,8 +21,9 @@ export const SignOutForm = () => {
   return (
     <button
       onClick={handleSignOut}
-      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+      className="flex items-center gap-2 rounded-lg border border-tag-border bg-tag-card px-4 py-3 font-mono text-xs uppercase tracking-[0.1em] text-tag-muted transition-colors hover:border-tag-dim hover:text-tag-text"
     >
+      <LogOut className="size-3.5" />
       Sign out
     </button>
   )

@@ -9,8 +9,15 @@ import {
   Cta,
   Footer,
 } from '@components/landing'
+import { getMemberCount } from '@lib/auth/queries'
+import { getUpcomingEvents } from '@lib/events/queries'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [events, memberCount] = await Promise.all([
+    getUpcomingEvents(),
+    getMemberCount(),
+  ])
+
   return (
     <>
       <GrainOverlay />
@@ -19,8 +26,8 @@ export default function HomePage() {
         <Manifesto />
         <Programs />
         <Quote />
-        <Builders />
-        <Events />
+        <Builders memberCount={memberCount} />
+        <Events events={events} />
         <Cta />
         <Footer />
       </main>
