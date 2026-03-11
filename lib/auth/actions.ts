@@ -1,6 +1,6 @@
 'use server'
 
-import { createServerSupabaseClient } from '@lib/db'
+import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
 
 import { loginSchema, registerSchema } from './schema'
 import type { LoginActionState, RegisterActionState } from './types'
@@ -46,27 +46,72 @@ export async function register(
     name: formData.get('name'),
     email: formData.get('email'),
     password: formData.get('password'),
+    building: formData.get('building'),
+    whyTag: formData.get('whyTag'),
+    referral: formData.get('referral') || undefined,
+    linkedinUrl: formData.get('linkedinUrl') || '',
+    twitterUrl: formData.get('twitterUrl') || '',
+    githubUrl: formData.get('githubUrl') || '',
+    websiteUrl: formData.get('websiteUrl') || '',
+    instagramUrl: formData.get('instagramUrl') || '',
   })
 
   if (!validatedFields.success) {
     return { status: 'invalid_data' }
   }
 
-  const { name, email, password } = validatedFields.data
+  const {
+    name,
+    email,
+    password,
+    building,
+    whyTag,
+    referral,
+    linkedinUrl,
+    twitterUrl,
+    githubUrl,
+    websiteUrl,
+    instagramUrl,
+  } = validatedFields.data
 
   try {
     const supabase = await createServerSupabaseClient()
+
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { name },
+        emailRedirectTo: `${siteUrl}/auth/callback?next=/portal`,
       },
     })
 
-    if (error) {
-      throw error
+    if (error) throw error
+
+    // Update profile with additional fields using service role
+    // (the trigger creates the profile row, we update it with extras)
+    if (data.user) {
+      const serviceClient = createServiceRoleClient()
+      const { error: profileError } = await serviceClient
+        .from('profiles')
+        .update({
+          building,
+          why_tag: whyTag,
+          referral: referral || null,
+          linkedin_url: linkedinUrl || null,
+          twitter_url: twitterUrl || null,
+          github_url: githubUrl || null,
+          website_url: websiteUrl || null,
+          instagram_url: instagramUrl || null,
+        })
+        .eq('id', data.user.id)
+
+      if (profileError) {
+        console.error('[register] Profile update error:', profileError)
+      }
     }
 
     return { status: 'success' }
