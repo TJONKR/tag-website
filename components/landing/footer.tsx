@@ -34,7 +34,7 @@ export const Footer = () => {
         <div className="flex gap-2">
           {/* X (Twitter) */}
           <a
-            href="#"
+            href="https://x.com/tageuamsterdam"
             className="inline-flex size-6 items-center justify-center rounded-full border border-tag-border transition-colors hover:border-tag-dim"
             aria-label="X"
           >
