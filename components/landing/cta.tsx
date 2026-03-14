@@ -38,9 +38,6 @@ export const Cta = () => {
           >
             Apply &rarr;
           </Link>
-          <span className="whitespace-nowrap font-mono text-[11px] text-tag-dim">
-            Amsterdam &middot; A Lab &middot; Every Thursday
-          </span>
         </div>
       </div>
     </section>

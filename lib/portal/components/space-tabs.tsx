@@ -7,6 +7,7 @@ import {
   Coffee,
   GripVertical,
   Hash,
+  MapPin,
   Pencil,
   Plus,
   ScrollText,
@@ -810,6 +811,20 @@ export const SpaceTabs = ({
       {/* Contact */}
       {activeTab === 'contact' && (
         <>
+          <div className="rounded-lg border border-tag-border bg-tag-card p-5">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 text-tag-orange">
+                <MapPin className="size-4" />
+              </div>
+              <div>
+                <h3 className="font-medium text-tag-text">Address</h3>
+                <p className="mt-1 text-sm leading-relaxed text-tag-muted">
+                  Jacob Bontiusplaats 9, 1018 LL Amsterdam
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="rounded-lg border border-tag-border bg-tag-card p-5">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 text-tag-orange">
