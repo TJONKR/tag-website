@@ -12,7 +12,6 @@ import {
   Plus,
   ScrollText,
   Trash2,
-  User,
   Users,
   Wifi,
 } from 'lucide-react'
@@ -78,12 +77,6 @@ const FACILITY_ICONS = [
 
 const facilityIconMap: Record<string, React.ComponentType<{ className?: string }>> =
   Object.fromEntries(FACILITY_ICONS.map((i) => [i.value, i.icon]))
-
-const communityManagers = [
-  { name: 'Pieter de Kroon' },
-  { name: 'Tijs Nieuwboer' },
-  { name: 'Kevin Muiser' },
-]
 
 // --- Generic CRUD helpers ---
 
@@ -831,30 +824,13 @@ export const SpaceTabs = ({
                 <Hash className="size-4" />
               </div>
               <div>
-                <h3 className="font-medium text-tag-text">Slack</h3>
+                <h3 className="font-medium text-tag-text">Communication</h3>
                 <p className="mt-1 text-sm leading-relaxed text-tag-muted">
-                  We use Slack for general communication. Ask a community manager to add you to our
-                  workspace.
+                  We use WhatsApp for general communication. You&apos;ll be added to the group when
+                  you join.
                 </p>
               </div>
             </div>
-          </div>
-
-          <h2 className="mb-4 mt-10 font-syne text-xl font-bold text-tag-text">
-            Community Managers
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {communityManagers.map((manager) => (
-              <div
-                key={manager.name}
-                className="flex items-center gap-3 rounded-lg border border-tag-border bg-tag-card p-4"
-              >
-                <div className="flex size-9 items-center justify-center rounded-full bg-tag-orange/10">
-                  <User className="size-4 text-tag-orange" />
-                </div>
-                <span className="font-medium text-tag-text">{manager.name}</span>
-              </div>
-            ))}
           </div>
         </>
       )}
