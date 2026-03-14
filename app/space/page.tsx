@@ -5,9 +5,9 @@ export default function SpacePage() {
   return (
     <PageShell>
       <SpaceHero />
+      <SpaceAddress />
       <AmenitiesGrid />
       <PricingTiers />
-      <SpaceAddress />
     </PageShell>
   )
 }

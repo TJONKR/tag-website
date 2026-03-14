@@ -99,9 +99,11 @@ export const DotGrid = () => {
     const resize = () => {
       dpr = window.devicePixelRatio || 1
       const rect = parent.getBoundingClientRect()
+      canvas.style.width = rect.width + 'px'
+      canvas.style.height = rect.height + 'px'
       canvas.width = rect.width * dpr
       canvas.height = rect.height * dpr
-      ctx.scale(dpr, dpr)
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       buildDots()
     }
 

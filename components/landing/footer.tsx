@@ -56,7 +56,14 @@ export const Footer = () => {
 
         </div>
 
-        <div className="font-mono text-[11px] text-tag-dim">Jacob Bontiusplaats 9, 1018 LL Amsterdam</div>
+        <a
+          href="https://maps.app.goo.gl/9zKGeVW2krPQwcNC6"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-[11px] text-tag-dim transition-colors hover:text-tag-orange"
+        >
+          Jacob Bontiusplaats 9, 1018 LL Amsterdam
+        </a>
       </div>
     </footer>
   )
