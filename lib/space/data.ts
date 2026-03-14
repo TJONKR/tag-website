@@ -66,7 +66,7 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     name: 'Builder',
-    price: '€350',
+    price: '€150',
     period: '/month',
     description: 'For serious builders',
     features: [
@@ -81,9 +81,9 @@ export const pricingTiers: PricingTier[] = [
   },
   {
     name: 'Team',
-    price: '€275',
-    period: '/person/month',
-    description: 'Build together',
+    price: 'Custom',
+    period: '',
+    description: 'Pricing on request',
     features: [
       'Everything in Builder',
       'Team area',

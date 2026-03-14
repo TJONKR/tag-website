@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -37,20 +38,32 @@ const BuilderPage = async ({ params }: BuilderPageProps) => {
         </Link>
 
         <div className="mt-12 grid grid-cols-[280px_1fr] gap-12 max-md:grid-cols-1">
-          {/* Large gradient placeholder */}
+          {/* Builder image or gradient fallback */}
           <div className="relative aspect-[3/4] overflow-hidden border border-tag-border">
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(135deg, ${builder.gradientFrom}, ${builder.gradientTo})`,
-              }}
-            />
-            <div className="absolute inset-0 bg-tag-orange/30 mix-blend-multiply" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-syne text-5xl font-bold text-tag-text/60">
-                {builder.initials}
-              </span>
-            </div>
+            {builder.image ? (
+              <Image
+                src={builder.image}
+                alt={builder.name}
+                fill
+                className="object-cover"
+                sizes="280px"
+              />
+            ) : (
+              <>
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${builder.gradientFrom}, ${builder.gradientTo})`,
+                  }}
+                />
+                <div className="absolute inset-0 bg-tag-orange/30 mix-blend-multiply" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-syne text-5xl font-bold text-tag-text/60">
+                    {builder.initials}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Info */}

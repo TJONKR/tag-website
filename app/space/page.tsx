@@ -1,10 +1,11 @@
 import { PageShell } from '@components/page-shell'
-import { SpaceHero, AmenitiesGrid, PricingTiers } from '@lib/space/components'
+import { SpaceHero, AmenitiesGrid, PricingTiers, SpaceAddress } from '@lib/space/components'
 
 export default function SpacePage() {
   return (
     <PageShell>
       <SpaceHero />
+      <SpaceAddress />
       <AmenitiesGrid />
       <PricingTiers />
     </PageShell>

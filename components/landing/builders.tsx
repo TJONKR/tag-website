@@ -14,7 +14,7 @@ interface BuildersProps {
 }
 
 export const Builders = ({ memberCount = 0 }: BuildersProps) => {
-  const counterTarget = memberCount > 0 ? memberCount : gridBuilders.length
+  const counterTarget = gridBuilders.length
   const sectionRef = useScrollReveal()
   const counterRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
