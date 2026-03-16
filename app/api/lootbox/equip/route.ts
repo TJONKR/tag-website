@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { getOptionalUser } from '@lib/auth/queries'
 import { equipSkin } from '@lib/lootbox/mutations'
+import { equipSkinSchema } from '@lib/lootbox/schema'
 
 export async function POST(req: Request) {
   try {
@@ -10,12 +11,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { skinId } = await req.json()
-    if (!skinId) {
-      return NextResponse.json({ error: 'Missing skinId' }, { status: 400 })
+    const body = await req.json()
+    const parsed = equipSkinSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
     }
 
-    await equipSkin(user.id, skinId)
+    await equipSkin(user.id, parsed.data.skinId)
     return NextResponse.json({ success: true })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to equip skin'

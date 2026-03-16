@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { getOptionalUser } from '@lib/auth/queries'
 import { openLootbox } from '@lib/lootbox/mutations'
 import { getLootboxEvent } from '@lib/lootbox/queries'
+import { openLootboxSchema } from '@lib/lootbox/schema'
 
 export async function POST(req: Request) {
   try {
@@ -11,7 +12,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { lootboxId, eventSlug } = await req.json()
+    const body = await req.json()
+    const parsed = openLootboxSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
+    }
+
+    const { eventSlug } = parsed.data
 
     // Get the event
     const slug = eventSlug || 'og-day-one'

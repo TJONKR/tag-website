@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getOptionalUser } from '@lib/auth/queries'
-import { createServerSupabaseClient } from '@lib/db'
+import { getMembersList } from '@lib/people/queries'
 
 export async function GET() {
   try {
@@ -11,15 +11,7 @@ export async function GET() {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 
-    const supabase = await createServerSupabaseClient()
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, name, role')
-      .order('name', { ascending: true })
-
-    if (error) throw new Error(error.message)
-
+    const data = await getMembersList()
     return NextResponse.json(data)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Something went wrong'

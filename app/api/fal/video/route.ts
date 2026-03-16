@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { getOptionalUser } from '@lib/auth/queries'
 import { fal, FAL_MODELS } from '@lib/fal/client'
 import { generateVideoSchema } from '@lib/fal/schema'
 import type { GenerateVideoOutput } from '@lib/fal/types'
@@ -7,6 +8,11 @@ import type { GenerateVideoOutput } from '@lib/fal/types'
 export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
+  const user = await getOptionalUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const body = await request.json()
   const parsed = generateVideoSchema.safeParse(body)
 

@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from '@lib/db'
+import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
 
 import type { Member, MemberCounts } from './types'
 import type { UserRole } from '@lib/auth/types'
@@ -11,6 +11,20 @@ export const getMembers = async (): Promise<Member[]> => {
   if (error) throw new Error(error.message)
 
   return (data as Member[]) ?? []
+}
+
+export const getMembersList = async (): Promise<
+  { id: string; name: string | null; role: UserRole }[]
+> => {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, name, role')
+    .order('name', { ascending: true })
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as { id: string; name: string | null; role: UserRole }[]
 }
 
 export const getMemberCounts = async (): Promise<MemberCounts> => {

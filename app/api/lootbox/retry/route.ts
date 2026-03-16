@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { getOptionalUser } from '@lib/auth/queries'
 import { retrySkinGeneration } from '@lib/lootbox/mutations'
 import { runGenerationPipeline } from '@lib/lootbox/pipeline/run'
+import { retrySkinSchema } from '@lib/lootbox/schema'
 
 export async function POST(req: Request) {
   try {
@@ -11,12 +12,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { skinId } = await req.json()
-    if (!skinId) {
-      return NextResponse.json({ error: 'Missing skinId' }, { status: 400 })
+    const body = await req.json()
+    const parsed = retrySkinSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
     }
 
-    const result = await retrySkinGeneration(user.id, skinId)
+    const result = await retrySkinGeneration(user.id, parsed.data.skinId)
 
     // Fire-and-forget generation pipeline
     runGenerationPipeline({

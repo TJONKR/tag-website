@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 
+import { getOptionalUser } from '@lib/auth/queries'
 import { createServiceRoleClient } from '@lib/db'
 import { evaluateSchema } from '@lib/taste/schema'
+import { getBuilderProfile } from '@lib/taste/queries'
 import { createOrResetProfile } from '@lib/taste/mutations'
 import { runProfilePipeline } from '@lib/taste/pipeline/run'
 
@@ -9,6 +11,11 @@ export const maxDuration = 300
 
 export async function POST(req: Request) {
   try {
+    const user = await getOptionalUser()
+    if (!user) {
+      return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
+    }
+
     const body = await req.json()
     const result = evaluateSchema.safeParse(body)
 
@@ -20,6 +27,26 @@ export async function POST(req: Request) {
     }
 
     const { userId } = result.data
+
+    // Ensure users can only evaluate their own profile
+    if (userId !== user.id) {
+      return NextResponse.json(
+        { errors: [{ message: 'Forbidden' }] },
+        { status: 403 }
+      )
+    }
+
+    // Reject if evaluation is already in progress
+    const existingProfile = await getBuilderProfile(userId)
+    if (
+      existingProfile &&
+      ['pending', 'researching', 'formatting', 'generating_skin'].includes(existingProfile.status)
+    ) {
+      return NextResponse.json(
+        { errors: [{ message: 'Evaluation already in progress' }] },
+        { status: 409 }
+      )
+    }
 
     // Fetch profile data
     const supabase = createServiceRoleClient()

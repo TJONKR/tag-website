@@ -1,6 +1,8 @@
 'use server'
 
 import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
+import { createOrResetProfile } from '@lib/taste/mutations'
+import { runProfilePipeline } from '@lib/taste/pipeline/run'
 
 import { loginSchema, registerSchema } from './schema'
 import type { LoginActionState, RegisterActionState } from './types'
@@ -114,14 +116,32 @@ export async function register(
       }
 
       // Fire-and-forget taste evaluation if enough data
+      // Call pipeline directly (bypasses API route which requires auth cookies)
       if (twitterUrl || linkedinUrl) {
-        const tasteSiteUrl =
-          process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-        fetch(`${tasteSiteUrl}/api/taste/evaluate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: data.user.id }),
-        }).catch(() => {})
+        const userId = data.user.id
+        createOrResetProfile({
+          userId,
+          name,
+          twitterUrl: twitterUrl || null,
+          linkedinUrl: linkedinUrl || null,
+          githubUrl: githubUrl || null,
+          websiteUrl: websiteUrl || null,
+          building,
+        })
+          .then(() =>
+            runProfilePipeline({
+              userId,
+              name,
+              twitterUrl,
+              linkedinUrl,
+              githubUrl,
+              websiteUrl,
+              building,
+            })
+          )
+          .catch((err) => {
+            console.error('[register] Taste evaluation error:', err)
+          })
       }
     }
 
