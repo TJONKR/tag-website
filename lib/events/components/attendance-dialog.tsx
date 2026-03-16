@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, ChevronsUpDown, Users, X } from 'lucide-react'
+import { Check, ChevronsUpDown, RefreshCw, Users, X } from 'lucide-react'
 
 import {
   Dialog,
@@ -32,47 +32,70 @@ interface Member {
 interface Attendee {
   user_id: string
   name: string | null
+  checked_in_at: string | null
+  source: string
 }
 
 interface AttendanceDialogProps {
   eventId: string
   eventTitle: string
+  isLumaLinked?: boolean
 }
 
-export const AttendanceDialog = ({ eventId, eventTitle }: AttendanceDialogProps) => {
+export const AttendanceDialog = ({ eventId, eventTitle, isLumaLinked }: AttendanceDialogProps) => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [comboboxOpen, setComboboxOpen] = useState(false)
   const [members, setMembers] = useState<Member[]>([])
+  const [attendees, setAttendees] = useState<Attendee[]>([])
   const [attendeeIds, setAttendeeIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState<string | null>(null)
+  const [syncingGuests, setSyncingGuests] = useState(false)
+
+  const loadData = async () => {
+    setLoading(true)
+    try {
+      const [membersRes, attendeesRes] = await Promise.all([
+        fetch('/api/members'),
+        fetch(`/api/events/${eventId}/attendance`),
+      ])
+
+      if (membersRes.ok && attendeesRes.ok) {
+        const membersData: Member[] = await membersRes.json()
+        const attendeesData: Attendee[] = await attendeesRes.json()
+        setMembers(membersData)
+        setAttendees(attendeesData)
+        setAttendeeIds(new Set(attendeesData.map((a) => a.user_id)))
+      }
+    } catch {
+      toast({ type: 'error', description: 'Failed to load data' })
+    }
+    setLoading(false)
+  }
 
   useEffect(() => {
     if (!open) return
-
-    const load = async () => {
-      setLoading(true)
-      try {
-        const [membersRes, attendeesRes] = await Promise.all([
-          fetch('/api/members'),
-          fetch(`/api/events/${eventId}/attendance`),
-        ])
-
-        if (membersRes.ok && attendeesRes.ok) {
-          const membersData: Member[] = await membersRes.json()
-          const attendeesData: Attendee[] = await attendeesRes.json()
-          setMembers(membersData)
-          setAttendeeIds(new Set(attendeesData.map((a) => a.user_id)))
-        }
-      } catch {
-        toast({ type: 'error', description: 'Failed to load data' })
-      }
-      setLoading(false)
-    }
-
-    load()
+    loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, eventId])
+
+  const handleSyncGuests = async () => {
+    setSyncingGuests(true)
+    try {
+      const res = await fetch(`/api/luma/sync/${eventId}`, { method: 'POST' })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      toast({
+        type: 'success',
+        description: `Synced ${data.guestsSynced} guests`,
+      })
+      await loadData()
+    } catch {
+      toast({ type: 'error', description: 'Guest sync failed' })
+    }
+    setSyncingGuests(false)
+  }
 
   const toggle = async (userId: string) => {
     setToggling(userId)
@@ -122,6 +145,7 @@ export const AttendanceDialog = ({ eventId, eventTitle }: AttendanceDialogProps)
   }
 
   const selectedMembers = members.filter((m) => attendeeIds.has(m.id))
+  const checkedInCount = attendees.filter((a) => a.checked_in_at).length
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -135,7 +159,19 @@ export const AttendanceDialog = ({ eventId, eventTitle }: AttendanceDialogProps)
       </DialogTrigger>
       <DialogContent className="border-tag-border bg-tag-bg text-tag-text sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-syne">Attendance</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="font-syne">Attendance</DialogTitle>
+            {isLumaLinked && (
+              <button
+                onClick={handleSyncGuests}
+                disabled={syncingGuests}
+                className="flex items-center gap-1.5 rounded-md border border-tag-border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-tag-muted transition-colors hover:border-tag-orange/30 hover:text-tag-orange disabled:opacity-50"
+              >
+                <RefreshCw className={cn('size-3', syncingGuests && 'animate-spin')} />
+                Sync Guests
+              </button>
+            )}
+          </div>
           <p className="text-sm text-tag-muted">{eventTitle}</p>
         </DialogHeader>
 
@@ -198,22 +234,37 @@ export const AttendanceDialog = ({ eventId, eventTitle }: AttendanceDialogProps)
             {/* Selected members as badges */}
             {selectedMembers.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {selectedMembers.map((member) => (
-                  <button
-                    key={member.id}
-                    onClick={() => toggle(member.id)}
-                    disabled={toggling === member.id}
-                    className="flex items-center gap-1 rounded-full border border-tag-border bg-tag-card px-2.5 py-1 text-xs text-tag-text transition-colors hover:border-tag-orange/50 disabled:opacity-50"
-                  >
-                    {member.name || 'Unnamed'}
-                    <X className="size-3 text-tag-muted" />
-                  </button>
-                ))}
+                {selectedMembers.map((member) => {
+                  const attendee = attendees.find((a) => a.user_id === member.id)
+                  const isCheckedIn = !!attendee?.checked_in_at
+                  return (
+                    <button
+                      key={member.id}
+                      onClick={() => toggle(member.id)}
+                      disabled={toggling === member.id}
+                      className="flex items-center gap-1 rounded-full border border-tag-border bg-tag-card px-2.5 py-1 text-xs text-tag-text transition-colors hover:border-tag-orange/50 disabled:opacity-50"
+                    >
+                      <span
+                        className={cn(
+                          'inline-block size-1.5 rounded-full',
+                          isCheckedIn ? 'bg-green-500' : attendee?.source === 'luma' ? 'bg-tag-dim' : ''
+                        )}
+                      />
+                      {member.name || 'Unnamed'}
+                      <X className="size-3 text-tag-muted" />
+                    </button>
+                  )
+                })}
               </div>
             )}
 
-            <div className="border-t border-tag-border pt-3 text-right">
-              <span className="text-xs text-tag-muted">
+            <div className="flex items-center justify-between border-t border-tag-border pt-3">
+              {checkedInCount > 0 && (
+                <span className="text-xs text-tag-muted">
+                  {checkedInCount} of {attendeeIds.size} checked in
+                </span>
+              )}
+              <span className="ml-auto text-xs text-tag-muted">
                 {attendeeIds.size} attendee{attendeeIds.size !== 1 ? 's' : ''}
               </span>
             </div>

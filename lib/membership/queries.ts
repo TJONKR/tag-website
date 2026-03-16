@@ -53,7 +53,7 @@ export async function getMembershipStatus(
   const hasActiveSubscription = subscription?.status === 'active'
 
   return {
-    tier: isBuilder ? 'builder' : 'fan',
+    tier: isBuilder ? 'builder' : 'ambassador',
     subscription,
     contract,
     canUpgrade: !isBuilder && !hasActiveSubscription,

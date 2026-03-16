@@ -2,7 +2,8 @@ import { createServerSupabaseClient } from '@lib/db'
 
 import type { TagEvent, EventAttendee } from './types'
 
-const EVENT_COLUMNS = 'id, title, type, description, date_iso, location, created_by'
+const EVENT_COLUMNS =
+  'id, title, type, description, date_iso, location, created_by, luma_event_id, luma_url, start_at, end_at, cover_url'
 
 export async function getUpcomingEvents(): Promise<TagEvent[]> {
   const supabase = await createServerSupabaseClient()
@@ -67,7 +68,7 @@ export async function getEventAttendees(eventId: string): Promise<EventAttendee[
 
   const { data, error } = await supabase
     .from('event_attendance')
-    .select('user_id, profiles(name)')
+    .select('user_id, checked_in_at, luma_approval_status, registered_at, source, profiles(name)')
     .eq('event_id', eventId)
 
   if (error) throw new Error(error.message)
@@ -77,30 +78,52 @@ export async function getEventAttendees(eventId: string): Promise<EventAttendee[
     return {
       user_id: row.user_id,
       name: profile?.name ?? null,
+      checked_in_at: row.checked_in_at ?? null,
+      luma_approval_status: row.luma_approval_status ?? null,
+      registered_at: row.registered_at ?? null,
+      source: row.source ?? 'manual',
     }
   })
 }
 
 export async function getUserAttendedEvents(
   userId: string
-): Promise<{ id: string; title: string; date_iso: string }[]> {
+): Promise<{ id: string; title: string; date_iso: string; checked_in_at: string | null }[]> {
   const supabase = await createServerSupabaseClient()
 
   const { data, error } = await supabase
     .from('event_attendance')
-    .select('event_id, events(id, title, date_iso)')
+    .select('event_id, checked_in_at, events(id, title, date_iso)')
     .eq('user_id', userId)
 
   if (error) throw new Error(error.message)
 
   return (data ?? [])
     .map((row) => {
-      const event = row.events as unknown as { id: string; title: string; date_iso: string } | null
+      const event = row.events as unknown as {
+        id: string
+        title: string
+        date_iso: string
+      } | null
       return event
-        ? { id: event.id, title: event.title, date_iso: event.date_iso }
+        ? {
+            id: event.id,
+            title: event.title,
+            date_iso: event.date_iso,
+            checked_in_at: row.checked_in_at ?? null,
+          }
         : null
     })
-    .filter((e): e is { id: string; title: string; date_iso: string } => e !== null)
+    .filter(
+      (
+        e
+      ): e is {
+        id: string
+        title: string
+        date_iso: string
+        checked_in_at: string | null
+      } => e !== null
+    )
     .sort((a, b) => b.date_iso.localeCompare(a.date_iso))
 }
 
@@ -114,4 +137,40 @@ export async function getUserAttendanceCount(userId: string): Promise<number> {
 
   if (error) throw new Error(error.message)
   return count ?? 0
+}
+
+export async function getUserCheckedInCount(userId: string): Promise<number> {
+  const supabase = await createServerSupabaseClient()
+
+  const { count, error } = await supabase
+    .from('event_attendance')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .not('checked_in_at', 'is', null)
+
+  if (error) throw new Error(error.message)
+  return count ?? 0
+}
+
+export async function getEventAttendanceSummary(
+  eventId: string
+): Promise<{ total: number; checkedIn: number }> {
+  const supabase = await createServerSupabaseClient()
+
+  const { count: total, error: totalError } = await supabase
+    .from('event_attendance')
+    .select('*', { count: 'exact', head: true })
+    .eq('event_id', eventId)
+
+  if (totalError) throw new Error(totalError.message)
+
+  const { count: checkedIn, error: checkedInError } = await supabase
+    .from('event_attendance')
+    .select('*', { count: 'exact', head: true })
+    .eq('event_id', eventId)
+    .not('checked_in_at', 'is', null)
+
+  if (checkedInError) throw new Error(checkedInError.message)
+
+  return { total: total ?? 0, checkedIn: checkedIn ?? 0 }
 }

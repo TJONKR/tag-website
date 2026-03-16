@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@components/ui/avatar'
 import { toast } from '@components/toast'
-import { updateAvatar } from '@lib/auth/actions'
 
 interface AvatarUploadProps {
   name: string | null
@@ -37,15 +36,23 @@ export const AvatarUpload = ({ name, avatarUrl }: AvatarUploadProps) => {
     }
 
     setUploading(true)
-    const formData = new FormData()
-    formData.append('avatar', file)
+    try {
+      const formData = new FormData()
+      formData.append('avatar', file)
 
-    const result = await updateAvatar(formData)
+      const res = await fetch('/api/profile/avatar', {
+        method: 'POST',
+        body: formData,
+      })
 
-    if (result.status === 'success') {
-      toast({ type: 'success', description: 'Avatar updated.' })
-      router.refresh()
-    } else {
+      if (res.ok) {
+        toast({ type: 'success', description: 'Avatar updated.' })
+        router.refresh()
+      } else {
+        const json = await res.json().catch(() => null)
+        toast({ type: 'error', description: json?.error || 'Failed to upload avatar.' })
+      }
+    } catch {
       toast({ type: 'error', description: 'Failed to upload avatar.' })
     }
 

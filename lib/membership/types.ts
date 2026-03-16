@@ -28,7 +28,7 @@ export interface Contract {
   created_at: string
 }
 
-export type MembershipTier = 'fan' | 'builder'
+export type MembershipTier = 'ambassador' | 'builder'
 
 export interface MembershipStatus {
   tier: MembershipTier

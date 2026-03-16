@@ -1,7 +1,10 @@
+import type { UserRole } from '@lib/auth/types'
+
 export interface NavItem {
   label: string
   href: string
   icon: string
+  requiredRole?: UserRole
 }
 
 export interface NavGroup {

@@ -22,6 +22,7 @@ import {
 } from '@components/ui/select'
 import { Button } from '@components/ui/button'
 
+import { Checkbox } from '@components/ui/checkbox'
 import { toast } from '@components/toast'
 import type { TagEvent } from '@lib/events/types'
 
@@ -30,16 +31,19 @@ const EVENT_TYPES = ['Event', 'Internal Event', 'Hackathon'] as const
 interface EventFormDialogProps {
   event?: TagEvent
   trigger: React.ReactNode
+  isAdmin?: boolean
 }
 
-export const EventFormDialog = ({ event, trigger }: EventFormDialogProps) => {
+export const EventFormDialog = ({ event, trigger, isAdmin }: EventFormDialogProps) => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [generalError, setGeneralError] = useState<string | null>(null)
+  const [publishToLuma, setPublishToLuma] = useState(false)
 
   const isEdit = !!event
+  const isLinkedToLuma = !!event?.luma_event_id
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -89,6 +93,29 @@ export const EventFormDialog = ({ event, trigger }: EventFormDialogProps) => {
           setGeneralError('Something went wrong')
         }
         return
+      }
+
+      // If publishing to Luma on create, push the event
+      if (!isEdit && publishToLuma) {
+        const eventData = await res.json()
+        if (eventData.id) {
+          try {
+            const lumaRes = await fetch('/api/luma/push', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ eventId: eventData.id }),
+            })
+            if (lumaRes.ok) {
+              const { lumaUrl } = await lumaRes.json()
+              toast({
+                type: 'success',
+                description: `Event published to Luma: ${lumaUrl}`,
+              })
+            }
+          } catch {
+            toast({ type: 'error', description: 'Event created but Luma publish failed' })
+          }
+        }
       }
 
       setOpen(false)
@@ -180,6 +207,33 @@ export const EventFormDialog = ({ event, trigger }: EventFormDialogProps) => {
             />
             {errors.location && <p className="text-xs text-destructive">{errors.location}</p>}
           </div>
+
+          {/* Luma integration */}
+          {isAdmin && !isEdit && !isLinkedToLuma && (
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="publish_to_luma"
+                checked={publishToLuma}
+                onCheckedChange={(checked) => setPublishToLuma(checked === true)}
+              />
+              <Label htmlFor="publish_to_luma" className="text-sm font-normal">
+                Publish to Luma
+              </Label>
+            </div>
+          )}
+          {isLinkedToLuma && event?.luma_url && (
+            <div className="text-xs text-tag-muted">
+              Linked to Luma:{' '}
+              <a
+                href={event.luma_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-tag-orange underline"
+              >
+                View on Luma
+              </a>
+            </div>
+          )}
 
           {generalError && <p className="text-sm text-destructive">{generalError}</p>}
 

@@ -39,6 +39,11 @@ export const JoinForm = () => {
       building: formData.get('building') as string,
       whyTag: formData.get('whyTag') as string,
       referral: (formData.get('referral') as string) || undefined,
+      linkedinUrl: (formData.get('linkedinUrl') as string) || '',
+      twitterUrl: (formData.get('twitterUrl') as string) || '',
+      githubUrl: (formData.get('githubUrl') as string) || '',
+      websiteUrl: (formData.get('websiteUrl') as string) || '',
+      instagramUrl: (formData.get('instagramUrl') as string) || '',
     }
 
     try {
@@ -179,6 +184,78 @@ export const JoinForm = () => {
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Socials */}
+        <div className="space-y-4">
+          <p className="font-grotesk text-sm text-tag-muted">
+            Add your socials so other builders can find you. All optional.
+          </p>
+
+          <div className="space-y-2">
+            <Label htmlFor="linkedinUrl" className={labelClass}>
+              LinkedIn
+            </Label>
+            <Input
+              id="linkedinUrl"
+              name="linkedinUrl"
+              type="url"
+              placeholder="https://linkedin.com/in/you"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="twitterUrl" className={labelClass}>
+              Twitter / X
+            </Label>
+            <Input
+              id="twitterUrl"
+              name="twitterUrl"
+              type="url"
+              placeholder="https://x.com/you"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="githubUrl" className={labelClass}>
+              GitHub
+            </Label>
+            <Input
+              id="githubUrl"
+              name="githubUrl"
+              type="url"
+              placeholder="https://github.com/you"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="websiteUrl" className={labelClass}>
+              Website
+            </Label>
+            <Input
+              id="websiteUrl"
+              name="websiteUrl"
+              type="url"
+              placeholder="https://yoursite.com"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="instagramUrl" className={labelClass}>
+              Instagram
+            </Label>
+            <Input
+              id="instagramUrl"
+              name="instagramUrl"
+              type="url"
+              placeholder="https://instagram.com/you"
+              className={inputClass}
+            />
+          </div>
         </div>
 
         {/* Submit */}

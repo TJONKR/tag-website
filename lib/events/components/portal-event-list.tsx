@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Pencil, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { ExternalLink, Pencil, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { toast } from '@components/toast'
@@ -25,16 +25,19 @@ interface PortalEventListProps {
   upcoming: TagEvent[]
   past: TagEvent[]
   isAdmin: boolean
+  attendanceSummaries?: Record<string, { total: number; checkedIn: number }>
 }
 
 const PortalEventRow = ({
   event,
   muted = false,
   isAdmin,
+  attendanceSummary,
 }: {
   event: TagEvent
   muted?: boolean
   isAdmin: boolean
+  attendanceSummary?: { total: number; checkedIn: number }
 }) => {
   const router = useRouter()
   const [deleting, setDeleting] = useState(false)
@@ -71,16 +74,44 @@ const PortalEventRow = ({
         <span className="font-syne text-lg text-tag-text">{event.title}</span>
         <span className="text-xs text-tag-muted">{event.description}</span>
       </div>
-      <div className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-tag-dim max-md:w-auto max-md:text-left md:w-28 md:text-right">
-        {event.type}
+      <div className="flex shrink-0 items-center gap-2 max-md:w-auto max-md:text-left md:w-36 md:justify-end">
+        {muted && attendanceSummary && attendanceSummary.total > 0 && (
+          <span className="font-mono text-[10px] text-tag-muted">
+            {attendanceSummary.checkedIn}/{attendanceSummary.total} checked in
+          </span>
+        )}
+        {event.luma_event_id && (
+          <span className="rounded bg-tag-orange/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-tag-orange">
+            Luma
+          </span>
+        )}
+        <span className="font-mono text-[10px] uppercase tracking-wider text-tag-dim">
+          {event.type}
+        </span>
       </div>
       {isAdmin && (
         <div className="ml-3 flex shrink-0 items-center gap-1">
+          {event.luma_url && (
+            <a
+              href={event.luma_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-orange"
+              aria-label="Open on Luma"
+            >
+              <ExternalLink className="size-3.5" />
+            </a>
+          )}
           {muted && (
-            <AttendanceDialog eventId={event.id} eventTitle={event.title} />
+            <AttendanceDialog
+              eventId={event.id}
+              eventTitle={event.title}
+              isLumaLinked={!!event.luma_event_id}
+            />
           )}
           <EventFormDialog
             event={event}
+            isAdmin={isAdmin}
             trigger={
               <button
                 className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
@@ -191,8 +222,36 @@ const HostEventContent = () => (
   </>
 )
 
-export const PortalEventList = ({ upcoming, past, isAdmin }: PortalEventListProps) => {
+export const PortalEventList = ({
+  upcoming,
+  past,
+  isAdmin,
+  attendanceSummaries,
+}: PortalEventListProps) => {
+  const router = useRouter()
   const [showPast, setShowPast] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+
+  const handleLumaSync = async () => {
+    setSyncing(true)
+    try {
+      const res = await fetch('/api/luma/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'all' }),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      toast({
+        type: 'success',
+        description: `Synced ${data.eventsSynced ?? 0} events, ${data.guestsSynced ?? 0} guests`,
+      })
+      router.refresh()
+    } catch {
+      toast({ type: 'error', description: 'Luma sync failed' })
+    }
+    setSyncing(false)
+  }
 
   return (
     <>
@@ -203,19 +262,30 @@ export const PortalEventList = ({ upcoming, past, isAdmin }: PortalEventListProp
             Upcoming
           </span>
           {isAdmin && (
-            <EventFormDialog
-              trigger={
-                <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
-                  <Plus className="size-3" />
-                  Add Event
-                </button>
-              }
-            />
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleLumaSync}
+                disabled={syncing}
+                className="flex items-center gap-1.5 rounded-md border border-tag-border px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-tag-muted transition-colors hover:border-tag-orange/30 hover:text-tag-orange disabled:opacity-50"
+              >
+                <RefreshCw className={cn('size-3', syncing && 'animate-spin')} />
+                {syncing ? 'Syncing...' : 'Sync Luma'}
+              </button>
+              <EventFormDialog
+                isAdmin={isAdmin}
+                trigger={
+                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
+                    <Plus className="size-3" />
+                    Add Event
+                  </button>
+                }
+              />
+            </div>
           )}
         </div>
         {upcoming.length > 0 ? (
           upcoming.map((event) => (
-            <PortalEventRow key={event.id} event={event} isAdmin={isAdmin} />
+            <PortalEventRow key={event.id} event={event} isAdmin={isAdmin} attendanceSummary={attendanceSummaries?.[event.id]} />
           ))
         ) : (
           <div className="px-4 py-8 text-center text-sm text-tag-muted">No upcoming events</div>
@@ -235,7 +305,7 @@ export const PortalEventList = ({ upcoming, past, isAdmin }: PortalEventListProp
         </div>
         {showPast &&
           past.map((event) => (
-            <PortalEventRow key={event.id} event={event} muted isAdmin={isAdmin} />
+            <PortalEventRow key={event.id} event={event} muted isAdmin={isAdmin} attendanceSummary={attendanceSummaries?.[event.id]} />
           ))}
       </div>
 

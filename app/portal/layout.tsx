@@ -4,7 +4,7 @@ import { getUser } from '@lib/auth/queries'
 export const dynamic = 'force-dynamic'
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
-  await getUser()
+  const user = await getUser()
 
   return (
     <div className="relative min-h-screen bg-tag-bg pt-14">
@@ -17,7 +17,7 @@ export default async function PortalLayout({ children }: { children: React.React
           backgroundSize: '16px 16px',
         }}
       />
-      <PortalSidebar />
+      <PortalSidebar role={user.role} />
       <div className="relative z-10 mx-auto max-w-4xl px-6 pb-20 pt-10 md:px-10 md:pb-10">
         {children}
       </div>

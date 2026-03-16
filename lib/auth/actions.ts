@@ -112,6 +112,17 @@ export async function register(
       if (profileError) {
         console.error('[register] Profile update error:', profileError)
       }
+
+      // Fire-and-forget taste evaluation if enough data
+      if (twitterUrl || linkedinUrl) {
+        const tasteSiteUrl =
+          process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+        fetch(`${tasteSiteUrl}/api/taste/evaluate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: data.user.id }),
+        }).catch(() => {})
+      }
     }
 
     return { status: 'success' }
@@ -228,6 +239,23 @@ export async function updateAvatar(
     if (updateError) throw updateError
 
     return { status: 'success', url: avatarUrl }
+  } catch (error) {
+    console.error('[updateAvatar] Error:', error)
+    return { status: 'failed' }
+  }
+}
+
+export async function setPassword(
+  password: string
+): Promise<{ status: 'success' | 'failed' }> {
+  try {
+    const supabase = await createServerSupabaseClient()
+
+    const { error } = await supabase.auth.updateUser({ password })
+
+    if (error) throw error
+
+    return { status: 'success' }
   } catch {
     return { status: 'failed' }
   }

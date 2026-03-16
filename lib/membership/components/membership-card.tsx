@@ -33,7 +33,7 @@ export const MembershipCard = ({ status }: MembershipCardProps) => {
         </div>
         <div>
           <h3 className="font-syne text-lg font-bold text-tag-text">
-            {isBuilder ? 'Builder' : 'Fan'}
+            {isBuilder ? 'Builder' : 'Ambassador'}
           </h3>
           <p className="text-sm text-tag-muted">
             {isBuilder

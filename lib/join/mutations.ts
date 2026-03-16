@@ -11,6 +11,11 @@ export const insertApplication = async (data: JoinInput) => {
     building: data.building,
     why_tag: data.whyTag,
     referral: data.referral || null,
+    linkedin_url: data.linkedinUrl || null,
+    twitter_url: data.twitterUrl || null,
+    github_url: data.githubUrl || null,
+    website_url: data.websiteUrl || null,
+    instagram_url: data.instagramUrl || null,
   })
 
   if (error) {

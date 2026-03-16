@@ -105,6 +105,6 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   if (status === 'active') {
     await updateProfileRoleFromWebhook(userId, 'builder')
   } else if (status === 'canceled' || status === 'unpaid') {
-    await updateProfileRoleFromWebhook(userId, 'fan')
+    await updateProfileRoleFromWebhook(userId, 'ambassador')
   }
 }

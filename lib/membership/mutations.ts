@@ -115,7 +115,7 @@ export async function upsertSubscriptionFromWebhook(data: {
 
 export async function updateProfileRoleFromWebhook(
   userId: string,
-  role: 'fan' | 'builder'
+  role: 'ambassador' | 'builder'
 ) {
   const supabase = createServiceRoleClient()
 

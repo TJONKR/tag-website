@@ -43,11 +43,26 @@ export async function middleware(request: NextRequest) {
   }
 
   // Auth pages — redirect to portal if already logged in
-  const authPages = ['/login', '/register', '/join']
+  const authPages = ['/login', '/register']
   if (user && authPages.includes(pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = '/portal'
     return NextResponse.redirect(url)
+  }
+
+  // Onboarding gate — authenticated portal users must complete onboarding
+  if (user && pathname.startsWith('/portal') && pathname !== '/portal/onboarding') {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('onboarding_completed')
+      .eq('id', user.id)
+      .single()
+
+    if (profile && profile.onboarding_completed === false) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/portal/onboarding'
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse

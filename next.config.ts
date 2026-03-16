@@ -1,6 +1,11 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '4mb',
+    },
+  },
   images: {
     remotePatterns: [
       {
@@ -11,6 +16,12 @@ const nextConfig: NextConfig = {
       },
       {
         hostname: 'cjvpeuxpwwwvxpjptslz.supabase.co',
+      },
+      {
+        hostname: 'fal.media',
+      },
+      {
+        hostname: 'v3.fal.media',
       },
     ],
   },

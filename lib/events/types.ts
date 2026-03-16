@@ -8,11 +8,20 @@ export interface TagEvent {
   date_iso: string
   location: string
   created_by: string | null
+  luma_event_id: string | null
+  luma_url: string | null
+  start_at: string | null
+  end_at: string | null
+  cover_url: string | null
 }
 
 export interface EventAttendee {
   user_id: string
   name: string | null
+  checked_in_at: string | null
+  luma_approval_status: string | null
+  registered_at: string | null
+  source: string
 }
 
 export function formatDateDisplay(dateIso: string): string {

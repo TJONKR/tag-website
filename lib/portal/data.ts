@@ -7,6 +7,7 @@ export const portalNavGroups: NavGroup[] = [
       { label: 'Events', href: '/portal/events', icon: 'calendar' },
       { label: 'Space', href: '/portal/space', icon: 'map' },
       { label: 'Profile', href: '/portal/profile', icon: 'user' },
+      { label: 'People', href: '/portal/people', icon: 'users', requiredRole: 'operator' },
     ],
   },
 ]

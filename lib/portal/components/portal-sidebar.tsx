@@ -2,21 +2,31 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, Map, User } from 'lucide-react'
+import { Calendar, Map, Sparkles, User, Users } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { portalNavGroups } from '@lib/portal/data'
 
+import type { UserRole } from '@lib/auth/types'
+
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   calendar: Calendar,
   map: Map,
+  sparkles: Sparkles,
   user: User,
+  users: Users,
 }
 
-const allItems = portalNavGroups.flatMap((group) => group.items)
+interface PortalSidebarProps {
+  role?: UserRole
+}
 
-export const PortalSidebar = () => {
+export const PortalSidebar = ({ role }: PortalSidebarProps) => {
   const pathname = usePathname()
+
+  const allItems = portalNavGroups
+    .flatMap((group) => group.items)
+    .filter((item) => !item.requiredRole || item.requiredRole === role)
 
   return (
     <>

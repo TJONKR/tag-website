@@ -1,0 +1,111 @@
+import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
+
+import type { LootboxEvent, LootboxStyle, UserLootbox, UserSkin } from './types'
+
+export async function getLootboxEvent(slug: string): Promise<LootboxEvent | null> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('lootbox_events')
+    .select('*')
+    .eq('slug', slug)
+    .eq('active', true)
+    .maybeSingle()
+
+  if (error) return null
+  return data as LootboxEvent | null
+}
+
+export async function getEventStyles(eventId: string): Promise<LootboxStyle[]> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('lootbox_styles')
+    .select('*')
+    .eq('event_id', eventId)
+
+  if (error) return []
+  return data as LootboxStyle[]
+}
+
+export async function getUserLootboxes(userId: string): Promise<UserLootbox[]> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('user_lootboxes')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) return []
+  return data as UserLootbox[]
+}
+
+export async function getUserLootbox(lootboxId: string): Promise<UserLootbox | null> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('user_lootboxes')
+    .select('*')
+    .eq('id', lootboxId)
+    .maybeSingle()
+
+  if (error) return null
+  return data as UserLootbox | null
+}
+
+export async function getUserSkins(userId: string): Promise<UserSkin[]> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('user_skins')
+    .select('*, style:lootbox_styles(*)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) return []
+  return data as UserSkin[]
+}
+
+export async function getEquippedSkin(userId: string): Promise<UserSkin | null> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('user_skins')
+    .select('*, style:lootbox_styles(*)')
+    .eq('user_id', userId)
+    .eq('equipped', true)
+    .maybeSingle()
+
+  if (error) return null
+  return data as UserSkin | null
+}
+
+export async function getPendingSkin(userId: string): Promise<UserSkin | null> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('user_skins')
+    .select('*')
+    .eq('user_id', userId)
+    .in('status', ['generating', 'error'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) return null
+  return data as UserSkin | null
+}
+
+export async function getSkinById(skinId: string): Promise<UserSkin | null> {
+  const supabase = createServiceRoleClient()
+
+  const { data, error } = await supabase
+    .from('user_skins')
+    .select('*, style:lootbox_styles(*)')
+    .eq('id', skinId)
+    .maybeSingle()
+
+  if (error) return null
+  return data as UserSkin | null
+}
