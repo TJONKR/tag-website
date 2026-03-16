@@ -59,7 +59,7 @@ export const amenities: Amenity[] = [
 export const pricingTiers: PricingTier[] = [
   {
     name: 'Day Pass',
-    price: '€25',
+    price: 'JUST ASK',
     period: '/day',
     description: 'Drop in and build',
     features: ['Desk for the day', 'Fast WiFi', 'Coffee included', 'Community access'],
