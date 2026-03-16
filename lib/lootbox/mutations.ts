@@ -1,6 +1,6 @@
 import { createServiceRoleClient } from '@lib/db'
 
-import type { LootboxStyle, RolledCard, SkinStatus } from './types'
+import type { GenerationType, LootboxStyle, RolledCard, SkinStatus } from './types'
 
 /**
  * Roll 4 cards from an event's style pool using weighted random selection.
@@ -8,6 +8,19 @@ import type { LootboxStyle, RolledCard, SkinStatus } from './types'
  */
 export async function openLootbox(userId: string, eventId: string) {
   const supabase = createServiceRoleClient()
+
+  // Prevent duplicate lootbox creation for the same user+event
+  const { data: existing } = await supabase
+    .from('user_lootboxes')
+    .select('id, cards')
+    .eq('user_id', userId)
+    .eq('event_id', eventId)
+    .eq('status', 'available')
+    .maybeSingle()
+
+  if (existing) {
+    return { lootboxId: existing.id, cards: existing.cards as RolledCard[] }
+  }
 
   // Get all styles for this event
   const { data: styles, error: stylesError } = await supabase
@@ -117,6 +130,44 @@ export async function updateSkinStatus(
     .eq('id', skinId)
 
   if (error) throw new Error(error.message)
+}
+
+/**
+ * Reset a failed skin back to 'generating' and return the info needed to re-run the pipeline.
+ */
+export async function retrySkinGeneration(userId: string, skinId: string) {
+  const supabase = createServiceRoleClient()
+
+  const { data: skin, error } = await supabase
+    .from('user_skins')
+    .select('id, style_id, rarity')
+    .eq('id', skinId)
+    .eq('user_id', userId)
+    .eq('status', 'error')
+    .single()
+
+  if (error || !skin) {
+    throw new Error('Skin not found or not in error state')
+  }
+
+  const { data: style } = await supabase
+    .from('lootbox_styles')
+    .select('generation_type')
+    .eq('id', skin.style_id)
+    .single()
+
+  if (!style) throw new Error('Style not found')
+
+  await supabase
+    .from('user_skins')
+    .update({ status: 'generating' as SkinStatus })
+    .eq('id', skinId)
+
+  return {
+    skinId: skin.id,
+    styleId: skin.style_id,
+    generationType: style.generation_type as GenerationType,
+  }
 }
 
 export async function equipSkin(userId: string, skinId: string) {

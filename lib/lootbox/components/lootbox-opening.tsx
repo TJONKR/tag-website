@@ -205,9 +205,21 @@ export const LootboxOpening = ({
                 </p>
               </div>
               <button
-                onClick={() => {
-                  setActiveSkinId(null)
-                  setError(null)
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/lootbox/retry', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ skinId: activeSkinId }),
+                    })
+                    if (!res.ok) {
+                      const data = await res.json()
+                      throw new Error(data.error || 'Retry failed')
+                    }
+                    // SWR will pick up the status change to 'generating' automatically
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : 'Retry failed')
+                  }
                 }}
                 className="rounded-lg bg-tag-orange/10 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20"
               >
