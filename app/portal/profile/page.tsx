@@ -115,7 +115,7 @@ export default async function ProfilePage() {
     <>
       <PortalHeader title="Profile" description="Your account and membership details." />
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-[280px_1fr]">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-[336px_1fr]">
         {/* ── Left Column ── */}
         <div className="space-y-6 md:sticky md:top-20 md:self-start">
           {/* Hero Identity Card */}
@@ -204,7 +204,7 @@ export default async function ProfilePage() {
         </div>
 
         {/* ── Right Column ── */}
-        <div className="space-y-6">
+        <div className="max-w-xl space-y-6">
           {/* Stats Strip */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-lg border border-tag-border bg-tag-card p-4">
