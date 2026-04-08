@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
-import { Input } from '@components/ui/input'
 import { Textarea } from '@components/ui/textarea'
 import { Label } from '@components/ui/label'
 import { toast } from '@components/toast'
@@ -19,11 +18,6 @@ import {
 interface ProfileData {
   building: string | null
   why_tag: string | null
-  linkedin_url: string | null
-  twitter_url: string | null
-  github_url: string | null
-  website_url: string | null
-  instagram_url: string | null
 }
 
 interface EditProfileFormProps {
@@ -47,11 +41,6 @@ export const EditProfileForm = ({ profile }: EditProfileFormProps) => {
     const data = {
       building: formData.get('building') as string,
       whyTag: formData.get('whyTag') as string,
-      linkedinUrl: (formData.get('linkedinUrl') as string) || '',
-      twitterUrl: (formData.get('twitterUrl') as string) || '',
-      githubUrl: (formData.get('githubUrl') as string) || '',
-      websiteUrl: (formData.get('websiteUrl') as string) || '',
-      instagramUrl: (formData.get('instagramUrl') as string) || '',
     }
 
     try {
@@ -76,13 +65,6 @@ export const EditProfileForm = ({ profile }: EditProfileFormProps) => {
       setSaving(false)
     }
   }
-
-  const hasSocials =
-    profile.linkedin_url ||
-    profile.twitter_url ||
-    profile.github_url ||
-    profile.website_url ||
-    profile.instagram_url
 
   return (
     <>
@@ -112,63 +94,6 @@ export const EditProfileForm = ({ profile }: EditProfileFormProps) => {
               {profile.why_tag || 'Not set'}
             </p>
           </div>
-          {hasSocials && (
-            <div className="px-6 py-4">
-              <span className="text-xs text-tag-muted">Socials</span>
-              <div className="mt-2 flex flex-wrap gap-3">
-                {profile.linkedin_url && (
-                  <a
-                    href={profile.linkedin_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-tag-orange transition-colors hover:text-tag-orange/80"
-                  >
-                    LinkedIn
-                  </a>
-                )}
-                {profile.twitter_url && (
-                  <a
-                    href={profile.twitter_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-tag-orange transition-colors hover:text-tag-orange/80"
-                  >
-                    Twitter/X
-                  </a>
-                )}
-                {profile.github_url && (
-                  <a
-                    href={profile.github_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-tag-orange transition-colors hover:text-tag-orange/80"
-                  >
-                    GitHub
-                  </a>
-                )}
-                {profile.website_url && (
-                  <a
-                    href={profile.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-tag-orange transition-colors hover:text-tag-orange/80"
-                  >
-                    Website
-                  </a>
-                )}
-                {profile.instagram_url && (
-                  <a
-                    href={profile.instagram_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-xs text-tag-orange transition-colors hover:text-tag-orange/80"
-                  >
-                    Instagram
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -203,45 +128,6 @@ export const EditProfileForm = ({ profile }: EditProfileFormProps) => {
                 rows={2}
                 defaultValue={profile.why_tag ?? ''}
                 placeholder="What drew you here?"
-                className={inputClass}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <Label className={labelClass}>Socials</Label>
-              <Input
-                name="linkedinUrl"
-                type="url"
-                defaultValue={profile.linkedin_url ?? ''}
-                placeholder="https://linkedin.com/in/you"
-                className={inputClass}
-              />
-              <Input
-                name="twitterUrl"
-                type="url"
-                defaultValue={profile.twitter_url ?? ''}
-                placeholder="https://x.com/you"
-                className={inputClass}
-              />
-              <Input
-                name="githubUrl"
-                type="url"
-                defaultValue={profile.github_url ?? ''}
-                placeholder="https://github.com/you"
-                className={inputClass}
-              />
-              <Input
-                name="websiteUrl"
-                type="url"
-                defaultValue={profile.website_url ?? ''}
-                placeholder="https://yoursite.com"
-                className={inputClass}
-              />
-              <Input
-                name="instagramUrl"
-                type="url"
-                defaultValue={profile.instagram_url ?? ''}
-                placeholder="https://instagram.com/you"
                 className={inputClass}
               />
             </div>

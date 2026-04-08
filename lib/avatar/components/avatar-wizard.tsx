@@ -94,7 +94,7 @@ export const AvatarWizard = ({ initialPhotos, photoUrls }: AvatarWizardProps) =>
   }
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <button

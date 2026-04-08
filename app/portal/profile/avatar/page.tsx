@@ -22,7 +22,6 @@ export default async function AvatarPage() {
 
   return (
     <>
-      <PortalHeader title="Update Avatar" description="Generate an AI avatar from your photos." />
       <AvatarWizard initialPhotos={userPhotos} photoUrls={photoUrls} />
     </>
   )

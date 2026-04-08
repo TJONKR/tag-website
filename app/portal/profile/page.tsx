@@ -1,11 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, Check, Pencil, Shield, Star } from 'lucide-react'
+import { Calendar, Check, Shield, Star } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { PortalHeader } from '@lib/portal/components'
 import { EditNameForm } from '@lib/auth/components/edit-name-form'
 import { EditProfileForm } from '@lib/auth/components/edit-profile-form'
+import { SocialLinks } from '@lib/auth/components/social-links'
 import { SignOutForm } from '@lib/auth/components/sign-out-form'
 import { AvatarUpload } from '@lib/auth/components/avatar-upload'
 import { getUser } from '@lib/auth/queries'
@@ -119,30 +120,27 @@ export default async function ProfilePage() {
         {/* ── Left Column ── */}
         <div className="space-y-6 md:sticky md:top-20 md:self-start">
           {/* Hero Identity Card */}
-          <div
-            className={cn(
-              'rounded-lg border bg-tag-card',
-              isBuilder ? 'border-tag-orange' : 'border-tag-border'
-            )}
-          >
-            {hasSkin ? (
-              /* Equipped skin hero */
-              <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
-                <Image
-                  src={equippedSkinUrl!}
-                  alt={user.name ?? 'Profile skin'}
-                  fill
-                  className="object-cover"
-                  sizes="280px"
-                  unoptimized
-                />
-              </div>
-            ) : (
-              /* Avatar fallback */
-              <div className="flex justify-center pt-8 pb-2">
-                <AvatarUpload name={user.name} avatarUrl={user.avatar_url} />
-              </div>
-            )}
+          <div className="rounded-lg border border-tag-border bg-tag-card">
+            <Link href="/portal/profile/avatar" className="group block">
+              {hasSkin ? (
+                /* Equipped skin hero */
+                <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
+                  <Image
+                    src={equippedSkinUrl!}
+                    alt={user.name ?? 'Profile skin'}
+                    fill
+                    className="object-cover transition-opacity group-hover:opacity-80"
+                    sizes="336px"
+                    unoptimized
+                  />
+                </div>
+              ) : (
+                /* Avatar fallback */
+                <div className="flex justify-center pt-8 pb-2">
+                  <AvatarUpload name={user.name} avatarUrl={user.avatar_url} />
+                </div>
+              )}
+            </Link>
 
             <div className="p-5">
               <h2 className="font-syne text-xl font-bold text-tag-text">
@@ -183,15 +181,19 @@ export default async function ProfilePage() {
                 Member since {formatMemberSince(user.created_at)}
               </div>
 
-              <Link
-                href="/portal/profile/avatar"
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-tag-border px-3 py-2 text-xs font-medium text-tag-muted transition-colors hover:border-tag-orange/50 hover:text-tag-orange"
-              >
-                <Pencil className="size-3" />
-                Update Avatar
-              </Link>
             </div>
           </div>
+
+          {/* Social links */}
+          <SocialLinks
+            profile={{
+              linkedin_url: onboardingProfile.linkedin_url,
+              twitter_url: onboardingProfile.twitter_url,
+              github_url: onboardingProfile.github_url,
+              website_url: onboardingProfile.website_url,
+              instagram_url: onboardingProfile.instagram_url,
+            }}
+          />
 
           {/* Lootbox progress / opening — left column */}
           {!lootboxAllDone && !hasSkin && <LootboxProgress steps={lootboxSteps} />}
@@ -206,7 +208,7 @@ export default async function ProfilePage() {
         {/* ── Right Column ── */}
         <div className="max-w-xl space-y-6">
           {/* Stats Strip */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-3 gap-3">
             <div className="rounded-lg border border-tag-border bg-tag-card p-4">
               <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
                 Events
@@ -240,14 +242,6 @@ export default async function ProfilePage() {
                 {participationRate !== null ? `${participationRate}%` : '--'}
               </p>
             </div>
-            <div className="rounded-lg border border-tag-border bg-tag-card p-4">
-              <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
-                Since
-              </span>
-              <p className="mt-1 font-syne text-lg font-bold text-tag-text">
-                {formatMemberSince(user.created_at)}
-              </p>
-            </div>
           </div>
 
           {/* Skins Collection */}
@@ -265,11 +259,6 @@ export default async function ProfilePage() {
             profile={{
               building: onboardingProfile.building,
               why_tag: onboardingProfile.why_tag,
-              linkedin_url: onboardingProfile.linkedin_url,
-              twitter_url: onboardingProfile.twitter_url,
-              github_url: onboardingProfile.github_url,
-              website_url: onboardingProfile.website_url,
-              instagram_url: onboardingProfile.instagram_url,
             }}
           />
 
