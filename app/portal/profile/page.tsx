@@ -1,5 +1,6 @@
 import Image from 'next/image'
-import { Calendar, Check, Shield, Star } from 'lucide-react'
+import Link from 'next/link'
+import { Calendar, Check, Pencil, Shield, Star } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { PortalHeader } from '@lib/portal/components'
@@ -21,10 +22,8 @@ import { LootboxProgress } from '@lib/portal/components/lootbox-progress'
 import { ProfileEventTimeline } from '@lib/events/components'
 import { getUserPhotos } from '@lib/photos/queries'
 import { getEquippedSkin, getUserSkins, getPendingSkin } from '@lib/lootbox/queries'
-import { PhotoUpload } from '@lib/photos/components'
 import { LootboxOpening, SkinsCollection } from '@lib/lootbox/components'
 import { MAX_PHOTOS } from '@lib/photos/types'
-import { createServerSupabaseClient } from '@lib/db'
 import type { UserRole } from '@lib/auth/types'
 
 const roleConfig: Record<UserRole, { label: string; icon: typeof Check; color: string }> = {
@@ -112,18 +111,6 @@ export default async function ProfilePage() {
       ? Math.round((checkedInCount / attendedEvents.length) * 100)
       : null
 
-  // Get signed URLs for photos
-  const supabase = await createServerSupabaseClient()
-  const photoUrls: Record<string, string> = {}
-  for (const photo of userPhotos) {
-    const { data } = await supabase.storage
-      .from('user-photos')
-      .createSignedUrl(photo.storage_path, 3600)
-    if (data?.signedUrl) {
-      photoUrls[photo.id] = data.signedUrl
-    }
-  }
-
   return (
     <>
       <PortalHeader title="Profile" description="Your account and membership details." />
@@ -195,6 +182,14 @@ export default async function ProfilePage() {
                 <Calendar className="size-3" />
                 Member since {formatMemberSince(user.created_at)}
               </div>
+
+              <Link
+                href="/portal/profile/avatar"
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-tag-border px-3 py-2 text-xs font-medium text-tag-muted transition-colors hover:border-tag-orange/50 hover:text-tag-orange"
+              >
+                <Pencil className="size-3" />
+                Update Avatar
+              </Link>
             </div>
           </div>
 
@@ -253,11 +248,6 @@ export default async function ProfilePage() {
                 {formatMemberSince(user.created_at)}
               </p>
             </div>
-          </div>
-
-          {/* Photo Upload */}
-          <div className="rounded-lg border border-tag-border bg-tag-card p-6">
-            <PhotoUpload initialPhotos={userPhotos} photoUrls={photoUrls} />
           </div>
 
           {/* Skins Collection */}
