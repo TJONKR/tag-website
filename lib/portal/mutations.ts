@@ -1,6 +1,6 @@
 import { createServerSupabaseClient } from '@lib/db'
 
-import type { FacilityInput, HouseRuleInput, OpeningHoursInput } from './schema'
+import type { ContactItemInput, FacilityInput, HouseRuleInput, OpeningHoursInput } from './schema'
 
 // Facilities
 export const insertFacility = async (data: FacilityInput) => {
@@ -77,4 +77,33 @@ export const deleteOpeningHours = async (id: string) => {
   const supabase = await createServerSupabaseClient()
   const { error } = await supabase.from('opening_hours').delete().eq('id', id)
   if (error) throw new Error(error.message)
+}
+
+// Contact Items
+export const insertContactItem = async (data: ContactItemInput) => {
+  const supabase = await createServerSupabaseClient()
+  const { error } = await supabase.from('contact_items').insert(data)
+  if (error) throw new Error(error.message)
+}
+
+export const updateContactItem = async (id: string, data: ContactItemInput) => {
+  const supabase = await createServerSupabaseClient()
+  const { error } = await supabase.from('contact_items').update(data).eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export const deleteContactItem = async (id: string) => {
+  const supabase = await createServerSupabaseClient()
+  const { error } = await supabase.from('contact_items').delete().eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export const reorderContactItems = async (ids: string[]) => {
+  const supabase = await createServerSupabaseClient()
+  const updates = ids.map((id, index) =>
+    supabase.from('contact_items').update({ sort_order: index }).eq('id', id)
+  )
+  const results = await Promise.all(updates)
+  const failed = results.find((r) => r.error)
+  if (failed?.error) throw new Error(failed.error.message)
 }

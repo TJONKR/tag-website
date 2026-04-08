@@ -1,14 +1,15 @@
 import { PortalHeader, FadeIn } from '@lib/portal/components'
 import { getUser } from '@lib/auth/queries'
-import { getFacilities, getHouseRules, getOpeningHours } from '@lib/portal/queries'
+import { getContactItems, getFacilities, getHouseRules, getOpeningHours } from '@lib/portal/queries'
 import { SpaceTabs } from '@lib/portal/components/space-tabs'
 
 export default async function SpacePage() {
   const user = await getUser()
-  const [facilities, houseRules, openingHours] = await Promise.all([
+  const [facilities, houseRules, openingHours, contactItems] = await Promise.all([
     getFacilities(),
     getHouseRules(),
     getOpeningHours(),
+    getContactItems(),
   ])
 
   return (
@@ -24,6 +25,7 @@ export default async function SpacePage() {
           facilities={facilities}
           openingHours={openingHours}
           houseRules={houseRules}
+          contactItems={contactItems}
           isAdmin={user.role === 'operator'}
         />
       </FadeIn>

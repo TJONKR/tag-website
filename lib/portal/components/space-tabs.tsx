@@ -1,14 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Building,
   Coffee,
+  Globe,
   GripVertical,
+  Link2,
   Hash,
+  Mail,
   MapPin,
   Pencil,
+  Phone,
   Plus,
   ScrollText,
   Trash2,
@@ -56,7 +60,7 @@ import {
 
 import { ConfirmDialog } from '@components/confirm-dialog'
 import { FloorPlanMap } from './floor-plan-map'
-import type { Facility, HouseRule, OpeningHours } from '@lib/portal/types'
+import type { ContactItem, Facility, HouseRule, OpeningHours } from '@lib/portal/types'
 
 const tabs = [
   { key: 'floor-plan', label: 'Floor Plan' },
@@ -78,6 +82,41 @@ const FACILITY_ICONS = [
 const facilityIconMap: Record<string, React.ComponentType<{ className?: string }>> =
   Object.fromEntries(FACILITY_ICONS.map((i) => [i.value, i.icon]))
 
+const CONTACT_ICONS = [
+  { value: 'mappin', label: 'Location', icon: MapPin },
+  { value: 'hash', label: 'Chat', icon: Hash },
+  { value: 'mail', label: 'Email', icon: Mail },
+  { value: 'phone', label: 'Phone', icon: Phone },
+  { value: 'globe', label: 'Website', icon: Globe },
+  { value: 'building', label: 'General', icon: Building },
+] as const
+
+const contactIconMap: Record<string, React.ComponentType<{ className?: string }>> =
+  Object.fromEntries(CONTACT_ICONS.map((i) => [i.value, i.icon]))
+
+// --- Markdown link parser ---
+
+const renderWithLinks = (text: string) => {
+  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/)
+  return parts.map((part, i) => {
+    const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
+    if (match) {
+      return (
+        <a
+          key={i}
+          href={match[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-tag-orange underline decoration-tag-orange/30 transition-colors hover:decoration-tag-orange"
+        >
+          {match[1]}
+        </a>
+      )
+    }
+    return part
+  })
+}
+
 // --- Generic CRUD helpers ---
 
 async function apiSubmit(url: string, method: string, body: Record<string, unknown>) {
@@ -98,6 +137,142 @@ async function apiDelete(url: string) {
 }
 
 // --- Form Dialogs ---
+
+const RichTextarea = ({
+  id,
+  name,
+  defaultValue,
+  required,
+}: {
+  id: string
+  name: string
+  defaultValue?: string
+  required?: boolean
+}) => {
+  const ref = useRef<HTMLTextAreaElement>(null)
+  const [popoverOpen, setPopoverOpen] = useState(false)
+  const [label, setLabel] = useState('')
+  const [url, setUrl] = useState('')
+  const cursorRef = useRef(0)
+
+  const openPopover = () => {
+    if (ref.current) cursorRef.current = ref.current.selectionStart
+    setLabel('')
+    setUrl('')
+    setPopoverOpen(true)
+  }
+
+  const confirmLink = () => {
+    const textarea = ref.current
+    if (!textarea || !label || !url) return
+
+    const pos = cursorRef.current
+    const before = textarea.value.slice(0, pos)
+    const after = textarea.value.slice(pos)
+    const markdown = `[${label}](${url})`
+
+    const nativeSet = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype,
+      'value'
+    )?.set
+    nativeSet?.call(textarea, before + markdown + after)
+    textarea.dispatchEvent(new Event('input', { bubbles: true }))
+
+    setPopoverOpen(false)
+    textarea.focus()
+    const newPos = pos + markdown.length
+    textarea.setSelectionRange(newPos, newPos)
+  }
+
+  return (
+    <div className="overflow-hidden rounded-md border border-tag-border transition-colors focus-within:border-tag-orange">
+      <div className="relative flex items-center gap-1 border-b border-tag-border bg-tag-card/50 px-2 py-1.5">
+        <button
+          type="button"
+          onClick={openPopover}
+          className={cn(
+            'flex items-center gap-1.5 rounded px-2 py-1 text-xs transition-colors',
+            popoverOpen
+              ? 'bg-tag-orange/10 text-tag-orange'
+              : 'text-tag-muted hover:bg-tag-border hover:text-tag-text'
+          )}
+          title="Insert link"
+        >
+          <Link2 className="size-3.5" />
+          Link
+        </button>
+
+        {popoverOpen && (
+          <div className="absolute left-0 top-full z-10 mt-1 w-72 rounded-lg border border-tag-border bg-tag-bg p-3 shadow-xl">
+            <div className="space-y-2.5">
+              <div>
+                <label className="mb-1 block font-mono text-xs uppercase tracking-wider text-tag-dim">
+                  Label
+                </label>
+                <Input
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  placeholder="Click here"
+                  className="h-8 border-tag-border bg-tag-card text-sm"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      if (label && url) confirmLink()
+                    }
+                  }}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block font-mono text-xs uppercase tracking-wider text-tag-dim">
+                  URL
+                </label>
+                <Input
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://"
+                  type="url"
+                  className="h-8 border-tag-border bg-tag-card text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      if (label && url) confirmLink()
+                    }
+                  }}
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setPopoverOpen(false)}
+                  className="rounded px-2.5 py-1 text-xs text-tag-muted transition-colors hover:text-tag-text"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmLink}
+                  disabled={!label || !url}
+                  className="rounded bg-tag-orange px-2.5 py-1 text-xs text-white transition-colors hover:bg-tag-orange/90 disabled:opacity-40"
+                >
+                  Insert
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      <Textarea
+        ref={ref}
+        id={id}
+        name={name}
+        defaultValue={defaultValue}
+        required={required}
+        className="rounded-none border-0 bg-transparent shadow-none ring-0 ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+      />
+    </div>
+  )
+}
 
 const FacilityFormDialog = ({
   facility,
@@ -158,13 +333,12 @@ const FacilityFormDialog = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
+            <Label htmlFor="fac-description">Description</Label>
+            <RichTextarea
+              id="fac-description"
               name="description"
               defaultValue={facility?.description}
               required
-              className="border-tag-border bg-tag-card"
             />
           </div>
           <div className="space-y-2">
@@ -267,13 +441,12 @@ const HouseRuleFormDialog = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
+            <Label htmlFor="rule-description">Description</Label>
+            <RichTextarea
+              id="rule-description"
               name="description"
               defaultValue={rule?.description}
               required
-              className="border-tag-border bg-tag-card"
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -397,6 +570,117 @@ const OpeningHoursFormDialog = ({
   )
 }
 
+const ContactFormDialog = ({
+  item,
+  trigger,
+}: {
+  item?: ContactItem
+  trigger: React.ReactNode
+}) => {
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const isEdit = !!item
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    const form = new FormData(e.currentTarget)
+    try {
+      const body = {
+        title: form.get('title') as string,
+        description: form.get('description') as string,
+        icon: form.get('icon') as string,
+        sort_order: item?.sort_order ?? 999,
+      }
+      const url = isEdit ? `/api/contact-items/${item.id}` : '/api/contact-items'
+      await apiSubmit(url, isEdit ? 'PUT' : 'POST', body)
+      setOpen(false)
+      toast({ type: 'success', description: isEdit ? 'Contact updated' : 'Contact added' })
+      router.refresh()
+    } catch (err) {
+      toast({
+        type: 'error',
+        description: err instanceof Error ? err.message : 'Something went wrong',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="border-tag-border bg-tag-bg text-tag-text sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="font-syne">
+            {isEdit ? 'Edit Contact' : 'Add Contact'}
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              name="title"
+              defaultValue={item?.title}
+              required
+              className="border-tag-border bg-tag-card"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contact-description">Description</Label>
+            <RichTextarea
+              id="contact-description"
+              name="description"
+              defaultValue={item?.description}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Icon</Label>
+            <Select name="icon" defaultValue={item?.icon || 'building'}>
+              <SelectTrigger className="border-tag-border bg-tag-card">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="border-tag-border bg-tag-bg">
+                {CONTACT_ICONS.map((i) => {
+                  const Icon = i.icon
+                  return (
+                    <SelectItem key={i.value} value={i.value}>
+                      <span className="flex items-center gap-2">
+                        <Icon className="size-3.5" />
+                        {i.label}
+                      </span>
+                    </SelectItem>
+                  )
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="border-tag-border"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-tag-orange hover:bg-[#e8551b]"
+            >
+              {loading ? 'Saving...' : isEdit ? 'Save' : 'Add'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // --- Delete button ---
 
 const DeleteButton = ({ url, label }: { url: string; label: string }) => {
@@ -485,7 +769,7 @@ const SortableFacilityCard = ({
         )}
         <div className="flex-1">
           <h3 className="font-medium text-tag-text">{facility.name}</h3>
-          <p className="mt-1 text-sm leading-relaxed text-tag-muted">{facility.description}</p>
+          <p className="mt-1 text-sm leading-relaxed text-tag-muted">{renderWithLinks(facility.description)}</p>
         </div>
         {isAdmin && (
           <AdminActions>
@@ -550,7 +834,7 @@ const SortableHouseRuleCard = ({
         </div>
         <div className="flex-1">
           <h3 className="font-medium text-tag-text">{rule.title}</h3>
-          <p className="mt-1 text-sm leading-relaxed text-tag-muted">{rule.description}</p>
+          <p className="mt-1 text-sm leading-relaxed text-tag-muted">{renderWithLinks(rule.description)}</p>
         </div>
         {isAdmin && (
           <AdminActions>
@@ -573,12 +857,82 @@ const SortableHouseRuleCard = ({
   )
 }
 
+const SortableContactCard = ({
+  item,
+  isAdmin,
+}: {
+  item: ContactItem
+  isAdmin: boolean
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+    disabled: !isAdmin,
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  const Icon = contactIconMap[item.icon]
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'rounded-lg border border-tag-border bg-tag-card p-5 transition-colors hover:border-tag-dim',
+        isDragging && 'z-10 shadow-lg opacity-90'
+      )}
+    >
+      <div className="flex items-start gap-3">
+        {isAdmin && (
+          <button
+            {...attributes}
+            {...listeners}
+            className="mt-0.5 cursor-grab touch-none text-tag-dim hover:text-tag-muted active:cursor-grabbing"
+            aria-label="Drag to reorder"
+          >
+            <GripVertical className="size-4" />
+          </button>
+        )}
+        {Icon && (
+          <div className="mt-0.5 text-tag-orange">
+            <Icon className="size-4" />
+          </div>
+        )}
+        <div className="flex-1">
+          <h3 className="font-medium text-tag-text">{item.title}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-tag-muted">{renderWithLinks(item.description)}</p>
+        </div>
+        {isAdmin && (
+          <AdminActions>
+            <ContactFormDialog
+              item={item}
+              trigger={
+                <button
+                  className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
+                  aria-label="Edit contact"
+                >
+                  <Pencil className="size-3.5" />
+                </button>
+              }
+            />
+            <DeleteButton url={`/api/contact-items/${item.id}`} label="Contact" />
+          </AdminActions>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // --- Main component ---
 
 interface SpaceTabsProps {
   facilities: Facility[]
   openingHours: OpeningHours[]
   houseRules: HouseRule[]
+  contactItems: ContactItem[]
   isAdmin: boolean
 }
 
@@ -586,11 +940,13 @@ export const SpaceTabs = ({
   facilities: initialFacilities,
   openingHours,
   houseRules: initialRules,
+  contactItems: initialContacts,
   isAdmin,
 }: SpaceTabsProps) => {
   const [activeTab, setActiveTab] = useState<Tab>('floor-plan')
   const [facilities, setFacilities] = useState(initialFacilities)
   const [houseRules, setHouseRules] = useState(initialRules)
+  const [contactItems, setContactItems] = useState(initialContacts)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -631,6 +987,25 @@ export const SpaceTabs = ({
       })
     } catch {
       setHouseRules(houseRules)
+      toast({ type: 'error', description: 'Failed to reorder' })
+    }
+  }
+
+  const handleContactDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = contactItems.findIndex((c) => c.id === active.id)
+    const newIndex = contactItems.findIndex((c) => c.id === over.id)
+    const reordered = arrayMove(contactItems, oldIndex, newIndex)
+    setContactItems(reordered)
+
+    try {
+      await apiSubmit('/api/contact-items/reorder', 'PUT', {
+        ids: reordered.map((c) => c.id),
+      })
+    } catch {
+      setContactItems(contactItems)
       toast({ type: 'error', description: 'Failed to reorder' })
     }
   }
@@ -803,36 +1178,38 @@ export const SpaceTabs = ({
 
       {/* Contact */}
       {activeTab === 'contact' && (
-        <>
-          <div className="rounded-lg border border-tag-border bg-tag-card p-5">
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 text-tag-orange">
-                <MapPin className="size-4" />
-              </div>
-              <div>
-                <h3 className="font-medium text-tag-text">Address</h3>
-                <p className="mt-1 text-sm leading-relaxed text-tag-muted">
-                  Jacob Bontiusplaats 9, 1018 LL Amsterdam
-                </p>
-              </div>
+        <div className="grid gap-4">
+          {isAdmin && (
+            <div className="flex justify-end">
+              <ContactFormDialog
+                trigger={
+                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
+                    <Plus className="size-3" />
+                    Add Contact
+                  </button>
+                }
+              />
             </div>
-          </div>
-
-          <div className="rounded-lg border border-tag-border bg-tag-card p-5">
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 text-tag-orange">
-                <Hash className="size-4" />
-              </div>
-              <div>
-                <h3 className="font-medium text-tag-text">Communication</h3>
-                <p className="mt-1 text-sm leading-relaxed text-tag-muted">
-                  We use WhatsApp for general communication. You&apos;ll be added to the group when
-                  you join.
-                </p>
-              </div>
-            </div>
-          </div>
-        </>
+          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleContactDragEnd}
+          >
+            <SortableContext
+              items={contactItems.map((c) => c.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {contactItems.map((item) => (
+                <SortableContactCard
+                  key={item.id}
+                  item={item}
+                  isAdmin={isAdmin}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        </div>
       )}
     </>
   )

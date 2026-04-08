@@ -36,11 +36,12 @@ export interface OpeningHours {
   sort_order: number
 }
 
-export interface ContactInfo {
-  type: string
-  label: string
-  value: string
-  href?: string
+export interface ContactItem {
+  id: string
+  title: string
+  description: string
+  icon: string
+  sort_order: number
 }
 
 export interface Room {
