@@ -33,7 +33,7 @@ const XIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
-const labelClass = 'font-mono text-[12px] uppercase tracking-[0.08em] text-tag-muted'
+const labelClass = 'font-mono text-sm uppercase tracking-[0.08em] text-tag-muted'
 const inputClass =
   'border-tag-border bg-tag-card text-tag-text placeholder:text-tag-dim focus-visible:ring-tag-orange'
 
@@ -95,12 +95,12 @@ export const SocialLinks = ({ profile }: SocialLinksProps) => {
     <>
       <div className="rounded-lg border border-tag-border bg-tag-card p-4">
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+          <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
             Socials
           </span>
           <button
             onClick={() => setOpen(true)}
-            className="font-mono text-[11px] uppercase tracking-wider text-tag-muted transition-colors hover:text-tag-text"
+            className="font-mono text-xs uppercase tracking-wider text-tag-muted transition-colors hover:text-tag-text"
           >
             {hasSocials ? 'Edit' : 'Add'}
           </button>
@@ -118,9 +118,9 @@ export const SocialLinks = ({ profile }: SocialLinksProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   title={s.label}
-                  className="flex size-8 items-center justify-center rounded-lg border border-tag-border transition-colors hover:border-tag-orange/50 hover:text-tag-orange"
+                  className="group/social flex size-9 items-center justify-center rounded-lg border border-tag-border transition-colors hover:border-tag-orange/50"
                 >
-                  <Icon className="size-3.5 text-tag-muted" />
+                  <Icon className="size-4 text-tag-muted transition-colors group-hover/social:text-tag-orange" />
                 </a>
               )
             })}
@@ -128,7 +128,7 @@ export const SocialLinks = ({ profile }: SocialLinksProps) => {
         ) : (
           <button
             onClick={() => setOpen(true)}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-tag-border py-3 text-xs text-tag-muted transition-colors hover:border-tag-orange/50 hover:text-tag-orange"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-tag-border py-3 text-sm text-tag-muted transition-colors hover:border-tag-orange/50 hover:text-tag-orange"
           >
             <Plus className="size-3" />
             Add your socials
@@ -169,7 +169,7 @@ export const SocialLinks = ({ profile }: SocialLinksProps) => {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 rounded-md bg-tag-orange px-4 py-2 font-mono text-xs uppercase tracking-wider text-tag-bg transition-colors hover:bg-tag-orange/90 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-md bg-tag-orange px-4 py-2 font-mono text-sm uppercase tracking-wider text-tag-bg transition-colors hover:bg-tag-orange/90 disabled:opacity-50"
               >
                 {saving ? (
                   <>

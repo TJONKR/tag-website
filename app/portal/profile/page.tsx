@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Calendar, Check, Shield, Star } from 'lucide-react'
 
 import { cn } from '@lib/utils'
-import { PortalHeader } from '@lib/portal/components'
+import { PortalHeader, FadeIn } from '@lib/portal/components'
 import { EditNameForm } from '@lib/auth/components/edit-name-form'
 import { EditProfileForm } from '@lib/auth/components/edit-profile-form'
 import { SocialLinks } from '@lib/auth/components/social-links'
@@ -114,12 +114,15 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <PortalHeader title="Profile" description="Your account and membership details." />
+      <FadeIn>
+        <PortalHeader title="Profile" description="Your account and membership details." />
+      </FadeIn>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-[336px_1fr]">
         {/* ── Left Column ── */}
         <div className="space-y-6 md:sticky md:top-20 md:self-start">
           {/* Hero Identity Card */}
+          <FadeIn delay={75}>
           <div className="rounded-lg border border-tag-border bg-tag-card">
             <Link href="/portal/profile/avatar" className="group block">
               {hasSkin ? (
@@ -156,7 +159,7 @@ export default async function ProfilePage() {
                   {builderProfile.tags.slice(0, 4).map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full border border-tag-orange/20 bg-tag-orange/5 px-2 py-0.5 text-[10px] text-tag-orange"
+                      className="rounded-full border border-tag-orange/20 bg-tag-orange/5 px-2 py-0.5 text-sm text-tag-orange"
                     >
                       {tag}
                     </span>
@@ -173,18 +176,25 @@ export default async function ProfilePage() {
                 >
                   <Icon className={cn('size-3', config.color)} />
                 </div>
-                <span className="text-xs font-medium text-tag-muted">{config.label}</span>
+                <span className="text-sm font-medium text-tag-muted">{config.label}</span>
               </div>
 
-              <div className="mt-2 flex items-center gap-1.5 text-xs text-tag-dim">
-                <Calendar className="size-3" />
-                Member since {formatMemberSince(user.created_at)}
+              <div className="mt-2 flex items-center gap-2">
+                <div className="flex size-6 items-center justify-center rounded-full bg-tag-orange/10">
+                  <Calendar className="size-3 text-tag-orange" />
+                </div>
+                <span className="text-sm font-medium text-tag-muted">
+                  Since {formatMemberSince(user.created_at)}
+                </span>
               </div>
 
             </div>
           </div>
 
+          </FadeIn>
+
           {/* Social links */}
+          <FadeIn delay={150}>
           <SocialLinks
             profile={{
               linkedin_url: onboardingProfile.linkedin_url,
@@ -194,23 +204,31 @@ export default async function ProfilePage() {
               instagram_url: onboardingProfile.instagram_url,
             }}
           />
+          </FadeIn>
 
           {/* Lootbox progress / opening — left column */}
-          {!lootboxAllDone && !hasSkin && <LootboxProgress steps={lootboxSteps} />}
+          {!lootboxAllDone && !hasSkin && (
+            <FadeIn delay={225}>
+              <LootboxProgress steps={lootboxSteps} />
+            </FadeIn>
+          )}
           {(lootboxAllDone || pendingSkin) && !hasSkin && (
-            <LootboxOpening
-              hasPhotos={hasEnoughPhotos}
-              pendingSkinId={pendingSkin?.id ?? null}
-            />
+            <FadeIn delay={225}>
+              <LootboxOpening
+                hasPhotos={hasEnoughPhotos}
+                pendingSkinId={pendingSkin?.id ?? null}
+              />
+            </FadeIn>
           )}
         </div>
 
         {/* ── Right Column ── */}
         <div className="max-w-xl space-y-6">
           {/* Stats Strip */}
+          <FadeIn delay={100}>
           <div className="grid grid-cols-3 gap-3">
             <div className="rounded-lg border border-tag-border bg-tag-card p-4">
-              <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+              <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
                 Events
               </span>
               <p className="mt-1 font-syne text-2xl font-bold text-tag-text">
@@ -218,13 +236,13 @@ export default async function ProfilePage() {
               </p>
             </div>
             <div className="rounded-lg border border-tag-border bg-tag-card p-4">
-              <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+              <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
                 Verified
               </span>
               <p className="mt-1 font-syne text-2xl font-bold text-tag-text">{checkedInCount}</p>
             </div>
             <div className="rounded-lg border border-tag-border bg-tag-card p-4">
-              <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+              <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
                 Rate
               </span>
               <p
@@ -243,32 +261,40 @@ export default async function ProfilePage() {
               </p>
             </div>
           </div>
+          </FadeIn>
 
           {/* Skins Collection */}
           {userSkins.length > 0 && <SkinsCollection initialSkins={userSkins} />}
 
           {/* Membership */}
+          <FadeIn delay={175}>
           <MembershipCard status={membershipStatus} />
 
           {membershipStatus.canUpgrade && <UpgradeCard />}
 
           {membershipStatus.subscription?.status === 'active' && <ManageSubscription />}
+          </FadeIn>
 
           {/* About / Edit Profile */}
+          <FadeIn delay={250}>
           <EditProfileForm
             profile={{
               building: onboardingProfile.building,
               why_tag: onboardingProfile.why_tag,
             }}
           />
+          </FadeIn>
 
           {/* Event Timeline */}
+          <FadeIn delay={325}>
           <ProfileEventTimeline events={attendedEvents} />
+          </FadeIn>
 
           {/* Account */}
+          <FadeIn delay={400}>
           <div className="rounded-lg border border-tag-border bg-tag-card">
             <div className="px-6 pt-5 pb-3">
-              <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+              <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
                 Account
               </span>
             </div>
@@ -277,12 +303,13 @@ export default async function ProfilePage() {
                 <EditNameForm currentName={user.name} />
               </div>
               <div className="px-6 py-4">
-                <span className="text-xs text-tag-muted">Email Address</span>
+                <span className="text-sm text-tag-muted">Email Address</span>
                 <p className="text-sm text-tag-text">{user.email}</p>
               </div>
               <SignOutForm />
             </div>
           </div>
+          </FadeIn>
         </div>
       </div>
     </>

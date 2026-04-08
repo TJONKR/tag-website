@@ -21,7 +21,7 @@ export const SignOutForm = () => {
   return (
     <button
       onClick={handleSignOut}
-      className="flex items-center gap-2 rounded-lg border border-tag-border bg-tag-card px-4 py-3 font-mono text-xs uppercase tracking-[0.1em] text-tag-muted transition-colors hover:border-tag-dim hover:text-tag-text"
+      className="flex items-center gap-2 rounded-lg border border-tag-border bg-tag-card px-4 py-3 font-mono text-sm uppercase tracking-[0.1em] text-tag-muted transition-colors hover:border-tag-dim hover:text-tag-text"
     >
       <LogOut className="size-3.5" />
       Sign out

@@ -69,7 +69,7 @@ export const LootboxProgress = ({ steps }: LootboxProgressProps) => {
         <p className="mt-4 font-syne text-sm font-bold text-tag-text">
           {percent < 80 ? 'Unlock your lootbox' : 'Almost there'}
         </p>
-        <p className="mt-1 text-xs text-tag-muted">
+        <p className="mt-1 text-sm text-tag-muted">
           Complete your profile to earn your first collectible card.
         </p>
       </div>
@@ -88,7 +88,7 @@ export const LootboxProgress = ({ steps }: LootboxProgressProps) => {
             </div>
             <span
               className={cn(
-                'text-xs',
+                'text-sm',
                 step.done ? 'text-tag-muted line-through' : 'text-tag-text'
               )}
             >

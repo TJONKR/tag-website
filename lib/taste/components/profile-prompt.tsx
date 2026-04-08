@@ -92,12 +92,12 @@ export const ProfilePrompt = ({ profile, onTrigger }: ProfilePromptProps) => {
                 {url.label}
               </span>
               {!filled && url.required && (
-                <span className="font-mono text-[10px] text-tag-orange">
+                <span className="font-mono text-xs text-tag-orange">
                   NEEDS AT LEAST ONE
                 </span>
               )}
               {!filled && !url.required && (
-                <span className="font-mono text-[10px] text-tag-dim">
+                <span className="font-mono text-xs text-tag-dim">
                   OPTIONAL
                 </span>
               )}

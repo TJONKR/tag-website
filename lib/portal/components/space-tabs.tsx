@@ -665,7 +665,7 @@ export const SpaceTabs = ({
             <div className="flex justify-end">
               <FacilityFormDialog
                 trigger={
-                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
+                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
                     <Plus className="size-3" />
                     Add Facility
                   </button>
@@ -719,7 +719,7 @@ export const SpaceTabs = ({
                 <div className="flex-1">
                   <span className="font-medium text-tag-text">{entry.day}</span>
                   {entry.note && (
-                    <p className="mt-0.5 text-xs text-tag-muted">{entry.note}</p>
+                    <p className="mt-0.5 text-sm text-tag-muted">{entry.note}</p>
                   )}
                 </div>
                 <span
@@ -776,7 +776,7 @@ export const SpaceTabs = ({
             <div className="flex justify-end">
               <HouseRuleFormDialog
                 trigger={
-                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
+                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
                     <Plus className="size-3" />
                     Add Rule
                   </button>

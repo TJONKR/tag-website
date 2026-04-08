@@ -24,7 +24,7 @@ interface EditProfileFormProps {
   profile: ProfileData
 }
 
-const labelClass = 'font-mono text-[12px] uppercase tracking-[0.08em] text-tag-muted'
+const labelClass = 'font-mono text-sm uppercase tracking-[0.08em] text-tag-muted'
 const inputClass =
   'border-tag-border bg-tag-card text-tag-text placeholder:text-tag-dim focus-visible:ring-tag-orange'
 
@@ -71,25 +71,25 @@ export const EditProfileForm = ({ profile }: EditProfileFormProps) => {
       {/* Display section */}
       <div className="rounded-lg border border-tag-border bg-tag-card">
         <div className="flex items-center justify-between px-6 pt-5 pb-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+          <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
             About
           </span>
           <button
             onClick={() => setOpen(true)}
-            className="font-mono text-[11px] uppercase tracking-wider text-tag-muted transition-colors hover:text-tag-text"
+            className="font-mono text-xs uppercase tracking-wider text-tag-muted transition-colors hover:text-tag-text"
           >
             Edit
           </button>
         </div>
         <div className="divide-y divide-tag-border">
           <div className="px-6 py-4">
-            <span className="text-xs text-tag-muted">What are you building?</span>
+            <span className="text-sm text-tag-muted">What are you building?</span>
             <p className="mt-1 whitespace-pre-wrap text-sm text-tag-text">
               {profile.building || 'Not set'}
             </p>
           </div>
           <div className="px-6 py-4">
-            <span className="text-xs text-tag-muted">Why TAG?</span>
+            <span className="text-sm text-tag-muted">Why TAG?</span>
             <p className="mt-1 whitespace-pre-wrap text-sm text-tag-text">
               {profile.why_tag || 'Not set'}
             </p>
@@ -143,7 +143,7 @@ export const EditProfileForm = ({ profile }: EditProfileFormProps) => {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 rounded-md bg-tag-orange px-4 py-2 font-mono text-xs uppercase tracking-wider text-tag-bg transition-colors hover:bg-tag-orange/90 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-md bg-tag-orange px-4 py-2 font-mono text-sm uppercase tracking-wider text-tag-bg transition-colors hover:bg-tag-orange/90 disabled:opacity-50"
               >
                 {saving ? (
                   <>

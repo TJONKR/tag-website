@@ -162,7 +162,7 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
             {roleLabels[role]} ({counts[role]})
           </button>
         ))}
-        <div className="ml-auto font-mono text-xs text-tag-dim leading-loose">
+        <div className="ml-auto font-mono text-sm text-tag-dim leading-loose">
           {counts.total} total
         </div>
       </div>
@@ -208,9 +208,9 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
                     </Badge>
                   )}
                 </div>
-                <p className="mt-1 font-mono text-xs text-tag-dim">{member.email}</p>
+                <p className="mt-1 font-mono text-sm text-tag-dim">{member.email}</p>
               </div>
-              <span className="ml-4 shrink-0 font-mono text-xs text-tag-dim">
+              <span className="ml-4 shrink-0 font-mono text-sm text-tag-dim">
                 {new Date(member.created_at).toLocaleDateString()}
               </span>
             </div>
@@ -239,7 +239,7 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
               <div className="space-y-4">
                 {/* Role change */}
                 <div>
-                  <p className="font-mono text-[12px] uppercase tracking-[0.08em] text-tag-dim">
+                  <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
                     Role
                   </p>
                   <div className="mt-1 flex items-center gap-2">
@@ -263,7 +263,7 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
 
                 {selected.building && (
                   <div>
-                    <p className="font-mono text-[12px] uppercase tracking-[0.08em] text-tag-dim">
+                    <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
                       Building
                     </p>
                     <p className="mt-1 font-grotesk text-sm text-tag-text">
@@ -273,7 +273,7 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
                 )}
 
                 <div>
-                  <p className="font-mono text-[12px] uppercase tracking-[0.08em] text-tag-dim">
+                  <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
                     Onboarding
                   </p>
                   <p className="mt-1 font-grotesk text-sm text-tag-text">
@@ -282,7 +282,7 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
                 </div>
               </div>
 
-              <p className="font-mono text-xs text-tag-dim">
+              <p className="font-mono text-sm text-tag-dim">
                 Joined {new Date(selected.created_at).toLocaleDateString()}
               </p>
 

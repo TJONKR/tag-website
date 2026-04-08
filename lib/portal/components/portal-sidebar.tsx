@@ -61,7 +61,7 @@ export const PortalSidebar = ({ role, avatarUrl, name }: PortalSidebarProps) => 
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.1em] transition-colors',
+                    'flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.1em] transition-colors',
                     isActive ? 'text-tag-orange' : 'text-tag-muted hover:text-tag-text'
                   )}
                 >

@@ -24,7 +24,7 @@ interface OnboardingFormProps {
 
 const REFERRAL_OPTIONS = ['Twitter/X', 'LinkedIn', 'Friend', 'Event', 'Other']
 
-const labelClass = 'font-mono text-[12px] uppercase tracking-[0.08em] text-tag-muted'
+const labelClass = 'font-mono text-xs uppercase tracking-[0.08em] text-tag-muted'
 const inputClass =
   'border-tag-border bg-tag-card text-tag-text placeholder:text-tag-dim focus-visible:ring-tag-orange'
 

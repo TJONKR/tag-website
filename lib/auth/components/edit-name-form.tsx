@@ -54,10 +54,10 @@ export const EditNameForm = ({ currentName }: EditNameFormProps) => {
       >
         <div className="flex items-center justify-between py-3">
           <div>
-            <span className="text-xs text-tag-muted">Name</span>
+            <span className="text-sm text-tag-muted">Name</span>
             <p className="text-sm text-tag-text">{currentName || 'Not set'}</p>
           </div>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-tag-muted">
+          <span className="font-mono text-xs uppercase tracking-wider text-tag-muted">
             Edit
           </span>
         </div>
@@ -88,7 +88,7 @@ export const EditNameForm = ({ currentName }: EditNameFormProps) => {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="rounded-md bg-tag-orange px-4 py-2 font-mono text-xs uppercase tracking-wider text-tag-bg transition-colors hover:bg-tag-orange/90 disabled:opacity-50"
+              className="rounded-md bg-tag-orange px-4 py-2 font-mono text-sm uppercase tracking-wider text-tag-bg transition-colors hover:bg-tag-orange/90 disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save'}
             </button>
