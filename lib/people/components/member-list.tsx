@@ -1,9 +1,21 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
-import { Search, Loader2 } from 'lucide-react'
+import { Search, Loader2, Trash2 } from 'lucide-react'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@components/ui/alert-dialog'
 import { Badge } from '@components/ui/badge'
+import { Button } from '@components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -49,6 +61,7 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
   const [filterRole, setFilterRole] = useState<FilterRole>('all')
   const [selected, setSelected] = useState<Member | null>(null)
   const [roleLoading, setRoleLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const filtered = useMemo(() => {
     return members.filter((m) => {
@@ -102,6 +115,33 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
       })
     } finally {
       setRoleLoading(false)
+    }
+  }
+
+  const handleDelete = async (memberId: string) => {
+    setDeleteLoading(true)
+    try {
+      const res = await fetch(`/api/people/${memberId}`, { method: 'DELETE' })
+
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.errors?.[0]?.message || 'Failed to delete member')
+      }
+
+      toast({
+        type: 'success',
+        description: 'Member has been deleted.',
+      })
+
+      setSelected(null)
+      await fetchMembers()
+    } catch (error) {
+      toast({
+        type: 'error',
+        description: error instanceof Error ? error.message : 'Something went wrong.',
+      })
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -245,6 +285,49 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
               <p className="font-mono text-xs text-tag-dim">
                 Joined {new Date(selected.created_at).toLocaleDateString()}
               </p>
+
+              <div className="border-t border-tag-border pt-4">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="gap-2"
+                      disabled={deleteLoading}
+                    >
+                      {deleteLoading ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="size-4" />
+                      )}
+                      Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="border-tag-border bg-tag-bg text-tag-text">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete member</AlertDialogTitle>
+                      <AlertDialogDescription className="text-tag-muted">
+                        Are you sure you want to delete{' '}
+                        <span className="font-medium text-tag-text">
+                          {selected.name || selected.email}
+                        </span>
+                        ? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="border-tag-border bg-tag-card text-tag-text hover:bg-tag-card/80">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(selected.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           )}
         </DialogContent>
