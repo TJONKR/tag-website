@@ -23,10 +23,10 @@ export const contractSections = [
       'you will be charged for the following month, and your membership ends at the end of that month.',
   },
   {
-    title: 'House Rules',
+    title: 'Guidelines',
     content:
-      'You agree to follow all TAG house rules as displayed in the space and on the member portal. ' +
-      'TAG reserves the right to update house rules with reasonable notice. Repeated violations ' +
+      'You agree to follow all TAG guidelines as displayed in the space and on the member portal. ' +
+      'TAG reserves the right to update guidelines with reasonable notice. Repeated violations ' +
       'may result in membership termination.',
   },
   {

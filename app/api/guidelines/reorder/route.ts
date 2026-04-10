@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getOptionalUser } from '@lib/auth/queries'
-import { reorderHouseRules } from '@lib/portal/mutations'
+import { reorderGuidelines } from '@lib/portal/mutations'
 
 export async function PUT(req: Request) {
   try {
@@ -17,12 +17,12 @@ export async function PUT(req: Request) {
       return NextResponse.json({ errors: [{ message: 'ids must be an array' }] }, { status: 400 })
     }
 
-    await reorderHouseRules(ids)
+    await reorderGuidelines(ids)
 
     return NextResponse.json({ success: true })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Something went wrong'
-    console.error('[house-rules reorder] Error:', message)
+    console.error('[guidelines reorder] Error:', message)
     return NextResponse.json({ errors: [{ message }] }, { status: 500 })
   }
 }

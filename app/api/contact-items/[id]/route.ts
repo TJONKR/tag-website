@@ -20,9 +20,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ errors: result.error.issues }, { status: 400 })
     }
 
-    await updateContactItem(id, result.data)
+    const item = await updateContactItem(id, result.data)
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, item })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Something went wrong'
     console.error('[contact-items] Error:', message)

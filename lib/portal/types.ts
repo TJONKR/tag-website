@@ -12,7 +12,7 @@ export interface NavGroup {
   items: NavItem[]
 }
 
-export interface HouseRule {
+export interface Guideline {
   id: string
   title: string
   description: string

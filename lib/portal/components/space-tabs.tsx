@@ -1,14 +1,15 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRef, useState, useCallback } from 'react'
 import {
   Building,
+  CircleParking,
   Coffee,
   Globe,
   GripVertical,
   Link2,
   Hash,
+  Lock,
   Mail,
   MapPin,
   Pencil,
@@ -60,13 +61,13 @@ import {
 
 import { ConfirmDialog } from '@components/confirm-dialog'
 import { FloorPlanMap } from './floor-plan-map'
-import type { ContactItem, Facility, HouseRule, OpeningHours } from '@lib/portal/types'
+import type { ContactItem, Facility, Guideline, OpeningHours } from '@lib/portal/types'
 
 const tabs = [
   { key: 'floor-plan', label: 'Floor Plan' },
   { key: 'facilities', label: 'Facilities' },
   { key: 'hours', label: 'Opening Hours' },
-  { key: 'house-rules', label: 'House Rules' },
+  { key: 'guidelines', label: 'Guidelines' },
   { key: 'contact', label: 'Contact' },
 ] as const
 
@@ -77,6 +78,8 @@ const FACILITY_ICONS = [
   { value: 'wifi', label: 'WiFi', icon: Wifi },
   { value: 'users', label: 'Meeting', icon: Users },
   { value: 'coffee', label: 'Kitchen', icon: Coffee },
+  { value: 'parking', label: 'Parking', icon: CircleParking },
+  { value: 'lock', label: 'Lock', icon: Lock },
 ] as const
 
 const facilityIconMap: Record<string, React.ComponentType<{ className?: string }>> =
@@ -119,7 +122,11 @@ const renderWithLinks = (text: string) => {
 
 // --- Generic CRUD helpers ---
 
-async function apiSubmit(url: string, method: string, body: Record<string, unknown>) {
+async function apiSubmit<T = unknown>(
+  url: string,
+  method: string,
+  body: Record<string, unknown>
+): Promise<T> {
   const res = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
@@ -129,6 +136,7 @@ async function apiSubmit(url: string, method: string, body: Record<string, unkno
     const data = await res.json()
     throw new Error(data.errors?.[0]?.message || 'Something went wrong')
   }
+  return res.json()
 }
 
 async function apiDelete(url: string) {
@@ -277,11 +285,14 @@ const RichTextarea = ({
 const FacilityFormDialog = ({
   facility,
   trigger,
+  onSaved,
+  onAdded,
 }: {
   facility?: Facility
   trigger: React.ReactNode
+  onSaved?: (updated: Facility) => void
+  onAdded?: (item: Facility) => void
 }) => {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const isEdit = !!facility
@@ -290,25 +301,49 @@ const FacilityFormDialog = ({
     e.preventDefault()
     setLoading(true)
     const form = new FormData(e.currentTarget)
-    try {
-      const body = {
-        name: form.get('name') as string,
-        description: form.get('description') as string,
-        icon: form.get('icon') as string,
-        sort_order: facility?.sort_order ?? 999,
-      }
-      const url = isEdit ? `/api/facilities/${facility.id}` : '/api/facilities'
-      await apiSubmit(url, isEdit ? 'PUT' : 'POST', body)
+    const body = {
+      name: form.get('name') as string,
+      description: form.get('description') as string,
+      icon: form.get('icon') as string,
+      sort_order: facility?.sort_order ?? 999,
+    }
+
+    if (isEdit) {
+      const original = facility
+      const optimistic = { ...original, ...body }
+      onSaved?.(optimistic)
       setOpen(false)
-      toast({ type: 'success', description: isEdit ? 'Facility updated' : 'Facility added' })
-      router.refresh()
-    } catch (err) {
-      toast({
-        type: 'error',
-        description: err instanceof Error ? err.message : 'Something went wrong',
-      })
-    } finally {
-      setLoading(false)
+      toast({ type: 'success', description: 'Facility updated' })
+      try {
+        const { item } = await apiSubmit<{ item: Facility }>(
+          `/api/facilities/${facility.id}`,
+          'PUT',
+          body
+        )
+        onSaved?.(item)
+      } catch (err) {
+        onSaved?.(original)
+        toast({
+          type: 'error',
+          description: err instanceof Error ? err.message : 'Something went wrong',
+        })
+      } finally {
+        setLoading(false)
+      }
+    } else {
+      try {
+        const { item } = await apiSubmit<{ item: Facility }>('/api/facilities', 'POST', body)
+        onAdded?.(item)
+        setOpen(false)
+        toast({ type: 'success', description: 'Facility added' })
+      } catch (err) {
+        toast({
+          type: 'error',
+          description: err instanceof Error ? err.message : 'Something went wrong',
+        })
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
@@ -385,14 +420,17 @@ const FacilityFormDialog = ({
   )
 }
 
-const HouseRuleFormDialog = ({
+const GuidelineFormDialog = ({
   rule,
   trigger,
+  onSaved,
+  onAdded,
 }: {
-  rule?: HouseRule
+  rule?: Guideline
   trigger: React.ReactNode
+  onSaved?: (updated: Guideline) => void
+  onAdded?: (item: Guideline) => void
 }) => {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const isEdit = !!rule
@@ -401,24 +439,48 @@ const HouseRuleFormDialog = ({
     e.preventDefault()
     setLoading(true)
     const form = new FormData(e.currentTarget)
-    try {
-      const body = {
-        title: form.get('title') as string,
-        description: form.get('description') as string,
-        sort_order: rule?.sort_order ?? 999,
-      }
-      const url = isEdit ? `/api/house-rules/${rule.id}` : '/api/house-rules'
-      await apiSubmit(url, isEdit ? 'PUT' : 'POST', body)
+    const body = {
+      title: form.get('title') as string,
+      description: form.get('description') as string,
+      sort_order: rule?.sort_order ?? 999,
+    }
+
+    if (isEdit) {
+      const original = rule
+      const optimistic = { ...original, ...body }
+      onSaved?.(optimistic)
       setOpen(false)
-      toast({ type: 'success', description: isEdit ? 'Rule updated' : 'Rule added' })
-      router.refresh()
-    } catch (err) {
-      toast({
-        type: 'error',
-        description: err instanceof Error ? err.message : 'Something went wrong',
-      })
-    } finally {
-      setLoading(false)
+      toast({ type: 'success', description: 'Rule updated' })
+      try {
+        const { item } = await apiSubmit<{ item: Guideline }>(
+          `/api/guidelines/${rule.id}`,
+          'PUT',
+          body
+        )
+        onSaved?.(item)
+      } catch (err) {
+        onSaved?.(original)
+        toast({
+          type: 'error',
+          description: err instanceof Error ? err.message : 'Something went wrong',
+        })
+      } finally {
+        setLoading(false)
+      }
+    } else {
+      try {
+        const { item } = await apiSubmit<{ item: Guideline }>('/api/guidelines', 'POST', body)
+        onAdded?.(item)
+        setOpen(false)
+        toast({ type: 'success', description: 'Rule added' })
+      } catch (err) {
+        toast({
+          type: 'error',
+          description: err instanceof Error ? err.message : 'Something went wrong',
+        })
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
@@ -475,11 +537,12 @@ const HouseRuleFormDialog = ({
 const OpeningHoursFormDialog = ({
   entry,
   trigger,
+  onSaved,
 }: {
   entry: OpeningHours
   trigger: React.ReactNode
+  onSaved?: (updated: OpeningHours) => void
 }) => {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -487,19 +550,28 @@ const OpeningHoursFormDialog = ({
     e.preventDefault()
     setLoading(true)
     const form = new FormData(e.currentTarget)
+    const body = {
+      day: entry.day,
+      hours: form.get('hours') as string,
+      building: form.get('building') as string,
+      note: (form.get('note') as string) || null,
+      sort_order: entry.sort_order,
+    }
+
+    const original = entry
+    const optimistic = { ...original, ...body }
+    onSaved?.(optimistic)
+    setOpen(false)
+    toast({ type: 'success', description: 'Hours updated' })
     try {
-      const body = {
-        day: entry.day,
-        hours: form.get('hours') as string,
-        building: form.get('building') as string,
-        note: (form.get('note') as string) || null,
-        sort_order: entry.sort_order,
-      }
-      await apiSubmit(`/api/opening-hours/${entry.id}`, 'PUT', body)
-      setOpen(false)
-      toast({ type: 'success', description: 'Hours updated' })
-      router.refresh()
+      const { item } = await apiSubmit<{ item: OpeningHours }>(
+        `/api/opening-hours/${entry.id}`,
+        'PUT',
+        body
+      )
+      onSaved?.(item)
     } catch (err) {
+      onSaved?.(original)
       toast({
         type: 'error',
         description: err instanceof Error ? err.message : 'Something went wrong',
@@ -573,11 +645,14 @@ const OpeningHoursFormDialog = ({
 const ContactFormDialog = ({
   item,
   trigger,
+  onSaved,
+  onAdded,
 }: {
   item?: ContactItem
   trigger: React.ReactNode
+  onSaved?: (updated: ContactItem) => void
+  onAdded?: (item: ContactItem) => void
 }) => {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const isEdit = !!item
@@ -586,25 +661,53 @@ const ContactFormDialog = ({
     e.preventDefault()
     setLoading(true)
     const form = new FormData(e.currentTarget)
-    try {
-      const body = {
-        title: form.get('title') as string,
-        description: form.get('description') as string,
-        icon: form.get('icon') as string,
-        sort_order: item?.sort_order ?? 999,
-      }
-      const url = isEdit ? `/api/contact-items/${item.id}` : '/api/contact-items'
-      await apiSubmit(url, isEdit ? 'PUT' : 'POST', body)
+    const body = {
+      title: form.get('title') as string,
+      description: form.get('description') as string,
+      icon: form.get('icon') as string,
+      sort_order: item?.sort_order ?? 999,
+    }
+
+    if (isEdit) {
+      const original = item
+      const optimistic = { ...original, ...body }
+      onSaved?.(optimistic)
       setOpen(false)
-      toast({ type: 'success', description: isEdit ? 'Contact updated' : 'Contact added' })
-      router.refresh()
-    } catch (err) {
-      toast({
-        type: 'error',
-        description: err instanceof Error ? err.message : 'Something went wrong',
-      })
-    } finally {
-      setLoading(false)
+      toast({ type: 'success', description: 'Contact updated' })
+      try {
+        const { item: saved } = await apiSubmit<{ item: ContactItem }>(
+          `/api/contact-items/${item.id}`,
+          'PUT',
+          body
+        )
+        onSaved?.(saved)
+      } catch (err) {
+        onSaved?.(original)
+        toast({
+          type: 'error',
+          description: err instanceof Error ? err.message : 'Something went wrong',
+        })
+      } finally {
+        setLoading(false)
+      }
+    } else {
+      try {
+        const { item: created } = await apiSubmit<{ item: ContactItem }>(
+          '/api/contact-items',
+          'POST',
+          body
+        )
+        onAdded?.(created)
+        setOpen(false)
+        toast({ type: 'success', description: 'Contact added' })
+      } catch (err) {
+        toast({
+          type: 'error',
+          description: err instanceof Error ? err.message : 'Something went wrong',
+        })
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
@@ -683,17 +786,27 @@ const ContactFormDialog = ({
 
 // --- Delete button ---
 
-const DeleteButton = ({ url, label }: { url: string; label: string }) => {
-  const router = useRouter()
+const DeleteButton = ({
+  url,
+  label,
+  onDeleted,
+  onRollback,
+}: {
+  url: string
+  label: string
+  onDeleted?: () => void
+  onRollback?: () => void
+}) => {
   const [deleting, setDeleting] = useState(false)
 
   const handleDelete = async () => {
     setDeleting(true)
+    onDeleted?.()
+    toast({ type: 'success', description: `${label} deleted` })
     try {
       await apiDelete(url)
-      toast({ type: 'success', description: `${label} deleted` })
-      router.refresh()
     } catch {
+      onRollback?.()
       toast({ type: 'error', description: `Failed to delete ${label.toLowerCase()}` })
       setDeleting(false)
     }
@@ -726,9 +839,15 @@ const AdminActions = ({ children }: { children: React.ReactNode }) => (
 const SortableFacilityCard = ({
   facility,
   isAdmin,
+  onSaved,
+  onDeleted,
+  onDeleteRollback,
 }: {
   facility: Facility
   isAdmin: boolean
+  onSaved?: (updated: Facility) => void
+  onDeleted?: () => void
+  onDeleteRollback?: () => void
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: facility.id,
@@ -775,6 +894,7 @@ const SortableFacilityCard = ({
           <AdminActions>
             <FacilityFormDialog
               facility={facility}
+              onSaved={onSaved}
               trigger={
                 <button
                   className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
@@ -784,7 +904,12 @@ const SortableFacilityCard = ({
                 </button>
               }
             />
-            <DeleteButton url={`/api/facilities/${facility.id}`} label="Facility" />
+            <DeleteButton
+              url={`/api/facilities/${facility.id}`}
+              label="Facility"
+              onDeleted={onDeleted}
+              onRollback={onDeleteRollback}
+            />
           </AdminActions>
         )}
       </div>
@@ -792,12 +917,18 @@ const SortableFacilityCard = ({
   )
 }
 
-const SortableHouseRuleCard = ({
+const SortableGuidelineCard = ({
   rule,
   isAdmin,
+  onSaved,
+  onDeleted,
+  onDeleteRollback,
 }: {
-  rule: HouseRule
+  rule: Guideline
   isAdmin: boolean
+  onSaved?: (updated: Guideline) => void
+  onDeleted?: () => void
+  onDeleteRollback?: () => void
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: rule.id,
@@ -838,8 +969,9 @@ const SortableHouseRuleCard = ({
         </div>
         {isAdmin && (
           <AdminActions>
-            <HouseRuleFormDialog
+            <GuidelineFormDialog
               rule={rule}
+              onSaved={onSaved}
               trigger={
                 <button
                   className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
@@ -849,7 +981,12 @@ const SortableHouseRuleCard = ({
                 </button>
               }
             />
-            <DeleteButton url={`/api/house-rules/${rule.id}`} label="Rule" />
+            <DeleteButton
+              url={`/api/guidelines/${rule.id}`}
+              label="Rule"
+              onDeleted={onDeleted}
+              onRollback={onDeleteRollback}
+            />
           </AdminActions>
         )}
       </div>
@@ -860,9 +997,15 @@ const SortableHouseRuleCard = ({
 const SortableContactCard = ({
   item,
   isAdmin,
+  onSaved,
+  onDeleted,
+  onDeleteRollback,
 }: {
   item: ContactItem
   isAdmin: boolean
+  onSaved?: (updated: ContactItem) => void
+  onDeleted?: () => void
+  onDeleteRollback?: () => void
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
@@ -909,6 +1052,7 @@ const SortableContactCard = ({
           <AdminActions>
             <ContactFormDialog
               item={item}
+              onSaved={onSaved}
               trigger={
                 <button
                   className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
@@ -918,7 +1062,12 @@ const SortableContactCard = ({
                 </button>
               }
             />
-            <DeleteButton url={`/api/contact-items/${item.id}`} label="Contact" />
+            <DeleteButton
+              url={`/api/contact-items/${item.id}`}
+              label="Contact"
+              onDeleted={onDeleted}
+              onRollback={onDeleteRollback}
+            />
           </AdminActions>
         )}
       </div>
@@ -931,22 +1080,57 @@ const SortableContactCard = ({
 interface SpaceTabsProps {
   facilities: Facility[]
   openingHours: OpeningHours[]
-  houseRules: HouseRule[]
+  guidelines: Guideline[]
   contactItems: ContactItem[]
   isAdmin: boolean
 }
 
 export const SpaceTabs = ({
   facilities: initialFacilities,
-  openingHours,
-  houseRules: initialRules,
+  openingHours: initialHours,
+  guidelines: initialGuidelines,
   contactItems: initialContacts,
   isAdmin,
 }: SpaceTabsProps) => {
   const [activeTab, setActiveTab] = useState<Tab>('floor-plan')
   const [facilities, setFacilities] = useState(initialFacilities)
-  const [houseRules, setHouseRules] = useState(initialRules)
+  const [hours, setHours] = useState(initialHours)
+  const [guidelines, setGuidelines] = useState(initialGuidelines)
   const [contactItems, setContactItems] = useState(initialContacts)
+
+  // --- Optimistic update helpers ---
+
+  const handleFacilitySaved = useCallback(
+    (updated: Facility) => setFacilities((prev) => prev.map((f) => (f.id === updated.id ? updated : f))),
+    []
+  )
+  const handleFacilityAdded = useCallback(
+    (item: Facility) => setFacilities((prev) => [...prev, item]),
+    []
+  )
+
+  const handleGuidelineSaved = useCallback(
+    (updated: Guideline) => setGuidelines((prev) => prev.map((r) => (r.id === updated.id ? updated : r))),
+    []
+  )
+  const handleGuidelineAdded = useCallback(
+    (item: Guideline) => setGuidelines((prev) => [...prev, item]),
+    []
+  )
+
+  const handleHoursSaved = useCallback(
+    (updated: OpeningHours) => setHours((prev) => prev.map((h) => (h.id === updated.id ? updated : h))),
+    []
+  )
+
+  const handleContactSaved = useCallback(
+    (updated: ContactItem) => setContactItems((prev) => prev.map((c) => (c.id === updated.id ? updated : c))),
+    []
+  )
+  const handleContactAdded = useCallback(
+    (item: ContactItem) => setContactItems((prev) => [...prev, item]),
+    []
+  )
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -972,21 +1156,21 @@ export const SpaceTabs = ({
     }
   }
 
-  const handleRuleDragEnd = async (event: DragEndEvent) => {
+  const handleGuidelineDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
 
-    const oldIndex = houseRules.findIndex((r) => r.id === active.id)
-    const newIndex = houseRules.findIndex((r) => r.id === over.id)
-    const reordered = arrayMove(houseRules, oldIndex, newIndex)
-    setHouseRules(reordered)
+    const oldIndex = guidelines.findIndex((r) => r.id === active.id)
+    const newIndex = guidelines.findIndex((r) => r.id === over.id)
+    const reordered = arrayMove(guidelines, oldIndex, newIndex)
+    setGuidelines(reordered)
 
     try {
-      await apiSubmit('/api/house-rules/reorder', 'PUT', {
+      await apiSubmit('/api/guidelines/reorder', 'PUT', {
         ids: reordered.map((r) => r.id),
       })
     } catch {
-      setHouseRules(houseRules)
+      setGuidelines(guidelines)
       toast({ type: 'error', description: 'Failed to reorder' })
     }
   }
@@ -1039,6 +1223,7 @@ export const SpaceTabs = ({
           {isAdmin && (
             <div className="flex justify-end">
               <FacilityFormDialog
+                onAdded={handleFacilityAdded}
                 trigger={
                   <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
                     <Plus className="size-3" />
@@ -1062,6 +1247,13 @@ export const SpaceTabs = ({
                   key={facility.id}
                   facility={facility}
                   isAdmin={isAdmin}
+                  onSaved={handleFacilitySaved}
+                  onDeleted={() => setFacilities((prev) => prev.filter((f) => f.id !== facility.id))}
+                  onDeleteRollback={() => setFacilities((prev) => {
+                    if (prev.some((f) => f.id === facility.id)) return prev
+                    const restored = [...prev, facility].sort((a, b) => a.sort_order - b.sort_order)
+                    return restored
+                  })}
                 />
               ))}
             </SortableContext>
@@ -1083,12 +1275,12 @@ export const SpaceTabs = ({
               </span>
               {isAdmin && <span className="w-16" />}
             </div>
-            {openingHours.map((entry, i) => (
+            {hours.map((entry, i) => (
               <div
                 key={entry.id}
                 className={cn(
                   'flex items-center px-5 py-4',
-                  i !== openingHours.length - 1 && 'border-b border-tag-border'
+                  i !== hours.length - 1 && 'border-b border-tag-border'
                 )}
               >
                 <div className="flex-1">
@@ -1117,6 +1309,7 @@ export const SpaceTabs = ({
                   <AdminActions>
                     <OpeningHoursFormDialog
                       entry={entry}
+                      onSaved={handleHoursSaved}
                       trigger={
                         <button
                           className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
@@ -1144,16 +1337,17 @@ export const SpaceTabs = ({
         </>
       )}
 
-      {/* House Rules */}
-      {activeTab === 'house-rules' && (
+      {/* Guidelines */}
+      {activeTab === 'guidelines' && (
         <div className="grid gap-4">
           {isAdmin && (
             <div className="flex justify-end">
-              <HouseRuleFormDialog
+              <GuidelineFormDialog
+                onAdded={handleGuidelineAdded}
                 trigger={
                   <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
                     <Plus className="size-3" />
-                    Add Rule
+                    Add Guideline
                   </button>
                 }
               />
@@ -1162,14 +1356,25 @@ export const SpaceTabs = ({
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
-            onDragEnd={handleRuleDragEnd}
+            onDragEnd={handleGuidelineDragEnd}
           >
             <SortableContext
-              items={houseRules.map((r) => r.id)}
+              items={guidelines.map((r) => r.id)}
               strategy={verticalListSortingStrategy}
             >
-              {houseRules.map((rule) => (
-                <SortableHouseRuleCard key={rule.id} rule={rule} isAdmin={isAdmin} />
+              {guidelines.map((rule) => (
+                <SortableGuidelineCard
+                  key={rule.id}
+                  rule={rule}
+                  isAdmin={isAdmin}
+                  onSaved={handleGuidelineSaved}
+                  onDeleted={() => setGuidelines((prev) => prev.filter((r) => r.id !== rule.id))}
+                  onDeleteRollback={() => setGuidelines((prev) => {
+                    if (prev.some((r) => r.id === rule.id)) return prev
+                    const restored = [...prev, rule].sort((a, b) => a.sort_order - b.sort_order)
+                    return restored
+                  })}
+                />
               ))}
             </SortableContext>
           </DndContext>
@@ -1182,6 +1387,7 @@ export const SpaceTabs = ({
           {isAdmin && (
             <div className="flex justify-end">
               <ContactFormDialog
+                onAdded={handleContactAdded}
                 trigger={
                   <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
                     <Plus className="size-3" />
@@ -1205,6 +1411,13 @@ export const SpaceTabs = ({
                   key={item.id}
                   item={item}
                   isAdmin={isAdmin}
+                  onSaved={handleContactSaved}
+                  onDeleted={() => setContactItems((prev) => prev.filter((c) => c.id !== item.id))}
+                  onDeleteRollback={() => setContactItems((prev) => {
+                    if (prev.some((c) => c.id === item.id)) return prev
+                    const restored = [...prev, item].sort((a, b) => a.sort_order - b.sort_order)
+                    return restored
+                  })}
                 />
               ))}
             </SortableContext>

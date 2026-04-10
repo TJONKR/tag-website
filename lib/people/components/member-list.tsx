@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
+import Image from 'next/image'
 import { Search, Loader2, Trash2 } from 'lucide-react'
 
 import {
@@ -14,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@components/ui/alert-dialog'
+import { Avatar, AvatarImage, AvatarFallback } from '@components/ui/avatar'
 import { Badge } from '@components/ui/badge'
 import { Button } from '@components/ui/button'
 import {
@@ -38,6 +40,7 @@ import type { UserRole } from '@lib/auth/types'
 interface MemberListProps {
   initialMembers: Member[]
   initialCounts: MemberCounts
+  isOperator: boolean
 }
 
 const roleColors: Record<UserRole, string> = {
@@ -52,14 +55,25 @@ const roleLabels: Record<UserRole, string> = {
   operator: 'Operator',
 }
 
+const getInitials = (name: string | null) => {
+  if (!name) return '?'
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+}
+
 type FilterRole = UserRole | 'all'
 
-export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) => {
+export const MemberList = ({ initialMembers, initialCounts, isOperator }: MemberListProps) => {
   const [members, setMembers] = useState(initialMembers)
   const [counts, setCounts] = useState(initialCounts)
   const [search, setSearch] = useState('')
   const [filterRole, setFilterRole] = useState<FilterRole>('all')
   const [selected, setSelected] = useState<Member | null>(null)
+  const [enlargedAvatar, setEnlargedAvatar] = useState<Member | null>(null)
   const [roleLoading, setRoleLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
@@ -188,27 +202,50 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
           {filtered.map((member) => (
             <div
               key={member.id}
-              className="flex cursor-pointer items-center justify-between rounded-lg border border-tag-border bg-tag-card p-4 transition-colors hover:border-tag-orange/30"
-              onClick={() => setSelected(member)}
+              className={`flex items-center justify-between rounded-lg border border-tag-border bg-tag-card p-4 transition-colors ${
+                isOperator
+                  ? 'cursor-pointer hover:border-tag-orange/30'
+                  : ''
+              }`}
+              onClick={isOperator ? () => setSelected(member) : undefined}
             >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-3">
-                  <span className="font-grotesk font-medium text-tag-text">
-                    {member.name || 'Unnamed'}
-                  </span>
-                  <Badge variant="outline" className={roleColors[member.role]}>
-                    {roleLabels[member.role]}
-                  </Badge>
-                  {!member.onboarding_completed && (
-                    <Badge
-                      variant="outline"
-                      className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
-                    >
-                      onboarding
+              <div className="flex min-w-0 flex-1 items-center gap-4">
+                <button
+                  type="button"
+                  className="shrink-0 focus:outline-none"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (member.avatar_url) setEnlargedAvatar(member)
+                  }}
+                >
+                  <Avatar className="size-9 cursor-pointer transition-opacity hover:opacity-80">
+                    {member.avatar_url && (
+                      <AvatarImage src={member.avatar_url} alt={member.name || 'Member'} />
+                    )}
+                    <AvatarFallback className="bg-tag-border text-xs font-medium text-tag-text">
+                      {getInitials(member.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-3">
+                    <span className="font-grotesk font-medium text-tag-text">
+                      {member.name || 'Unnamed'}
+                    </span>
+                    <Badge variant="outline" className={roleColors[member.role]}>
+                      {roleLabels[member.role]}
                     </Badge>
-                  )}
+                    {!member.onboarding_completed && (
+                      <Badge
+                        variant="outline"
+                        className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
+                      >
+                        onboarding
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="mt-1 font-mono text-sm text-tag-dim">{member.email}</p>
                 </div>
-                <p className="mt-1 font-mono text-sm text-tag-dim">{member.email}</p>
               </div>
               <span className="ml-4 shrink-0 font-mono text-sm text-tag-dim">
                 {new Date(member.created_at).toLocaleDateString()}
@@ -218,120 +255,155 @@ export const MemberList = ({ initialMembers, initialCounts }: MemberListProps) =
         </div>
       )}
 
-      {/* Detail dialog */}
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-h-[80vh] overflow-y-auto border-tag-border bg-tag-bg text-tag-text">
+      {/* Avatar enlarge dialog */}
+      <Dialog open={!!enlargedAvatar} onOpenChange={() => setEnlargedAvatar(null)}>
+        <DialogContent className="flex max-w-sm flex-col items-center border-tag-border bg-tag-bg p-6">
           <DialogHeader>
-            <DialogTitle className="font-syne text-xl">
-              {selected?.name || 'Unnamed'}
+            <DialogTitle className="font-syne text-lg text-tag-text">
+              {enlargedAvatar?.name || 'Member'}
             </DialogTitle>
           </DialogHeader>
-
-          {selected && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-sm text-tag-muted">{selected.email}</span>
-                <Badge variant="outline" className={roleColors[selected.role]}>
-                  {roleLabels[selected.role]}
-                </Badge>
-              </div>
-
-              <div className="space-y-4">
-                {/* Role change */}
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
-                    Role
-                  </p>
-                  <div className="mt-1 flex items-center gap-2">
-                    <Select
-                      value={selected.role}
-                      onValueChange={(v) => handleRoleChange(selected.id, v as UserRole)}
-                      disabled={roleLoading}
-                    >
-                      <SelectTrigger className="w-40 border-tag-border bg-tag-card text-tag-text">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="border-tag-border bg-tag-bg">
-                        <SelectItem value="ambassador">Ambassador</SelectItem>
-                        <SelectItem value="builder">Builder</SelectItem>
-                        <SelectItem value="operator">Operator</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {roleLoading && <Loader2 className="size-4 animate-spin text-tag-dim" />}
-                  </div>
-                </div>
-
-                {selected.building && (
-                  <div>
-                    <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
-                      Building
-                    </p>
-                    <p className="mt-1 font-grotesk text-sm text-tag-text">
-                      {selected.building}
-                    </p>
-                  </div>
-                )}
-
-                <div>
-                  <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
-                    Onboarding
-                  </p>
-                  <p className="mt-1 font-grotesk text-sm text-tag-text">
-                    {selected.onboarding_completed ? 'Completed' : 'Pending'}
-                  </p>
-                </div>
-              </div>
-
-              <p className="font-mono text-sm text-tag-dim">
-                Joined {new Date(selected.created_at).toLocaleDateString()}
-              </p>
-
-              <div className="border-t border-tag-border pt-4">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="gap-2"
-                      disabled={deleteLoading}
-                    >
-                      {deleteLoading ? (
-                        <Loader2 className="size-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="size-4" />
-                      )}
-                      Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="border-tag-border bg-tag-bg text-tag-text">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete member</AlertDialogTitle>
-                      <AlertDialogDescription className="text-tag-muted">
-                        Are you sure you want to delete{' '}
-                        <span className="font-medium text-tag-text">
-                          {selected.name || selected.email}
-                        </span>
-                        ? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel className="border-tag-border bg-tag-card text-tag-text hover:bg-tag-card/80">
-                        Cancel
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDelete(selected.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </div>
+          {enlargedAvatar?.avatar_url && (
+            <Image
+              src={enlargedAvatar.avatar_url}
+              alt={enlargedAvatar.name || 'Member'}
+              width={192}
+              height={192}
+              className="mt-2 rounded-full object-cover"
+              unoptimized
+            />
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Detail dialog (operator only) */}
+      {isOperator && (
+        <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
+          <DialogContent className="max-h-[80vh] overflow-y-auto border-tag-border bg-tag-bg text-tag-text">
+            <DialogHeader>
+              <DialogTitle className="font-syne text-xl">
+                {selected?.name || 'Unnamed'}
+              </DialogTitle>
+            </DialogHeader>
+
+            {selected && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <Avatar className="size-12">
+                    {selected.avatar_url && (
+                      <AvatarImage src={selected.avatar_url} alt={selected.name || 'Member'} />
+                    )}
+                    <AvatarFallback className="bg-tag-border text-sm font-medium text-tag-text">
+                      {getInitials(selected.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <span className="font-mono text-sm text-tag-muted">{selected.email}</span>
+                    <div className="mt-1">
+                      <Badge variant="outline" className={roleColors[selected.role]}>
+                        {roleLabels[selected.role]}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Role change */}
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
+                      Role
+                    </p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <Select
+                        value={selected.role}
+                        onValueChange={(v) => handleRoleChange(selected.id, v as UserRole)}
+                        disabled={roleLoading}
+                      >
+                        <SelectTrigger className="w-40 border-tag-border bg-tag-card text-tag-text">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="border-tag-border bg-tag-bg">
+                          <SelectItem value="ambassador">Ambassador</SelectItem>
+                          <SelectItem value="builder">Builder</SelectItem>
+                          <SelectItem value="operator">Operator</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {roleLoading && <Loader2 className="size-4 animate-spin text-tag-dim" />}
+                    </div>
+                  </div>
+
+                  {selected.building && (
+                    <div>
+                      <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
+                        Building
+                      </p>
+                      <p className="mt-1 font-grotesk text-sm text-tag-text">
+                        {selected.building}
+                      </p>
+                    </div>
+                  )}
+
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
+                      Onboarding
+                    </p>
+                    <p className="mt-1 font-grotesk text-sm text-tag-text">
+                      {selected.onboarding_completed ? 'Completed' : 'Pending'}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="font-mono text-sm text-tag-dim">
+                  Joined {new Date(selected.created_at).toLocaleDateString()}
+                </p>
+
+                <div className="border-t border-tag-border pt-4">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="gap-2"
+                        disabled={deleteLoading}
+                      >
+                        {deleteLoading ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="size-4" />
+                        )}
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="border-tag-border bg-tag-bg text-tag-text">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete member</AlertDialogTitle>
+                        <AlertDialogDescription className="text-tag-muted">
+                          Are you sure you want to delete{' '}
+                          <span className="font-medium text-tag-text">
+                            {selected.name || selected.email}
+                          </span>
+                          ? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="border-tag-border bg-tag-card text-tag-text hover:bg-tag-card/80">
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(selected.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }

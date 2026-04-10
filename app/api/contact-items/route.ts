@@ -19,9 +19,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ errors: result.error.issues }, { status: 400 })
     }
 
-    await insertContactItem(result.data)
+    const item = await insertContactItem(result.data)
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, item })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Something went wrong'
     console.error('[contact-items POST] Error:', message)

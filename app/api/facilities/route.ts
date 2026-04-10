@@ -19,9 +19,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ errors: result.error.issues }, { status: 400 })
     }
 
-    await insertFacility(result.data)
+    const item = await insertFacility(result.data)
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, item })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Something went wrong'
     console.error('[facilities POST] Error:', message)

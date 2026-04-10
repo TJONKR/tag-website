@@ -39,9 +39,9 @@ Captured from full codebase engineering audit (2026-03-16).
 ## Code Quality
 
 ### TODO-9: Split space-tabs.tsx (839 lines)
-**What:** `lib/portal/components/space-tabs.tsx` contains 5 tab panels (floor plan, facilities, hours, house rules, contact), inline CRUD dialogs, drag-and-drop, and API helper functions.
+**What:** `lib/portal/components/space-tabs.tsx` contains 5 tab panels (floor plan, facilities, hours, guidelines, contact), inline CRUD dialogs, drag-and-drop, and API helper functions.
 **Why:** Hard to navigate, test, or modify one tab without reading 800+ lines. Inline `apiSubmit()`/`apiDelete()` helpers belong in mutations.
-**Fix:** Split into `facilities-tab.tsx`, `hours-tab.tsx`, `house-rules-tab.tsx`, etc. Move API helpers to `lib/portal/mutations.ts`. Each tab is independent — no shared state.
+**Fix:** Split into `facilities-tab.tsx`, `hours-tab.tsx`, `guidelines-tab.tsx`, etc. Move API helpers to `lib/portal/mutations.ts`. Each tab is independent — no shared state.
 **When:** Next time you modify the space management UI.
 **Effort:** Medium (pure refactor, no behavior change).
 

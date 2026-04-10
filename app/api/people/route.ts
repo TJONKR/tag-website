@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   try {
     const user = await getOptionalUser()
 
-    if (!user || user.role !== 'operator') {
+    if (!user) {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 
