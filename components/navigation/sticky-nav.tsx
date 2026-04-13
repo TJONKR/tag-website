@@ -73,14 +73,19 @@ export const StickyNav = ({ isLoggedIn = false }: StickyNavProps) => {
               {link.label}
             </Link>
           ))}
-          {isLoggedIn && (
-            <Link
-              href="/portal"
-              className="font-mono text-[12px] uppercase tracking-[0.1em] text-tag-orange transition-colors hover:text-tag-text"
-            >
-              Portal
-            </Link>
-          )}
+          <Link
+            href="/portal"
+            className={cn(
+              'font-mono text-[12px] uppercase tracking-[0.1em] transition-colors',
+              isLoggedIn
+                ? 'text-tag-orange hover:text-tag-text'
+                : pathname === '/portal'
+                  ? 'text-tag-orange'
+                  : 'text-tag-muted hover:text-tag-text'
+            )}
+          >
+            Portal
+          </Link>
         </div>
 
         {/* Mobile hamburger */}
@@ -92,6 +97,7 @@ export const StickyNav = ({ isLoggedIn = false }: StickyNavProps) => {
           </SheetTrigger>
           <SheetContent
             side="right"
+            hideClose
             className="w-[280px] border-tag-border bg-tag-bg p-0"
           >
             <div className="flex h-14 items-center justify-between px-6">
@@ -118,15 +124,20 @@ export const StickyNav = ({ isLoggedIn = false }: StickyNavProps) => {
                   {link.label}
                 </Link>
               ))}
-              {isLoggedIn && (
-                <Link
-                  href="/portal"
-                  onClick={() => setOpen(false)}
-                  className="border-t border-tag-border px-6 py-4 font-mono text-[13px] uppercase tracking-[0.1em] text-tag-orange transition-colors hover:text-tag-text"
-                >
-                  Portal
-                </Link>
-              )}
+              <Link
+                href="/portal"
+                onClick={() => setOpen(false)}
+                className={cn(
+                  'border-t border-tag-border px-6 py-4 font-mono text-[13px] uppercase tracking-[0.1em] transition-colors',
+                  isLoggedIn
+                    ? 'text-tag-orange hover:text-tag-text'
+                    : pathname === '/portal'
+                      ? 'bg-tag-card text-tag-orange'
+                      : 'text-tag-muted hover:text-tag-text'
+                )}
+              >
+                Portal
+              </Link>
             </div>
           </SheetContent>
         </Sheet>
