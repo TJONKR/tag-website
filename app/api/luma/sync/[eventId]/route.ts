@@ -32,7 +32,7 @@ export async function POST(
       )
     }
 
-    const result = await syncGuestsForEvent(eventId, event.luma_event_id)
+    const result = await syncGuestsForEvent(eventId, event.luma_event_id, user.id)
 
     return NextResponse.json({
       guestsSynced: result.guestsSynced,

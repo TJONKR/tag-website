@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
         let totalGuests = 0
         for (const event of lumaEvents ?? []) {
-          const guestResult = await syncGuestsForEvent(event.id, event.luma_event_id!)
+          const guestResult = await syncGuestsForEvent(event.id, event.luma_event_id!, user.id)
           totalGuests += guestResult.guestsSynced
         }
 
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
       let totalGuests = 0
       for (const event of lumaEvents ?? []) {
-        const guestResult = await syncGuestsForEvent(event.id, event.luma_event_id!)
+        const guestResult = await syncGuestsForEvent(event.id, event.luma_event_id!, user.id)
         totalGuests += guestResult.guestsSynced
       }
 

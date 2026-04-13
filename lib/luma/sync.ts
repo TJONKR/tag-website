@@ -118,7 +118,11 @@ export async function pushEventToLuma(eventId: string) {
   return { lumaUrl: lumaEvent.url, lumaEventId: lumaEvent.api_id }
 }
 
-export async function syncGuestsForEvent(eventId: string, lumaEventId: string) {
+export async function syncGuestsForEvent(
+  eventId: string,
+  lumaEventId: string,
+  triggeredBy: string = 'operator'
+) {
   const supabase = createServiceRoleClient()
   let guestsSynced = 0
   const unmatched: string[] = []
@@ -187,7 +191,7 @@ export async function syncGuestsForEvent(eventId: string, lumaEventId: string) {
       status: 'success',
       guests_synced: guestsSynced,
       details: { eventId, total: lumaGuests.length, unmatched },
-      triggered_by: 'operator',
+      triggered_by: triggeredBy,
     })
 
     return { guestsSynced, total: lumaGuests.length, unmatched }
@@ -199,7 +203,7 @@ export async function syncGuestsForEvent(eventId: string, lumaEventId: string) {
       status: 'error',
       error: message,
       details: { eventId },
-      triggered_by: 'operator',
+      triggered_by: triggeredBy,
     })
 
     throw err
