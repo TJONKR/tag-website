@@ -198,58 +198,51 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
           No members found.
         </p>
       ) : (
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {filtered.map((member) => (
             <div
               key={member.id}
-              className={`flex items-center justify-between rounded-lg border border-tag-border bg-tag-card p-4 transition-colors ${
-                isOperator
-                  ? 'cursor-pointer hover:border-tag-orange/30'
-                  : ''
+              className={`group flex flex-col items-center rounded-lg border border-tag-border bg-tag-card p-4 transition-all duration-300 hover:border-tag-orange/30 hover:shadow-[0_0_24px_rgba(255,95,31,0.15)] ${
+                isOperator ? 'cursor-pointer' : ''
               }`}
               onClick={isOperator ? () => setSelected(member) : undefined}
             >
-              <div className="flex min-w-0 flex-1 items-center gap-4">
-                <button
-                  type="button"
-                  className="shrink-0 focus:outline-none"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (member.avatar_url) setEnlargedAvatar(member)
-                  }}
-                >
-                  <Avatar className="size-9 cursor-pointer transition-opacity hover:opacity-80">
-                    {member.avatar_url && (
-                      <AvatarImage src={member.avatar_url} alt={member.name || 'Member'} />
-                    )}
-                    <AvatarFallback className="bg-tag-border text-xs font-medium text-tag-text">
-                      {getInitials(member.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-3">
-                    <span className="font-grotesk font-medium text-tag-text">
-                      {member.name || 'Unnamed'}
-                    </span>
-                    <Badge variant="outline" className={roleColors[member.role]}>
-                      {roleLabels[member.role]}
-                    </Badge>
-                    {!member.onboarding_completed && (
-                      <Badge
-                        variant="outline"
-                        className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
-                      >
-                        onboarding
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="mt-1 font-mono text-sm text-tag-dim">{member.email}</p>
-                </div>
-              </div>
-              <span className="ml-4 shrink-0 font-mono text-sm text-tag-dim">
-                {new Date(member.created_at).toLocaleDateString()}
+              <button
+                type="button"
+                className="mb-3 shrink-0 focus:outline-none"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (member.avatar_url) setEnlargedAvatar(member)
+                }}
+              >
+                <Avatar className="size-20 cursor-pointer transition-opacity hover:opacity-80">
+                  {member.avatar_url && (
+                    <AvatarImage src={member.avatar_url} alt={member.name || 'Member'} />
+                  )}
+                  <AvatarFallback className="bg-tag-border text-lg font-medium text-tag-text">
+                    {getInitials(member.name)}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+              <span className="w-full truncate text-center font-grotesk text-sm font-medium text-tag-text">
+                {member.name || 'Unnamed'}
               </span>
+              <Badge variant="outline" className={`mt-1.5 ${roleColors[member.role]}`}>
+                {roleLabels[member.role]}
+              </Badge>
+              {member.building && (
+                <p className="mt-1.5 w-full truncate text-center font-mono text-xs text-tag-dim">
+                  {member.building}
+                </p>
+              )}
+              {!member.onboarding_completed && (
+                <Badge
+                  variant="outline"
+                  className="mt-1.5 bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
+                >
+                  onboarding
+                </Badge>
+              )}
             </div>
           ))}
         </div>
