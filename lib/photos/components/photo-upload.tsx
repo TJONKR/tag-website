@@ -13,9 +13,11 @@ import { MAX_PHOTOS } from '../types'
 interface PhotoUploadProps {
   initialPhotos: UserPhoto[]
   photoUrls: Record<string, string>
+  /** Controls header text and messaging. Defaults to 'lootbox'. */
+  context?: 'lootbox' | 'avatar'
 }
 
-export const PhotoUpload = ({ initialPhotos, photoUrls }: PhotoUploadProps) => {
+export const PhotoUpload = ({ initialPhotos, photoUrls, context = 'lootbox' }: PhotoUploadProps) => {
   const [photos, setPhotos] = useState(initialPhotos)
   const [uploading, setUploading] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -25,38 +27,47 @@ export const PhotoUpload = ({ initialPhotos, photoUrls }: PhotoUploadProps) => {
 
   const handleUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (!file) return
+      const files = Array.from(e.target.files ?? [])
+      if (!files.length) return
 
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error('File must be under 2MB')
-        return
+      const slotsLeft = MAX_PHOTOS - photos.length
+      const toUpload = files.slice(0, slotsLeft)
+
+      for (const file of toUpload) {
+        if (file.size > 2 * 1024 * 1024) {
+          toast.error(`${file.name} must be under 2MB`)
+          continue
+        }
       }
+
+      const validFiles = toUpload.filter((f) => f.size <= 2 * 1024 * 1024)
+      if (!validFiles.length) return
 
       setUploading(true)
       try {
-        const formData = new FormData()
-        formData.append('photo', file)
+        for (const file of validFiles) {
+          const formData = new FormData()
+          formData.append('photo', file)
 
-        const res = await fetch('/api/profile/photos', {
-          method: 'POST',
-          body: formData,
-        })
+          const res = await fetch('/api/profile/photos', {
+            method: 'POST',
+            body: formData,
+          })
 
-        if (!res.ok) {
+          if (!res.ok) {
+            const data = await res.json()
+            toast.error(data.error || `Upload failed for ${file.name}`)
+            continue
+          }
+
           const data = await res.json()
-          toast.error(data.error || 'Upload failed')
-          return
+          setPhotos((prev) => [
+            ...prev,
+            { id: data.id, user_id: '', storage_path: '', created_at: new Date().toISOString() },
+          ])
         }
 
-        const data = await res.json()
-        // Add placeholder photo to list — URL will show on refresh
-        setPhotos((prev) => [
-          ...prev,
-          { id: data.id, user_id: '', storage_path: '', created_at: new Date().toISOString() },
-        ])
-        toast.success('Photo uploaded')
-        // Refresh to get signed URL
+        toast.success(`${validFiles.length} photo${validFiles.length > 1 ? 's' : ''} uploaded`)
         window.location.reload()
       } catch {
         toast.error('Upload failed')
@@ -65,7 +76,7 @@ export const PhotoUpload = ({ initialPhotos, photoUrls }: PhotoUploadProps) => {
         if (inputRef.current) inputRef.current.value = ''
       }
     },
-    []
+    [photos.length]
   )
 
   const handleDelete = useCallback(async (photoId: string) => {
@@ -101,7 +112,10 @@ export const PhotoUpload = ({ initialPhotos, photoUrls }: PhotoUploadProps) => {
         <div>
           <p className="font-syne text-sm font-bold text-tag-text">Reference Photos</p>
           <p className="text-xs text-tag-muted">
-            {photos.length}/{MAX_PHOTOS} photos — used to generate your lootbox skin
+            {photos.length}/{MAX_PHOTOS} photos
+            {context === 'lootbox'
+              ? ' — used to generate your lootbox skin'
+              : ' — used to generate your avatar'}
           </p>
         </div>
       </div>
@@ -171,6 +185,7 @@ export const PhotoUpload = ({ initialPhotos, photoUrls }: PhotoUploadProps) => {
         ref={inputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
+        multiple
         onChange={handleUpload}
         className="hidden"
       />
@@ -178,7 +193,7 @@ export const PhotoUpload = ({ initialPhotos, photoUrls }: PhotoUploadProps) => {
       {photos.length < MAX_PHOTOS && (
         <p className="text-xs text-amber-400">
           Upload {MAX_PHOTOS - photos.length} more photo{MAX_PHOTOS - photos.length > 1 ? 's' : ''}{' '}
-          to unlock your lootbox
+          {context === 'lootbox' ? 'to unlock your lootbox' : 'to generate your avatar'}
         </p>
       )}
     </div>

@@ -1,6 +1,6 @@
 import { createServerSupabaseClient } from '@lib/db'
 
-import type { Facility, HouseRule, OpeningHours } from './types'
+import type { ContactItem, Facility, Guideline, OpeningHours } from './types'
 
 export async function getFacilities(): Promise<Facility[]> {
   const supabase = await createServerSupabaseClient()
@@ -14,16 +14,16 @@ export async function getFacilities(): Promise<Facility[]> {
   return data as Facility[]
 }
 
-export async function getHouseRules(): Promise<HouseRule[]> {
+export async function getGuidelines(): Promise<Guideline[]> {
   const supabase = await createServerSupabaseClient()
 
   const { data, error } = await supabase
-    .from('house_rules')
+    .from('guidelines')
     .select('id, title, description, sort_order')
     .order('sort_order', { ascending: true })
 
   if (error) throw new Error(error.message)
-  return data as HouseRule[]
+  return data as Guideline[]
 }
 
 export async function getOpeningHours(): Promise<OpeningHours[]> {
@@ -36,4 +36,16 @@ export async function getOpeningHours(): Promise<OpeningHours[]> {
 
   if (error) throw new Error(error.message)
   return data as OpeningHours[]
+}
+
+export async function getContactItems(): Promise<ContactItem[]> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('contact_items')
+    .select('id, title, description, icon, sort_order')
+    .order('sort_order', { ascending: true })
+
+  if (error) throw new Error(error.message)
+  return data as ContactItem[]
 }

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { getOptionalUser } from '@lib/auth/queries'
-import { houseRuleSchema } from '@lib/portal/schema'
-import { updateHouseRule, deleteHouseRule } from '@lib/portal/mutations'
+import { contactItemSchema } from '@lib/portal/schema'
+import { updateContactItem, deleteContactItem } from '@lib/portal/mutations'
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -14,18 +14,18 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     const { id } = await params
     const body = await req.json()
-    const result = houseRuleSchema.safeParse(body)
+    const result = contactItemSchema.safeParse(body)
 
     if (!result.success) {
       return NextResponse.json({ errors: result.error.issues }, { status: 400 })
     }
 
-    await updateHouseRule(id, result.data)
+    const item = await updateContactItem(id, result.data)
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, item })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Something went wrong'
-    console.error('[house-rules] Error:', message)
+    console.error('[contact-items] Error:', message)
     return NextResponse.json({ errors: [{ message }] }, { status: 500 })
   }
 }
@@ -40,12 +40,12 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
 
     const { id } = await params
 
-    await deleteHouseRule(id)
+    await deleteContactItem(id)
 
     return NextResponse.json({ success: true })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Something went wrong'
-    console.error('[house-rules] Error:', message)
+    console.error('[contact-items] Error:', message)
     return NextResponse.json({ errors: [{ message }] }, { status: 500 })
   }
 }

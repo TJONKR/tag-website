@@ -52,7 +52,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
             {profile.data_sources.map((source) => (
               <span
                 key={source}
-                className="rounded-full bg-tag-border px-2.5 py-0.5 font-mono text-[10px] uppercase text-tag-dim"
+                className="rounded-full bg-tag-border px-2.5 py-0.5 font-mono text-xs uppercase text-tag-dim"
               >
                 {source}
               </span>
@@ -88,7 +88,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
                     {project.name}
                   </span>
                   {project.role && (
-                    <span className="font-mono text-[10px] text-tag-dim">
+                    <span className="font-mono text-xs text-tag-dim">
                       {project.role}
                     </span>
                   )}
@@ -170,7 +170,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
               >
                 <ExternalLink className="size-3 shrink-0" />
                 <span className="truncate">{link.title}</span>
-                <span className="shrink-0 font-mono text-[10px] text-tag-dim">
+                <span className="shrink-0 font-mono text-xs text-tag-dim">
                   {link.type}
                 </span>
               </a>

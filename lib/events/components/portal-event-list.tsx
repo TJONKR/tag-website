@@ -72,11 +72,11 @@ const PortalEventRow = ({
       </div>
       <div className="flex flex-1 flex-col gap-0.5">
         <span className="font-syne text-lg text-tag-text">{event.title}</span>
-        <span className="text-xs text-tag-muted">{event.description}</span>
+        <span className="text-sm text-tag-muted">{event.description}</span>
       </div>
       <div className="flex shrink-0 items-center gap-2 max-md:w-auto max-md:text-left md:w-36 md:justify-end">
         {muted && attendanceSummary && attendanceSummary.total > 0 && (
-          <span className="font-mono text-[10px] text-tag-muted">
+          <span className="font-mono text-sm text-tag-muted">
             {attendanceSummary.checkedIn}/{attendanceSummary.total} checked in
           </span>
         )}
@@ -85,7 +85,7 @@ const PortalEventRow = ({
             Luma
           </span>
         )}
-        <span className="font-mono text-[10px] uppercase tracking-wider text-tag-dim">
+        <span className="font-mono text-xs uppercase tracking-wider text-tag-dim">
           {event.type}
         </span>
       </div>
@@ -258,7 +258,7 @@ export const PortalEventList = ({
       <div className="rounded-lg border border-tag-border bg-tag-card">
         {/* Upcoming */}
         <div className="flex items-center justify-between px-4 py-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+          <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
             Upcoming
           </span>
           {isAdmin && (
@@ -266,7 +266,7 @@ export const PortalEventList = ({
               <button
                 onClick={handleLumaSync}
                 disabled={syncing}
-                className="flex items-center gap-1.5 rounded-md border border-tag-border px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-tag-muted transition-colors hover:border-tag-orange/30 hover:text-tag-orange disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-md border border-tag-border px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-muted transition-colors hover:border-tag-orange/30 hover:text-tag-orange disabled:opacity-50"
               >
                 <RefreshCw className={cn('size-3', syncing && 'animate-spin')} />
                 {syncing ? 'Syncing...' : 'Sync Luma'}
@@ -274,7 +274,7 @@ export const PortalEventList = ({
               <EventFormDialog
                 isAdmin={isAdmin}
                 trigger={
-                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
+                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
                     <Plus className="size-3" />
                     Add Event
                   </button>
@@ -293,12 +293,12 @@ export const PortalEventList = ({
 
         {/* Past */}
         <div className="flex items-center justify-between border-t border-tag-border px-4 py-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+          <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
             Past Events
           </span>
           <button
             onClick={() => setShowPast((prev) => !prev)}
-            className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-muted transition-colors hover:text-tag-orange"
+            className="font-mono text-xs uppercase tracking-[0.15em] text-tag-muted transition-colors hover:text-tag-orange"
           >
             {showPast ? 'Hide' : 'Show'} &rarr;
           </button>

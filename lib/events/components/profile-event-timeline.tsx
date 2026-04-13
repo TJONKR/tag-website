@@ -46,13 +46,13 @@ export const ProfileEventTimeline = ({ events }: ProfileEventTimelineProps) => {
           <Calendar className="size-8 text-tag-dim" />
           <div>
             <p className="font-syne text-sm font-bold text-tag-text">No events yet</p>
-            <p className="mt-1 text-xs text-tag-muted">
+            <p className="mt-1 text-sm text-tag-muted">
               Join an event to start building your timeline.
             </p>
           </div>
           <Link
             href="/portal/events"
-            className="mt-2 rounded-md bg-tag-orange px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-tag-orange/90"
+            className="mt-2 rounded-md bg-tag-orange px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-tag-orange/90"
           >
             Browse events
           </Link>
@@ -79,11 +79,11 @@ export const ProfileEventTimeline = ({ events }: ProfileEventTimelineProps) => {
     <div className="rounded-lg border border-tag-border bg-tag-card">
       <div className="px-6 pt-5 pb-3">
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+          <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
             Activity
           </span>
           {streak >= 2 && (
-            <span className="flex items-center gap-1.5 rounded-full border border-tag-orange/30 bg-tag-orange/5 px-2.5 py-0.5 text-[11px] font-medium text-tag-orange">
+            <span className="flex items-center gap-1.5 rounded-full border border-tag-orange/30 bg-tag-orange/5 px-2.5 py-0.5 text-sm font-medium text-tag-orange">
               <Flame className="size-3" />
               {streak} event streak
             </span>
@@ -94,7 +94,7 @@ export const ProfileEventTimeline = ({ events }: ProfileEventTimelineProps) => {
       <div className="px-6 pb-5">
         {grouped.map((group) => (
           <div key={group.label}>
-            <p className="mb-2 mt-4 font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-tag-muted first:mt-0">
+            <p className="mb-2 mt-4 font-mono text-xs font-bold uppercase tracking-[0.15em] text-tag-muted first:mt-0">
               {group.label}
             </p>
             <div className="space-y-0">
@@ -108,7 +108,7 @@ export const ProfileEventTimeline = ({ events }: ProfileEventTimelineProps) => {
                       <div className="size-2.5 rounded-full border border-tag-border" />
                     )}
                   </div>
-                  <span className="w-12 shrink-0 font-mono text-[11px] font-bold text-tag-orange">
+                  <span className="w-12 shrink-0 font-mono text-xs font-bold text-tag-orange">
                     {formatDateDisplay(event.date_iso)}
                   </span>
                   <span className="flex-1 truncate text-sm text-tag-text">{event.title}</span>

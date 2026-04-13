@@ -1,4 +1,4 @@
-import { PortalHeader } from '@lib/portal/components'
+import { PortalHeader, FadeIn } from '@lib/portal/components'
 import { getUser } from '@lib/auth/queries'
 import {
   getAllUpcomingEvents,
@@ -26,13 +26,17 @@ export default async function EventsPage() {
 
   return (
     <>
-      <PortalHeader title="Events" description="Upcoming events, workshops and meetups at TAG." />
-      <PortalEventList
-        upcoming={upcoming}
-        past={past}
-        isAdmin={isAdmin}
-        attendanceSummaries={attendanceSummaries}
-      />
+      <FadeIn>
+        <PortalHeader title="Events" description="Upcoming events, workshops and meetups at TAG." />
+      </FadeIn>
+      <FadeIn delay={75}>
+        <PortalEventList
+          upcoming={upcoming}
+          past={past}
+          isAdmin={isAdmin}
+          attendanceSummaries={attendanceSummaries}
+        />
+      </FadeIn>
     </>
   )
 }

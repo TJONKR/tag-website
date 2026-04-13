@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server'
 
 import { getOptionalUser } from '@lib/auth/queries'
-import { reorderHouseRules } from '@lib/portal/mutations'
+import { deleteMember } from '@lib/people/mutations'
 
-export async function PUT(req: Request) {
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const user = await getOptionalUser()
 
@@ -11,18 +14,20 @@ export async function PUT(req: Request) {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 
-    const { ids } = (await req.json()) as { ids: string[] }
+    const { id } = await params
 
-    if (!Array.isArray(ids)) {
-      return NextResponse.json({ errors: [{ message: 'ids must be an array' }] }, { status: 400 })
+    if (id === user.id) {
+      return NextResponse.json(
+        { errors: [{ message: 'You cannot delete yourself' }] },
+        { status: 400 }
+      )
     }
 
-    await reorderHouseRules(ids)
+    await deleteMember(id)
 
     return NextResponse.json({ success: true })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Something went wrong'
-    console.error('[house-rules reorder] Error:', message)
     return NextResponse.json({ errors: [{ message }] }, { status: 500 })
   }
 }

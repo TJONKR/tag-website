@@ -18,7 +18,7 @@ export const EventList = ({ upcoming, past }: EventListProps) => {
     <section>
       {/* Upcoming events */}
       <div className="px-[60px] py-4 max-md:px-8">
-        <span className="font-mono text-[12px] uppercase tracking-[0.1em] text-tag-dim">
+        <span className="font-mono text-xs uppercase tracking-[0.1em] text-tag-dim">
           Upcoming
         </span>
       </div>
@@ -28,12 +28,12 @@ export const EventList = ({ upcoming, past }: EventListProps) => {
 
       {/* Past events */}
       <div className="flex items-center justify-between px-[60px] py-4 max-md:px-8">
-        <span className="font-mono text-[12px] uppercase tracking-[0.1em] text-tag-dim">
+        <span className="font-mono text-xs uppercase tracking-[0.1em] text-tag-dim">
           Past Events
         </span>
         <button
           onClick={() => setShowPast((prev) => !prev)}
-          className="font-mono text-[12px] uppercase tracking-[0.1em] text-tag-muted transition-colors hover:text-tag-orange"
+          className="font-mono text-xs uppercase tracking-[0.1em] text-tag-muted transition-colors hover:text-tag-orange"
         >
           {showPast ? 'Hide' : 'Show'} &rarr;
         </button>

@@ -1,38 +1,41 @@
-import { redirect } from 'next/navigation'
-
 import { getUser } from '@lib/auth/queries'
 import { getMembers, getMemberCounts } from '@lib/people/queries'
 import { getApplications, getApplicationCounts } from '@lib/applications/queries'
+import { FadeIn, PortalHeader } from '@lib/portal/components'
 import { PeopleTabs } from '@lib/people/components'
 
-export default async function PeoplePage() {
+export default async function CommunityPage() {
   const user = await getUser()
-
-  if (user.role !== 'operator') {
-    redirect('/portal/events')
-  }
+  const isOperator = user.role === 'operator'
 
   const [members, memberCounts, applications, applicationCounts] = await Promise.all([
     getMembers(),
     getMemberCounts(),
-    getApplications(),
-    getApplicationCounts(),
+    isOperator ? getApplications() : Promise.resolve([]),
+    isOperator ? getApplicationCounts() : Promise.resolve({ pending: 0, accepted: 0, rejected: 0 }),
   ])
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-syne text-2xl font-bold text-tag-text">People</h1>
-        <p className="mt-1 font-grotesk text-sm text-tag-muted">
-          Manage members and review applications.
-        </p>
-      </div>
-      <PeopleTabs
-        members={members}
-        memberCounts={memberCounts}
-        applications={applications}
-        applicationCounts={applicationCounts}
-      />
-    </div>
+    <>
+      <FadeIn>
+        <PortalHeader
+          title="Community"
+          description={
+            isOperator
+              ? 'Manage members and review applications.'
+              : 'See who is part of the community.'
+          }
+        />
+      </FadeIn>
+      <FadeIn delay={75}>
+        <PeopleTabs
+          members={members}
+          memberCounts={memberCounts}
+          applications={applications}
+          applicationCounts={applicationCounts}
+          isOperator={isOperator}
+        />
+      </FadeIn>
+    </>
   )
 }

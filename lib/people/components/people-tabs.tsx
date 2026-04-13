@@ -12,6 +12,7 @@ interface PeopleTabsProps {
   memberCounts: MemberCounts
   applications: Application[]
   applicationCounts: ApplicationCounts
+  isOperator: boolean
 }
 
 export const PeopleTabs = ({
@@ -19,7 +20,12 @@ export const PeopleTabs = ({
   memberCounts,
   applications,
   applicationCounts,
+  isOperator,
 }: PeopleTabsProps) => {
+  if (!isOperator) {
+    return <MemberList initialMembers={members} initialCounts={memberCounts} isOperator={false} />
+  }
+
   return (
     <Tabs defaultValue="members">
       <div className="flex items-center justify-between">
@@ -41,7 +47,7 @@ export const PeopleTabs = ({
       </div>
 
       <TabsContent value="members" className="mt-6">
-        <MemberList initialMembers={members} initialCounts={memberCounts} />
+        <MemberList initialMembers={members} initialCounts={memberCounts} isOperator={true} />
       </TabsContent>
 
       <TabsContent value="applications" className="mt-6">

@@ -11,11 +11,7 @@ export const MembershipCard = ({ status }: MembershipCardProps) => {
 
   return (
     <div
-      className={`rounded-lg border p-6 ${
-        isBuilder
-          ? 'border-tag-orange bg-tag-orange/5'
-          : 'border-tag-border bg-tag-card'
-      }`}
+      className="rounded-lg border border-tag-border bg-tag-card p-6"
     >
       <div className="flex items-center gap-3">
         <div
