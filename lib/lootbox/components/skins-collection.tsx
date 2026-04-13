@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Check, Loader2, Sparkles, Box } from 'lucide-react'
+import { Check, Loader2, Sparkles, Box, Crown } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { cn } from '@lib/utils'
@@ -61,6 +61,7 @@ export const SkinsCollection = ({ initialSkins }: SkinsCollectionProps) => {
       <div className="grid grid-cols-2 gap-3 px-6 pb-6 sm:grid-cols-3">
         {skins.map((skin) => {
           const isRare = skin.rarity === 'rare'
+          const isEpic = skin.rarity === 'epic'
           const isGenerating = skin.status === 'generating'
           const isComplete = skin.status === 'complete'
 
@@ -71,9 +72,11 @@ export const SkinsCollection = ({ initialSkins }: SkinsCollectionProps) => {
               className={cn(
                 'relative overflow-hidden rounded-xl border-2 transition-colors',
                 skin.equipped
-                  ? isRare
-                    ? 'border-amber-400'
-                    : 'border-tag-orange'
+                  ? isEpic
+                    ? 'border-purple-400'
+                    : isRare
+                      ? 'border-amber-400'
+                      : 'border-tag-orange'
                   : 'border-tag-border',
                 isComplete && 'cursor-pointer hover:border-tag-orange/50'
               )}
@@ -109,7 +112,9 @@ export const SkinsCollection = ({ initialSkins }: SkinsCollectionProps) => {
               {/* Info bar */}
               <div className="flex items-center justify-between bg-tag-bg/80 px-3 py-2 backdrop-blur-sm">
                 <div className="flex items-center gap-1.5">
-                  {isRare ? (
+                  {isEpic ? (
+                    <Crown className="size-3 text-purple-400" />
+                  ) : isRare ? (
                     <Box className="size-3 text-amber-400" />
                   ) : (
                     <Sparkles className="size-3 text-tag-orange" />

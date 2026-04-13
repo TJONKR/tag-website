@@ -1,14 +1,16 @@
 'use client'
 
-import { Rocket } from 'lucide-react'
+import { Building2, Rocket } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '@components/ui/button'
 
+import { AiAmClaimDialog } from './ai-am-claim-dialog'
 import { ContractDialog } from './contract-dialog'
 
 export const UpgradeCard = () => {
   const [showContract, setShowContract] = useState(false)
+  const [showClaim, setShowClaim] = useState(false)
 
   return (
     <>
@@ -23,19 +25,35 @@ export const UpgradeCard = () => {
             </h3>
             <p className="mt-1 text-sm text-tag-muted">
               Get a dedicated desk, 24/7 access, meeting rooms, and more for
-              €150/month.
+              €150/month (excl. VAT).
             </p>
-            <Button
-              onClick={() => setShowContract(true)}
-              className="mt-4 bg-tag-orange text-white hover:bg-tag-orange/90"
-            >
-              Upgrade to Builder
-            </Button>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Button
+                onClick={() => setShowContract(true)}
+                className="bg-tag-orange text-white hover:bg-tag-orange/90"
+              >
+                <Rocket className="mr-2 size-4" />
+                Pay via TAG
+              </Button>
+              <Button
+                onClick={() => setShowClaim(true)}
+                variant="outline"
+                className="border-tag-border text-tag-text hover:bg-tag-card"
+              >
+                <Building2 className="mr-2 size-4" />
+                I pay through AI/AM
+              </Button>
+            </div>
+            <p className="mt-3 text-xs text-tag-dim">
+              Already have a direct contract with AI AM? Use the second option —
+              we&apos;ll verify and approve.
+            </p>
           </div>
         </div>
       </div>
 
       <ContractDialog open={showContract} onOpenChange={setShowContract} />
+      <AiAmClaimDialog open={showClaim} onOpenChange={setShowClaim} />
     </>
   )
 }

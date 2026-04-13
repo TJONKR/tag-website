@@ -1,4 +1,4 @@
-export type Rarity = 'common' | 'rare'
+export type Rarity = 'common' | 'rare' | 'epic'
 export type GenerationType = '2d' | '3d'
 export type LootboxStatus = 'available' | 'opened'
 export type SkinStatus = 'generating' | 'complete' | 'error'
@@ -14,7 +14,7 @@ export interface LootboxEvent {
 
 export interface LootboxStyle {
   id: string
-  event_id: string
+  event_id: string | null
   name: string
   prompt: string
   preview_url: string | null

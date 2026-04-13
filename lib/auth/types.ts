@@ -7,6 +7,7 @@ export interface AuthUser {
   role: UserRole
   avatar_url: string | null
   created_at: string
+  is_super_admin: boolean
 }
 
 export interface LoginActionState {

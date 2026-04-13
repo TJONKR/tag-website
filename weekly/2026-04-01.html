@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAG Weekly — 1 April 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #141210;
+      --bg-elevated: #1e1c19;
+      --fg: #f0ebe3;
+      --fg-secondary: #9b9589;
+      --fg-muted: #5e5850;
+      --orange: #ff5f1f;
+      --blue: #2b5cff;
+      --amber: #ffb347;
+      --border: #2a2724;
+      --border-strong: #3d3a35;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Space Grotesk', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 120px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .slide-number {
+      position: fixed;
+      bottom: 40px;
+      right: 60px;
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      color: var(--fg-muted);
+      z-index: 100;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--orange);
+      transition: width 0.4s ease;
+      z-index: 100;
+    }
+
+    .tag-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--orange);
+      margin-bottom: 24px;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0.06;
+    }
+
+    /* ---- TITLE SLIDE ---- */
+    .slide--title {
+      align-items: center;
+      text-align: center;
+    }
+
+    .slide--title h1 {
+      font-size: clamp(64px, 10vw, 140px);
+      line-height: 0.9;
+      color: var(--fg);
+    }
+
+    .slide--title h1 span {
+      color: var(--orange);
+    }
+
+    .slide--title .date {
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      color: var(--fg-secondary);
+      margin-top: 32px;
+      letter-spacing: 0.1em;
+    }
+
+    .slide--title .tagline {
+      font-size: 20px;
+      color: var(--fg-muted);
+      margin-top: 12px;
+    }
+
+    /* ---- CONTENT SLIDES ---- */
+    .slide--content h2 {
+      font-size: clamp(40px, 5vw, 72px);
+      line-height: 1.05;
+      margin-bottom: 40px;
+    }
+
+    .slide--content h2 .emoji {
+      display: inline-block;
+      margin-right: 16px;
+    }
+
+    .slide--content .bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .slide--content .bullets li {
+      font-size: clamp(18px, 2vw, 24px);
+      line-height: 1.5;
+      color: var(--fg-secondary);
+      padding-left: 28px;
+      position: relative;
+    }
+
+    .slide--content .bullets li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 12px;
+      width: 8px;
+      height: 8px;
+      background: var(--orange);
+      border-radius: 1px;
+    }
+
+    .slide--content .bullets li strong {
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    .highlight {
+      color: var(--orange);
+      font-weight: 700;
+    }
+
+    .highlight-blue {
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .highlight-amber {
+      color: var(--amber);
+      font-weight: 700;
+    }
+
+    /* ---- CTA SLIDES ---- */
+    .slide--cta {
+      align-items: center;
+      text-align: center;
+    }
+
+    .slide--cta h2 {
+      font-size: clamp(48px, 7vw, 100px);
+      line-height: 1;
+      margin-bottom: 32px;
+    }
+
+    .slide--cta p {
+      font-size: clamp(18px, 2vw, 26px);
+      color: var(--fg-secondary);
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    .slide--cta .cta-box {
+      margin-top: 48px;
+      padding: 24px 48px;
+      border: 2px solid var(--orange);
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      text-transform: uppercase;
+      color: var(--orange);
+      letter-spacing: 0.05em;
+    }
+
+    /* ---- SPLIT SLIDE ---- */
+    .slide--split {
+      flex-direction: row;
+      padding: 0;
+    }
+
+    .slide--split .split-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px;
+      border-right: 1px solid var(--border);
+    }
+
+    .slide--split .split-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px;
+      background: var(--bg-elevated);
+    }
+
+    .stat {
+      margin-bottom: 32px;
+    }
+
+    .stat .number {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 56px;
+      color: var(--orange);
+      line-height: 1;
+    }
+
+    .stat .label {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 8px;
+    }
+
+    .card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 28px 32px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .card p {
+      font-size: 15px;
+      color: var(--fg-secondary);
+      line-height: 1.5;
+    }
+
+    /* ---- NAV HINT ---- */
+    .nav-hint {
+      position: fixed;
+      bottom: 40px;
+      left: 60px;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--fg-muted);
+      z-index: 100;
+    }
+
+    .nav-hint kbd {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      font-size: 11px;
+      margin: 0 2px;
+    }
+
+    /* ---- DIVIDER ---- */
+    .divider {
+      width: 60px;
+      height: 3px;
+      background: var(--orange);
+      margin: 24px 0;
+    }
+
+    /* ---- RECRUIT LIST ---- */
+    .recruit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .recruit-item {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .recruit-item .avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--border-strong);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--orange);
+      flex-shrink: 0;
+    }
+
+    .recruit-item .info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .recruit-item .name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .recruit-item .role {
+      font-size: 13px;
+      color: var(--fg-muted);
+      font-family: 'Space Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Grain overlay -->
+  <svg class="grain" viewBox="0 0 512 512" preserveAspectRatio="none" width="100%" height="100%">
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#noise)"/>
+  </svg>
+
+  <div class="progress" id="progress"></div>
+  <div class="slide-number" id="slideNumber"></div>
+  <div class="nav-hint"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate</div>
+
+  <div class="deck">
+
+    <!-- SLIDE 1: Title -->
+    <div class="slide slide--title active" data-slide="0">
+      <h1>GUTEN <span>TAG</span></h1>
+      <div class="date">WEEKLY &mdash; 01 / 04 / 2026</div>
+      <div class="tagline">To Achieve Greatness</div>
+    </div>
+
+    <!-- SLIDE 2: Hackathon Terugblik -->
+    <div class="slide slide--content" data-slide="1">
+      <div class="tag-label">Terugblik</div>
+      <h2><span class="emoji">&#x1F3C6;</span>AI Hackathon</h2>
+      <ul class="bullets">
+        <li><strong>TAG AI Hackathon</strong> &mdash; 25 maart @ Amsterdam</li>
+        <li>Judges: <span class="highlight">Matt Biilmann</span> (Netlify), <span class="highlight">Marnix Broers</span> (Peak Capital), <span class="highlight">Jerrod Engelberg</span> (CharlieLabs)</li>
+        <li>Learnings &amp; highlights &mdash; open floor</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 3: Vliegwiel Event -->
+    <div class="slide slide--content" data-slide="2">
+      <div class="tag-label">Inspiration</div>
+      <h2><span class="emoji">&#x1F525;</span>Vliegwiel Evenement</h2>
+      <ul class="bullets">
+        <li>Gisteren aanwezig bij het <strong>Vliegwiel evenement</strong></li>
+        <li>High energy &mdash; actief in de scene, inspiratie ophalen</li>
+        <li>Takeaways &amp; connections</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 4: Pieter Announcement -->
+    <div class="slide slide--cta" data-slide="3">
+      <div class="tag-label">Announcement</div>
+      <h2><span class="highlight">&#x1F44B;</span> Pieter</h2>
+      <p>Introducing our newest addition to the TAG community.</p>
+      <div class="divider" style="margin: 24px auto;"></div>
+      <p style="font-size: 18px; color: var(--fg-muted);">Welcome to the crew.</p>
+    </div>
+
+    <!-- SLIDE 5: New Recruits -->
+    <div class="slide slide--content" data-slide="4">
+      <div class="tag-label">Community</div>
+      <h2><span class="emoji">&#x1F680;</span>New Recruits</h2>
+      <p style="color: var(--fg-secondary); font-size: 20px; margin-bottom: 32px;">
+        Welcome to everyone who joined TAG recently.
+      </p>
+      <div class="recruit-grid">
+        <div class="recruit-item">
+          <div class="avatar">?</div>
+          <div class="info">
+            <span class="name">Your Name Here</span>
+            <span class="role">What are you building?</span>
+          </div>
+        </div>
+        <div class="recruit-item">
+          <div class="avatar">?</div>
+          <div class="info">
+            <span class="name">Your Name Here</span>
+            <span class="role">What are you building?</span>
+          </div>
+        </div>
+        <div class="recruit-item">
+          <div class="avatar">?</div>
+          <div class="info">
+            <span class="name">Your Name Here</span>
+            <span class="role">What are you building?</span>
+          </div>
+        </div>
+        <div class="recruit-item">
+          <div class="avatar">?</div>
+          <div class="info">
+            <span class="name">Your Name Here</span>
+            <span class="role">What are you building?</span>
+          </div>
+        </div>
+      </div>
+      <p style="color: var(--fg-muted); font-size: 15px; margin-top: 24px; font-family: 'Space Mono', monospace;">
+        Stand up &amp; introduce yourself &#x1F44A;
+      </p>
+    </div>
+
+    <!-- SLIDE 6: Got a Pitch? -->
+    <div class="slide slide--cta" data-slide="5">
+      <div class="tag-label">Open Floor</div>
+      <h2>Got a <span class="highlight">pitch</span>?</h2>
+      <p>Working on something you want to share? Need feedback, a co-builder, or just want to show what you shipped?</p>
+      <div class="cta-box">Tag, you're it.</div>
+    </div>
+
+    <!-- SLIDE 7: Closing -->
+    <div class="slide slide--title" data-slide="6">
+      <h1>LET'S <span>BUILD</span></h1>
+      <div class="date" style="margin-top: 40px;">tag.amsterdam</div>
+    </div>
+
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide')
+    const total = slides.length
+    let current = 0
+
+    function goTo(n) {
+      if (n < 0 || n >= total) return
+      slides[current].classList.remove('active')
+      current = n
+      slides[current].classList.add('active')
+      document.getElementById('progress').style.width = ((current / (total - 1)) * 100) + '%'
+      document.getElementById('slideNumber').textContent = (current + 1) + ' / ' + total
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1) }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1) }
+      if (e.key === 'Home') { e.preventDefault(); goTo(0) }
+      if (e.key === 'End') { e.preventDefault(); goTo(total - 1) }
+    })
+
+    // Touch support
+    let touchStartX = 0
+    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX })
+    document.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX
+      if (Math.abs(diff) > 50) {
+        diff > 0 ? goTo(current + 1) : goTo(current - 1)
+      }
+    })
+
+    // Click to advance
+    document.addEventListener('click', (e) => {
+      if (e.clientX > window.innerWidth / 2) goTo(current + 1)
+      else goTo(current - 1)
+    })
+
+    goTo(0)
+  </script>
+</body>
+</html>

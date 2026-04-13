@@ -22,11 +22,11 @@ export async function openLootbox(userId: string, eventId: string) {
     return { lootboxId: existing.id, cards: existing.cards as RolledCard[] }
   }
 
-  // Get all styles for this event
+  // Get event-specific + global styles
   const { data: styles, error: stylesError } = await supabase
     .from('lootbox_styles')
     .select('*')
-    .eq('event_id', eventId)
+    .or(`event_id.eq.${eventId},event_id.is.null`)
 
   if (stylesError || !styles?.length) {
     throw new Error('No styles available for this event')

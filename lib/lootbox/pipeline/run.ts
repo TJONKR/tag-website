@@ -59,7 +59,7 @@ export async function runGenerationPipeline(input: PipelineInput) {
     // 3. Generate 2D skin
     const imageUrl = await generate2dSkin(signedUrl.signedUrl, style.prompt)
 
-    // 4. If rare, also generate 3D
+    // 4. If rare or epic (3d type), also generate 3D
     let model3dUrl: string | undefined
     if (generationType === '3d') {
       try {

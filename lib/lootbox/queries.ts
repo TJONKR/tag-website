@@ -22,7 +22,19 @@ export async function getEventStyles(eventId: string): Promise<LootboxStyle[]> {
   const { data, error } = await supabase
     .from('lootbox_styles')
     .select('*')
-    .eq('event_id', eventId)
+    .or(`event_id.eq.${eventId},event_id.is.null`)
+
+  if (error) return []
+  return data as LootboxStyle[]
+}
+
+export async function getGlobalStyles(): Promise<LootboxStyle[]> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('lootbox_styles')
+    .select('*')
+    .is('event_id', null)
 
   if (error) return []
   return data as LootboxStyle[]

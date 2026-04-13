@@ -2,36 +2,39 @@
 
 import { createServerSupabaseClient } from '@lib/db'
 
-import { insertContract } from './mutations'
-import { generateContractPdf } from './pdf'
 import { CONTRACT_VERSION } from './contract-template'
+import { createAiAmClaim, insertContract } from './mutations'
+import { generateContractPdf } from './pdf'
+import { contractFieldsSchema, type ContractFieldsInput } from './schema'
 
-export async function signContract(): Promise<{ status: 'success' | 'failed' }> {
+type ActionResult<T = void> =
+  | { status: 'success'; data?: T }
+  | { status: 'failed'; error: string }
+
+export async function signContract(
+  fields: ContractFieldsInput
+): Promise<ActionResult> {
   try {
+    const parsed = contractFieldsSchema.safeParse(fields)
+    if (!parsed.success) {
+      return {
+        status: 'failed',
+        error: parsed.error.issues[0]?.message ?? 'Invalid contract fields',
+      }
+    }
+
     const supabase = await createServerSupabaseClient()
 
     const {
       data: { user },
     } = await supabase.auth.getUser()
 
-    if (!user) return { status: 'failed' }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('name')
-      .eq('id', user.id)
-      .single()
+    if (!user) return { status: 'failed', error: 'Unauthorized' }
 
     const signedAt = new Date()
 
-    // Generate PDF
-    const pdfBuffer = await generateContractPdf(
-      profile?.name ?? '',
-      user.email ?? '',
-      signedAt
-    )
+    const pdfBuffer = await generateContractPdf(parsed.data, user.email ?? '', signedAt)
 
-    // Upload to Supabase Storage
     const path = `contracts/${user.id}/${CONTRACT_VERSION}-${signedAt.getTime()}.pdf`
 
     const { error: uploadError } = await supabase.storage
@@ -49,11 +52,40 @@ export async function signContract(): Promise<{ status: 'success' | 'failed' }> 
       data: { publicUrl },
     } = supabase.storage.from('contracts').getPublicUrl(path)
 
-    await insertContract(user.id, CONTRACT_VERSION, uploadError ? undefined : publicUrl)
+    await insertContract(
+      user.id,
+      CONTRACT_VERSION,
+      uploadError ? undefined : publicUrl,
+      parsed.data
+    )
 
     return { status: 'success' }
   } catch (error) {
     console.error('signContract error:', error)
-    return { status: 'failed' }
+    return {
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Failed to sign contract',
+    }
+  }
+}
+
+export async function submitAiAmClaim(): Promise<ActionResult<{ id: string }>> {
+  try {
+    const supabase = await createServerSupabaseClient()
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { status: 'failed', error: 'Unauthorized' }
+
+    const claim = await createAiAmClaim(user.id)
+    return { status: 'success', data: claim }
+  } catch (error) {
+    console.error('submitAiAmClaim error:', error)
+    return {
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Failed to submit claim',
+    }
   }
 }

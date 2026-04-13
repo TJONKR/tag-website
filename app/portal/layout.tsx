@@ -17,7 +17,12 @@ export default async function PortalLayout({ children }: { children: React.React
           backgroundSize: '16px 16px',
         }}
       />
-      <PortalSidebar role={user.role} avatarUrl={user.avatar_url} name={user.name} />
+      <PortalSidebar
+        role={user.role}
+        avatarUrl={user.avatar_url}
+        name={user.name}
+        isSuperAdmin={user.is_super_admin}
+      />
       <div className="relative z-10 mx-auto max-w-5xl px-6 pb-20 pt-10 md:px-10 md:pb-10">
         {children}
       </div>

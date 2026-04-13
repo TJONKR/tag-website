@@ -49,3 +49,12 @@ yarn-error.log*
 /blob-report/
 /playwright/*
 .superpowers/
+.gstack/
+
+# Local-only files (env backups, contracts, draft assets, etc.)
+_local/
+
+# Generated artifacts
+tests/test-results/
+scripts/output/
+supabase/.temp/

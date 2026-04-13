@@ -20,6 +20,7 @@ export const SkinResult = ({ skinId, onComplete }: SkinResultProps) => {
   const isComplete = skin?.status === 'complete'
   const isError = skin?.status === 'error'
   const isRare = skin?.rarity === 'rare'
+  const isEpic = skin?.rarity === 'epic'
 
   // Notify parent when generation completes
   if (isComplete && onComplete) {
@@ -56,7 +57,11 @@ export const SkinResult = ({ skinId, onComplete }: SkinResultProps) => {
           <div className="text-center">
             <p className="font-syne text-sm font-bold text-tag-text">Generating your skin...</p>
             <p className="mt-1 font-mono text-[11px] text-tag-muted">
-              {isRare ? 'Creating 2D art + 3D model' : 'Creating your unique artwork'}
+              {isEpic
+                ? 'Forging epic 2D art + 3D model'
+                : isRare
+                  ? 'Creating 2D art + 3D model'
+                  : 'Creating your unique artwork'}
             </p>
           </div>
         </motion.div>
@@ -73,9 +78,11 @@ export const SkinResult = ({ skinId, onComplete }: SkinResultProps) => {
           <div
             className={cn(
               'relative aspect-[3/4] w-48 overflow-hidden rounded-2xl border-2',
-              isRare
-                ? 'border-amber-400 shadow-[0_0_40px_rgba(251,191,36,0.3)]'
-                : 'border-tag-orange shadow-[0_0_30px_rgba(255,95,31,0.2)]'
+              isEpic
+                ? 'border-purple-400 shadow-[0_0_50px_rgba(168,85,247,0.4)]'
+                : isRare
+                  ? 'border-amber-400 shadow-[0_0_40px_rgba(251,191,36,0.3)]'
+                  : 'border-tag-orange shadow-[0_0_30px_rgba(255,95,31,0.2)]'
             )}
           >
             <Image

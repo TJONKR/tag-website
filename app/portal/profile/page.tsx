@@ -14,9 +14,9 @@ import { getUserAttendedEvents, getUserCheckedInCount } from '@lib/events/querie
 import { getMembershipStatus } from '@lib/membership/queries'
 import { getOnboardingProfile } from '@lib/onboarding/queries'
 import {
+  ClaimPendingNotice,
   MembershipCard,
   UpgradeCard,
-  ManageSubscription,
 } from '@lib/membership/components'
 import { getBuilderProfile } from '@lib/taste/queries'
 import { LootboxProgress } from '@lib/portal/components/lootbox-progress'
@@ -272,7 +272,9 @@ export default async function ProfilePage() {
 
           {membershipStatus.canUpgrade && <UpgradeCard />}
 
-          {membershipStatus.subscription?.status === 'active' && <ManageSubscription />}
+          {membershipStatus.aiAmClaim?.status === 'pending' && (
+            <ClaimPendingNotice claim={membershipStatus.aiAmClaim} />
+          )}
           </FadeIn>
 
           {/* About / Edit Profile */}

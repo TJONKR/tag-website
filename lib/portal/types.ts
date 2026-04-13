@@ -5,6 +5,7 @@ export interface NavItem {
   href: string
   icon: string
   requiredRole?: UserRole
+  requiredSuperAdmin?: boolean
 }
 
 export interface NavGroup {

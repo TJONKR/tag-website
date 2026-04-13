@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, Map, Sparkles, User, Users } from 'lucide-react'
+import { Calendar, Map, Shield, Sparkles, User, Users } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@components/ui/avatar'
 import { cn } from '@lib/utils'
@@ -13,6 +13,7 @@ import type { UserRole } from '@lib/auth/types'
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   calendar: Calendar,
   map: Map,
+  shield: Shield,
   sparkles: Sparkles,
   user: User,
   users: Users,
@@ -32,15 +33,25 @@ interface PortalSidebarProps {
   role?: UserRole
   avatarUrl?: string | null
   name?: string | null
+  isSuperAdmin?: boolean
 }
 
-export const PortalSidebar = ({ role, avatarUrl, name }: PortalSidebarProps) => {
+export const PortalSidebar = ({
+  role,
+  avatarUrl,
+  name,
+  isSuperAdmin = false,
+}: PortalSidebarProps) => {
   const pathname = usePathname()
   const isProfileActive = pathname === '/portal/profile'
 
   const allItems = portalNavGroups
     .flatMap((group) => group.items)
-    .filter((item) => !item.requiredRole || item.requiredRole === role)
+    .filter((item) => {
+      if (item.requiredSuperAdmin && !isSuperAdmin) return false
+      if (item.requiredRole && item.requiredRole !== role) return false
+      return true
+    })
 
   return (
     <>

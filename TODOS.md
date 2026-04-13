@@ -16,9 +16,9 @@ Captured from full codebase engineering audit (2026-03-16).
 ### TODO-8: Standardize error response format across API routes
 **What:** Three inconsistent formats: `{ errors: [{ message }] }` (most routes), `{ error: 'string' }` (stripe, fal, luma, lootbox), `{ message: 'string' }` (occasional).
 **Why:** Client-side error handling has to guess which shape it gets.
-**Fix:** Pick one format (recommend `{ errors: [{ message }] }` since most routes already use it), update the rest. Add a shared `errorResponse()` helper.
+**Fix:** Pick one format (recommend `{ errors: [{ message }] }` since most routes already use it), update the rest. The shared `errorResponse()` helper in `lib/api/utils.ts` (added by security hardening) can be extended for this.
 **When:** Next time you're doing a broad route cleanup.
-**Effort:** Small-medium (touch ~15 routes).
+**Effort:** Small-medium (touch ~15 routes). Partially addressed by security hardening (error sanitization in 8 routes).
 
 ### TODO-10: Extract shared registration schema
 **What:** `lib/auth/schema.ts` (registerSchema), `lib/onboarding/schema.ts` (onboardingSchema), and `lib/join/schema.ts` (joinSchema) all validate nearly identical fields: name, email, building, whyTag, referral, social URLs.
@@ -26,6 +26,24 @@ Captured from full codebase engineering audit (2026-03-16).
 **Fix:** Create a shared base schema in `lib/auth/schema.ts`, compose the three variants from it.
 **When:** Next time you touch any of these schemas.
 **Effort:** Small.
+
+### TODO-25: Payment & contract overhaul (AI/AM claim + onderhuur-contract) — IMPLEMENTED 2026-04-13, awaiting deploy
+**What:** Refactor membership payment flow to support two paths:
+1. **New members via site:** TAG onderhuur-contract (NL/EN, user kiest) → Stripe
+2. **Existing AI AM members:** "I pay through AI/AM" claim button → super admin approves → Builder (no Stripe, no new contract)
+**Why:** TAG positioneert zich als onderverhuurder tussen AI AM B.V. (hoofdverhuurder) en members. Real Dutch huurovereenkomst-PDF moet gegenereerd worden i.p.v. huidige generieke Engelse template.
+**Scope:**
+- New `super_admin` role (Tijs + Pieter only) for AI/AM approval queue
+- Contract template rewrite: TAG als onderverhuurder, 1 flex desk, €150/maand excl. BTW, afgeleid van Notso-contract
+- Contract velden per member: bedrijfsnaam + KVK, vestigingsplaats, vertegenwoordiger. NL + EN versies.
+- Data model: `subscriptions.stripe_subscription_id` nullable, add `payment_method` (stripe|ai_am), approval audit columns (approved_by, approved_at). Contracts table: company_name, kvk, city, representative_name, language.
+- Stripe blijft LIVE; add `allow_promotion_codes: true` voor live testing met coupon
+- Geen recurring check voor AI/AM — eenmalig approven, super admin kan handmatig stopzetten
+**Briefing:** `weekly/payment-contract-briefing.md` (volledige context, beslissingen, open items, interview-quotes)
+**Blockers:**
+- Juridische tekst TAG onderhuur-contract (NL + EN) moet opgesteld worden, mogelijk juridisch reviewen
+- Stripe tax config verifiëren (excl BTW correct ingericht?)
+**Effort:** Large (migratie + UI + API + tests, twee flows).
 
 ### TODO-11: Standardize mutation error handling patterns
 **What:** Some mutations throw errors, some return `{ status: 'success' | 'failed' }`, some use Zod safeParse. Callers can't predict whether to try/catch or check return values.
@@ -86,6 +104,30 @@ Captured from full codebase engineering audit (2026-03-16).
 **Fix:** Track start time in the pipeline. If approaching 280s, save partial results and set status to `complete` (without skin) or `error` with a clear message. Alternatively, break the pipeline into smaller Vercel functions chained via queue/webhook.
 **When:** When users report stuck profiles, or proactively before scaling.
 **Effort:** Medium.
+
+---
+
+## Security
+
+### TODO-23: Add rate limiting to public endpoints
+**What:** Implement rate limiting on `/api/join` (unauthenticated POST) and auth endpoints to prevent spam and brute force.
+**Why:** Currently no protection against automated form submissions or password guessing. `/api/join` is fully public.
+**Pros:** Prevents abuse, protects against credential stuffing.
+**Cons:** Requires infrastructure (Redis/Upstash), adds complexity, needs tuning.
+**Fix:** Use Upstash `@upstash/ratelimit` or Vercel's built-in rate limiting. Apply to `/api/join`, login, and registration endpoints.
+**Context:** Redis is already in `package.json` but unused. Upstash is the standard edge-compatible rate limiter for Vercel/Next.js.
+**Depends on:** Choosing a rate limiting provider (Upstash recommended).
+**Effort:** Medium.
+
+### TODO-24: Add dependency audit to CI pipeline
+**What:** Add `pnpm audit` to CI/CD pipeline (GitHub Actions) to catch vulnerable dependencies before deploy.
+**Why:** Currently no automated vulnerability scanning. 50+ npm dependencies update frequently.
+**Pros:** Catches known CVEs before they reach production.
+**Cons:** Can produce false positives, may block deploys for low-severity issues.
+**Fix:** Add a `pnpm audit --audit-level=high` step to GitHub Actions workflow.
+**Context:** Redis is installed but unused (potential attack surface). No existing CI pipeline config found in the repo.
+**Depends on:** Having a CI pipeline configured.
+**Effort:** Small.
 
 ---
 

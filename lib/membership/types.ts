@@ -25,7 +25,32 @@ export interface Contract {
   version: string
   signed_at: string
   pdf_url: string | null
+  company_name: string | null
+  kvk: string | null
+  city: string | null
+  representative_name: string | null
+  language: 'nl' | 'en' | null
   created_at: string
+}
+
+export type AiAmClaimStatus = 'pending' | 'approved' | 'rejected' | 'revoked'
+
+export interface AiAmClaim {
+  id: string
+  user_id: string
+  status: AiAmClaimStatus
+  submitted_at: string
+  reviewed_by: string | null
+  reviewed_at: string | null
+  notes: string | null
+}
+
+export interface AiAmClaimWithUser extends AiAmClaim {
+  user: {
+    id: string
+    name: string | null
+    email: string | null
+  }
 }
 
 export type MembershipTier = 'ambassador' | 'builder'
@@ -34,6 +59,7 @@ export interface MembershipStatus {
   tier: MembershipTier
   subscription: Subscription | null
   contract: Contract | null
+  aiAmClaim: AiAmClaim | null
   canUpgrade: boolean
   canCancel: boolean
 }
