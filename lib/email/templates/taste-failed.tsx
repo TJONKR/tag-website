@@ -1,0 +1,38 @@
+import { SITE_URL } from '../config'
+import { Callout, H1, P, PrimaryButton } from './_components'
+import { EmailLayout } from './_layout'
+
+interface TasteFailedProps {
+  name?: string
+  errorMessage?: string
+}
+
+export const TasteFailed = ({ name, errorMessage }: TasteFailedProps) => {
+  return (
+    <EmailLayout preview="Your Taste profile generation failed">
+      <H1>
+        {name ? `${name.split(' ')[0]}, we hit a snag` : 'We hit a snag'}
+      </H1>
+      <P>
+        The Taste profile pipeline wasn&apos;t able to finish. This usually means one
+        of the research agents couldn&apos;t reach a source, or a link was
+        unreachable.
+      </P>
+      {errorMessage ? (
+        <Callout>
+          <strong>Error details:</strong>
+          <br />
+          {errorMessage}
+        </Callout>
+      ) : null}
+      <PrimaryButton href={`${SITE_URL}/portal/taste`}>
+        Retry on the Taste page
+      </PrimaryButton>
+      <P muted>
+        If it keeps failing, reply to this email and we&apos;ll debug together.
+      </P>
+    </EmailLayout>
+  )
+}
+
+export default TasteFailed

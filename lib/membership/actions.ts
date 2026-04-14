@@ -1,6 +1,7 @@
 'use server'
 
 import { createServerSupabaseClient } from '@lib/db'
+import { sendClaimNewAdmin, sendClaimSubmitted, sendContractSigned } from '@lib/email/senders'
 
 import { CONTRACT_VERSION } from './contract-template'
 import { createAiAmClaim, insertContract } from './mutations'
@@ -59,6 +60,23 @@ export async function signContract(
       parsed.data
     )
 
+    // Email the signer a copy of the PDF. Non-blocking — failures are logged
+    // but won't fail the contract signing.
+    if (user.email) {
+      await sendContractSigned({
+        to: user.email,
+        representativeName: parsed.data.representativeName,
+        companyName: parsed.data.companyName,
+        signedOn: signedAt.toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        }),
+        pdf: pdfBuffer,
+        filename: `tag-membership-${CONTRACT_VERSION}.pdf`,
+      })
+    }
+
     return { status: 'success' }
   } catch (error) {
     console.error('signContract error:', error)
@@ -80,6 +98,24 @@ export async function submitAiAmClaim(): Promise<ActionResult<{ id: string }>> {
     if (!user) return { status: 'failed', error: 'Unauthorized' }
 
     const claim = await createAiAmClaim(user.id)
+
+    // Pull the user's display name from profiles for friendlier emails.
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name')
+      .eq('id', user.id)
+      .single()
+
+    if (user.email) {
+      await sendClaimSubmitted({ to: user.email, name: profile?.name ?? undefined })
+    }
+    if (user.email) {
+      await sendClaimNewAdmin({
+        userName: profile?.name ?? undefined,
+        userEmail: user.email,
+      })
+    }
+
     return { status: 'success', data: claim }
   } catch (error) {
     console.error('submitAiAmClaim error:', error)

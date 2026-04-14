@@ -1,4 +1,5 @@
 import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
+import { sendApplicationApproved, sendApplicationRejected } from '@lib/email/senders'
 
 import type { ApplicationStatus } from './types'
 
@@ -8,6 +9,16 @@ export const updateApplicationStatus = async (
   reviewedBy: string
 ) => {
   const supabase = await createServerSupabaseClient()
+
+  const { data: application, error: fetchError } = await supabase
+    .from('applications')
+    .select('email, name')
+    .eq('id', id)
+    .single()
+
+  if (fetchError || !application) {
+    throw new Error('Application not found')
+  }
 
   const { error } = await supabase
     .from('applications')
@@ -19,6 +30,10 @@ export const updateApplicationStatus = async (
     .eq('id', id)
 
   if (error) throw new Error(error.message)
+
+  if (status === 'rejected') {
+    await sendApplicationRejected({ to: application.email, name: application.name })
+  }
 }
 
 export const acceptApplication = async (
@@ -57,6 +72,9 @@ export const acceptApplication = async (
   )
 
   if (inviteError) throw new Error(inviteError.message)
+
+  // Custom welcome email sent alongside the Supabase magic-link invite.
+  await sendApplicationApproved({ to: application.email, name: application.name })
 }
 
 export const inviteUserByEmail = async (

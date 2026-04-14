@@ -53,6 +53,44 @@ export async function getUserLootboxes(userId: string): Promise<UserLootbox[]> {
   return data as UserLootbox[]
 }
 
+/**
+ * Count of unopened lootboxes available to a user.
+ * Used for the LOOTBOXES stat on the profile page.
+ */
+export async function getAvailableLootboxCount(userId: string): Promise<number> {
+  const supabase = await createServerSupabaseClient()
+
+  const { count, error } = await supabase
+    .from('user_lootboxes')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('status', 'available')
+
+  if (error) return 0
+  return count ?? 0
+}
+
+/**
+ * The oldest unopened lootbox for a user (FIFO open order).
+ */
+export async function getNextAvailableLootbox(
+  userId: string
+): Promise<UserLootbox | null> {
+  const supabase = await createServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('user_lootboxes')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('status', 'available')
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) return null
+  return data as UserLootbox | null
+}
+
 export async function getUserLootbox(lootboxId: string): Promise<UserLootbox | null> {
   const supabase = await createServerSupabaseClient()
 

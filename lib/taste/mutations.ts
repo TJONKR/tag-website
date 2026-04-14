@@ -1,6 +1,30 @@
 import { createServiceRoleClient } from '@lib/db'
+import { getUserEmail, sendTasteComplete, sendTasteFailed } from '@lib/email/senders'
 
 import type { ProfileStatus, VisibilityField } from './types'
+
+async function notifyBuilderProfileStatus(
+  userId: string,
+  status: 'complete' | 'error',
+  errorMessage?: string
+) {
+  const email = await getUserEmail(userId)
+  if (!email) return
+
+  const supabase = createServiceRoleClient()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('name')
+    .eq('id', userId)
+    .single()
+  const name = profile?.name ?? undefined
+
+  if (status === 'complete') {
+    await sendTasteComplete({ to: email, name })
+  } else {
+    await sendTasteFailed({ to: email, name, errorMessage })
+  }
+}
 
 interface CreateProfileInput {
   userId: string
@@ -121,6 +145,8 @@ export async function saveSkinResult(userId: string, skinUrl: string | null) {
     .eq('user_id', userId)
 
   if (error) throw new Error(error.message)
+
+  await notifyBuilderProfileStatus(userId, 'complete')
 }
 
 export async function setEvaluationError(userId: string, errorMessage: string) {
@@ -135,6 +161,8 @@ export async function setEvaluationError(userId: string, errorMessage: string) {
     .eq('user_id', userId)
 
   if (error) throw new Error(error.message)
+
+  await notifyBuilderProfileStatus(userId, 'error', errorMessage)
 }
 
 export async function updateVisibility(

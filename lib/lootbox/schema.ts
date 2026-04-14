@@ -5,6 +5,10 @@ export const openLootboxSchema = z.object({
   eventSlug: z.string().optional(),
 })
 
+export const rollLootboxSchema = z.object({
+  lootboxId: z.string().min(1, 'lootboxId is required').optional(),
+})
+
 export const chooseSkinSchema = z.object({
   lootboxId: z.string().min(1, 'lootboxId is required'),
   styleId: z.string().min(1, 'styleId is required'),

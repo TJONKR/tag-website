@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@lib/db'
+import { sendApplicationNewAdmin, sendApplicationReceived } from '@lib/email/senders'
 
 import type { JoinInput } from './schema'
 
@@ -21,4 +22,15 @@ export const insertApplication = async (data: JoinInput) => {
   if (error) {
     throw new Error(error.message)
   }
+
+  // Fire notification emails. Senders never throw, so insert success is not
+  // tied to email delivery.
+  await sendApplicationReceived({ to: data.email, name: data.name })
+  await sendApplicationNewAdmin({
+    applicantName: data.name,
+    applicantEmail: data.email,
+    building: data.building,
+    whyTag: data.whyTag,
+    referral: data.referral || null,
+  })
 }

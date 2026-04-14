@@ -94,4 +94,26 @@ test.describe('Lootbox routes', () => {
       expect(body.error).toBe('Unauthorized')
     })
   })
+
+  test.describe('POST /api/lootbox/roll', () => {
+    test('rejects unauthenticated request', async ({ request }) => {
+      const response = await request.post('/api/lootbox/roll', {
+        data: {},
+      })
+
+      expect(response.status()).toBe(401)
+      const body = await response.json()
+      expect(body.error).toBe('Unauthorized')
+    })
+
+    test('rejects unauthenticated request with explicit lootboxId', async ({
+      request,
+    }) => {
+      const response = await request.post('/api/lootbox/roll', {
+        data: { lootboxId: 'some-id' },
+      })
+
+      expect(response.status()).toBe(401)
+    })
+  })
 })

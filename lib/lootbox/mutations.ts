@@ -1,4 +1,5 @@
 import { createServiceRoleClient } from '@lib/db'
+import { getUserEmail, sendSkinComplete, sendSkinFailed } from '@lib/email/senders'
 
 import type { GenerationType, LootboxStyle, RolledCard, SkinStatus } from './types'
 
@@ -120,6 +121,14 @@ export async function updateSkinStatus(
 ) {
   const supabase = createServiceRoleClient()
 
+  // Capture prior status so we only email on transitions into complete/error,
+  // not on idempotent re-writes.
+  const { data: prior } = await supabase
+    .from('user_skins')
+    .select('status, user_id')
+    .eq('id', skinId)
+    .single()
+
   const { error } = await supabase
     .from('user_skins')
     .update({
@@ -130,6 +139,40 @@ export async function updateSkinStatus(
     .eq('id', skinId)
 
   if (error) throw new Error(error.message)
+
+  if (!prior || prior.status === status) return
+  if (status !== 'complete' && status !== 'error') return
+
+  const userId = prior.user_id as string
+  const email = await getUserEmail(userId)
+  if (!email) return
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('name')
+    .eq('id', userId)
+    .single()
+  const name = profile?.name ?? undefined
+
+  if (status === 'complete') {
+    // Fetch style name + rarity for a friendlier email.
+    const { data: skin } = await supabase
+      .from('user_skins')
+      .select('rarity, style_id, image_url, lootbox_styles(name)')
+      .eq('id', skinId)
+      .single()
+
+    const styleName = (skin?.lootbox_styles as { name?: string } | null)?.name
+    await sendSkinComplete({
+      to: email,
+      name,
+      skinName: styleName,
+      rarity: skin?.rarity as string | undefined,
+      imageUrl: (skin?.image_url as string | undefined) ?? imageUrl,
+    })
+  } else {
+    await sendSkinFailed({ to: email, name })
+  }
 }
 
 /**
@@ -191,6 +234,56 @@ export async function equipSkin(userId: string, skinId: string) {
     .eq('status', 'complete')
 
   if (error) throw new Error(error.message)
+}
+
+/**
+ * Roll cards lazily for an existing (already-granted) lootbox.
+ * Used for check-in lootboxes that are created without cards by the DB trigger.
+ * Pulls from ALL styles in the system (global + every event's pool).
+ */
+export async function rollLootboxCards(userId: string, lootboxId: string) {
+  const supabase = createServiceRoleClient()
+
+  // Verify ownership + state
+  const { data: lootbox, error: lbError } = await supabase
+    .from('user_lootboxes')
+    .select('id, cards, status')
+    .eq('id', lootboxId)
+    .eq('user_id', userId)
+    .single()
+
+  if (lbError || !lootbox) {
+    throw new Error('Lootbox not found')
+  }
+
+  if (lootbox.status !== 'available') {
+    throw new Error('Lootbox already opened')
+  }
+
+  // Idempotent: if cards already rolled, return them
+  if (lootbox.cards && Array.isArray(lootbox.cards) && lootbox.cards.length > 0) {
+    return { lootboxId: lootbox.id, cards: lootbox.cards as RolledCard[] }
+  }
+
+  // Pull from ALL styles (global + every event)
+  const { data: styles, error: stylesError } = await supabase
+    .from('lootbox_styles')
+    .select('*')
+
+  if (stylesError || !styles?.length) {
+    throw new Error('No styles available')
+  }
+
+  const cards = rollCards(styles as LootboxStyle[], 4)
+
+  const { error: updateError } = await supabase
+    .from('user_lootboxes')
+    .update({ cards })
+    .eq('id', lootboxId)
+
+  if (updateError) throw new Error(updateError.message)
+
+  return { lootboxId: lootbox.id, cards }
 }
 
 export async function grantLootbox(userId: string, eventSlug: string) {

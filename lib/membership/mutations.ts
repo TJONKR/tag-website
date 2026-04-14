@@ -1,6 +1,12 @@
 import Stripe from 'stripe'
 
 import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
+import {
+  getUserEmail,
+  sendClaimApproved,
+  sendClaimRejected,
+  sendClaimRevoked,
+} from '@lib/email/senders'
 
 const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -160,6 +166,7 @@ export async function reviewAiAmClaim(
   if (updateError) throw new Error(updateError.message)
 
   // Role flip — promote on approved, demote on revoked
+  let keptBuilderViaStripe = false
   if (status === 'approved') {
     const { error: roleError } = await supabase
       .from('profiles')
@@ -181,6 +188,28 @@ export async function reviewAiAmClaim(
         .update({ role: 'ambassador' })
         .eq('id', claim.user_id)
       if (roleError) throw new Error(roleError.message)
+    } else {
+      keptBuilderViaStripe = true
+    }
+  }
+
+  // Notify the claimant. Resolve email + name outside the success path so we
+  // don't block on email delivery for the role flip.
+  const email = await getUserEmail(claim.user_id)
+  if (email) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name')
+      .eq('id', claim.user_id)
+      .single()
+    const name = profile?.name ?? undefined
+
+    if (status === 'approved') {
+      await sendClaimApproved({ to: email, name })
+    } else if (status === 'rejected') {
+      await sendClaimRejected({ to: email, name, notes })
+    } else if (status === 'revoked') {
+      await sendClaimRevoked({ to: email, name, notes, keptBuilderViaStripe })
     }
   }
 }

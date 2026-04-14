@@ -22,7 +22,12 @@ import { getBuilderProfile } from '@lib/taste/queries'
 import { LootboxProgress } from '@lib/portal/components/lootbox-progress'
 import { ProfileEventTimeline } from '@lib/events/components'
 import { getUserPhotos } from '@lib/photos/queries'
-import { getEquippedSkin, getUserSkins, getPendingSkin } from '@lib/lootbox/queries'
+import {
+  getEquippedSkin,
+  getUserSkins,
+  getPendingSkin,
+  getAvailableLootboxCount,
+} from '@lib/lootbox/queries'
 import { LootboxOpening, SkinsCollection } from '@lib/lootbox/components'
 import { MAX_PHOTOS } from '@lib/photos/types'
 import type { UserRole } from '@lib/auth/types'
@@ -66,6 +71,7 @@ export default async function ProfilePage() {
     equippedSkin,
     userSkins,
     pendingSkin,
+    availableLootboxCount,
   ] = await Promise.all([
     getUserAttendedEvents(user.id),
     getMembershipStatus(user.id, user.role),
@@ -76,6 +82,7 @@ export default async function ProfilePage() {
     getEquippedSkin(user.id),
     getUserSkins(user.id),
     getPendingSkin(user.id),
+    getAvailableLootboxCount(user.id),
   ])
   const config = roleConfig[user.role]
   const Icon = config.icon
@@ -212,10 +219,14 @@ export default async function ProfilePage() {
               <LootboxProgress steps={lootboxSteps} />
             </FadeIn>
           )}
-          {(lootboxAllDone || pendingSkin) && !hasSkin && (
+          {/* Show opening UI when: ready for first skin, or has new lootboxes from check-ins */}
+          {(((lootboxAllDone || pendingSkin) && !hasSkin) ||
+            availableLootboxCount > 0 ||
+            pendingSkin) && (
             <FadeIn delay={225}>
               <LootboxOpening
                 hasPhotos={hasEnoughPhotos}
+                availableCount={availableLootboxCount}
                 pendingSkinId={pendingSkin?.id ?? null}
               />
             </FadeIn>
@@ -226,7 +237,7 @@ export default async function ProfilePage() {
         <div className="max-w-xl space-y-6">
           {/* Stats Strip */}
           <FadeIn delay={100}>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-lg border border-tag-border bg-tag-card p-4">
               <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
                 Events
@@ -258,6 +269,26 @@ export default async function ProfilePage() {
                 )}
               >
                 {participationRate !== null ? `${participationRate}%` : '--'}
+              </p>
+            </div>
+            <div
+              className={cn(
+                'rounded-lg border bg-tag-card p-4 transition-colors',
+                availableLootboxCount > 0
+                  ? 'border-tag-orange/40 shadow-[0_0_20px_rgba(255,95,31,0.1)]'
+                  : 'border-tag-border'
+              )}
+            >
+              <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
+                Lootboxes
+              </span>
+              <p
+                className={cn(
+                  'mt-1 font-syne text-2xl font-bold',
+                  availableLootboxCount > 0 ? 'text-tag-orange' : 'text-tag-dim'
+                )}
+              >
+                {availableLootboxCount}
               </p>
             </div>
           </div>

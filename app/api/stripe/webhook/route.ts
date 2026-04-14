@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
+import { createServiceRoleClient } from '@lib/db'
+import {
+  getUserEmail,
+  sendPaymentFailed,
+  sendSubscriptionActive,
+  sendSubscriptionCancelled,
+} from '@lib/email/senders'
 import {
   upsertSubscriptionFromWebhook,
   updateProfileRoleFromWebhook,
@@ -39,14 +46,22 @@ export async function POST(req: Request) {
             session.subscription as string
           )
           await handleSubscriptionChange(subscription)
+          // New subscription → welcome to Builder email
+          await notifySubscriptionActive(subscription)
         }
         break
       }
 
-      case 'customer.subscription.updated':
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription
+        await handleSubscriptionChange(subscription)
+        break
+      }
+
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         await handleSubscriptionChange(subscription)
+        await notifySubscriptionCancelled(subscription)
         break
       }
 
@@ -56,6 +71,7 @@ export async function POST(req: Request) {
         if (subId && typeof subId === 'string') {
           const subscription = await getStripe().subscriptions.retrieve(subId)
           await handleSubscriptionChange(subscription)
+          await notifyPaymentFailed(subscription, invoice)
         }
         break
       }
@@ -107,4 +123,69 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   } else if (status === 'canceled' || status === 'unpaid') {
     await updateProfileRoleFromWebhook(userId, 'ambassador')
   }
+}
+
+async function resolveRecipient(
+  userId: string
+): Promise<{ email: string; name?: string } | null> {
+  const email = await getUserEmail(userId)
+  if (!email) return null
+
+  try {
+    const client = createServiceRoleClient()
+    const { data } = await client
+      .from('profiles')
+      .select('name')
+      .eq('id', userId)
+      .single()
+    return { email, name: data?.name ?? undefined }
+  } catch {
+    return { email }
+  }
+}
+
+async function notifySubscriptionActive(subscription: Stripe.Subscription) {
+  const userId = subscription.metadata.supabase_user_id
+  if (!userId || subscription.status !== 'active') return
+  const recipient = await resolveRecipient(userId)
+  if (!recipient) return
+  await sendSubscriptionActive({ to: recipient.email, name: recipient.name })
+}
+
+async function notifySubscriptionCancelled(subscription: Stripe.Subscription) {
+  const userId = subscription.metadata.supabase_user_id
+  if (!userId) return
+  const recipient = await resolveRecipient(userId)
+  if (!recipient) return
+
+  const endTs = subscription.cancel_at ?? subscription.canceled_at
+  const endsOn = endTs
+    ? new Date(endTs * 1000).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : undefined
+
+  await sendSubscriptionCancelled({ to: recipient.email, name: recipient.name, endsOn })
+}
+
+async function notifyPaymentFailed(
+  subscription: Stripe.Subscription,
+  invoice: Stripe.Invoice
+) {
+  const userId = subscription.metadata.supabase_user_id
+  if (!userId) return
+  const recipient = await resolveRecipient(userId)
+  if (!recipient) return
+
+  const amountDue =
+    typeof invoice.amount_due === 'number' && invoice.currency
+      ? new Intl.NumberFormat('en-GB', {
+          style: 'currency',
+          currency: invoice.currency.toUpperCase(),
+        }).format(invoice.amount_due / 100)
+      : undefined
+
+  await sendPaymentFailed({ to: recipient.email, name: recipient.name, amountDue })
 }

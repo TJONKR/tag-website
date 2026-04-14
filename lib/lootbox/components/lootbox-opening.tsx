@@ -20,6 +20,8 @@ type ModalPhase = 'opening' | 'reveal' | 'pick'
 
 interface LootboxOpeningProps {
   hasPhotos: boolean
+  /** Number of unopened lootboxes available to roll */
+  availableCount?: number
   /** If a skin is already generating/errored from a previous session */
   pendingSkinId?: string | null
   onNeedPhotos?: () => void
@@ -27,6 +29,7 @@ interface LootboxOpeningProps {
 
 export const LootboxOpening = ({
   hasPhotos,
+  availableCount = 0,
   pendingSkinId = null,
   onNeedPhotos,
 }: LootboxOpeningProps) => {
@@ -66,10 +69,10 @@ export const LootboxOpening = ({
     setSelectedIndex(null)
 
     try {
-      const res = await fetch('/api/lootbox/open', {
+      const res = await fetch('/api/lootbox/roll', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventSlug: 'og-day-one' }),
+        body: JSON.stringify({}),
       })
 
       if (!res.ok) {
@@ -249,7 +252,11 @@ export const LootboxOpening = ({
               </motion.div>
 
               <div className="text-center">
-                <p className="font-syne text-sm font-bold text-tag-text">Lootbox ready!</p>
+                <p className="font-syne text-sm font-bold text-tag-text">
+                  {availableCount > 1
+                    ? `${availableCount} lootboxes ready!`
+                    : 'Lootbox ready!'}
+                </p>
                 {!hasPhotos && (
                   <p className="mt-1 text-xs text-amber-400">Upload 3 photos first</p>
                 )}

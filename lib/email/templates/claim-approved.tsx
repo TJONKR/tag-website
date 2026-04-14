@@ -1,0 +1,27 @@
+import { SITE_URL } from '../config'
+import { Callout, H1, P, PrimaryButton } from './_components'
+import { EmailLayout } from './_layout'
+
+interface ClaimApprovedProps {
+  name?: string
+}
+
+export const ClaimApproved = ({ name }: ClaimApprovedProps) => {
+  return (
+    <EmailLayout preview="Your AI/AM claim is approved">
+      <H1>{name ? `You're in, ${name.split(' ')[0]}` : 'Your claim is approved'}</H1>
+      <P>
+        Your AI/AM membership claim has been approved. Your TAG account has been
+        upgraded to <strong>Builder</strong>.
+      </P>
+      <Callout>
+        You now have full access to the TAG space, events, and Builder-only perks.
+      </Callout>
+      <PrimaryButton href={`${SITE_URL}/portal/profile`}>
+        Go to your profile
+      </PrimaryButton>
+    </EmailLayout>
+  )
+}
+
+export default ClaimApproved

@@ -1,4 +1,5 @@
 import { createServiceRoleClient } from '@lib/db'
+import { getUserEmail, sendLootboxUnlocked } from '@lib/email/senders'
 
 /**
  * Find a Supabase user by email, searching through paginated auth users.
@@ -41,7 +42,7 @@ export async function handleGuestWebhook(guest: {
   // Find the TAG event
   const { data: tagEvent } = await supabase
     .from('events')
-    .select('id')
+    .select('id, title')
     .eq('luma_event_id', lumaEventId)
     .single()
 
@@ -52,6 +53,16 @@ export async function handleGuestWebhook(guest: {
   if (!userId) return
 
   const checkedInAt = guest.event_tickets?.[0]?.checked_in_at ?? null
+
+  // Detect first-time check-in so we only send the lootbox email once.
+  const { data: prior } = await supabase
+    .from('event_attendance')
+    .select('checked_in_at')
+    .eq('event_id', tagEvent.id)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  const becameCheckedIn = Boolean(checkedInAt) && !prior?.checked_in_at
 
   await supabase.from('event_attendance').upsert(
     {
@@ -65,6 +76,25 @@ export async function handleGuestWebhook(guest: {
     },
     { onConflict: 'event_id,user_id' }
   )
+
+  // DB trigger grants a user_lootbox when checked_in_at flips to non-null.
+  // Notify the user they've earned one.
+  if (becameCheckedIn) {
+    const email = await getUserEmail(userId)
+    if (email) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', userId)
+        .single()
+
+      await sendLootboxUnlocked({
+        to: email,
+        name: profile?.name ?? undefined,
+        eventTitle: tagEvent.title as string,
+      })
+    }
+  }
 }
 
 /**
