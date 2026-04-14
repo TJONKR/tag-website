@@ -6,44 +6,13 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Handle Supabase auth code on root (password recovery PKCE flow)
+  // Pass the code to /reset-password for client-side exchange
   if (pathname === '/' && request.nextUrl.searchParams.get('code')) {
     const code = request.nextUrl.searchParams.get('code')!
-    const redirectUrl = `${request.nextUrl.origin}/reset-password`
-    const response = NextResponse.redirect(redirectUrl)
-
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(
-            cookiesToSet: {
-              name: string
-              value: string
-              options: CookieOptions
-            }[]
-          ) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options)
-            })
-          },
-        },
-      }
-    )
-
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-
-    if (!error) {
-      return response
-    }
-
-    // Exchange failed — send to forgot-password
-    return NextResponse.redirect(
-      `${request.nextUrl.origin}/forgot-password?error=invalid_link`
-    )
+    const url = request.nextUrl.clone()
+    url.pathname = '/reset-password'
+    url.search = `?code=${code}`
+    return NextResponse.redirect(url)
   }
 
   let supabaseResponse = NextResponse.next({ request })
