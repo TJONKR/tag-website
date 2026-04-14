@@ -42,7 +42,7 @@ export default function ResetPasswordPage() {
     } else {
       toast({
         type: 'error',
-        description: 'Something went wrong. Please try again.',
+        description: result.error ?? 'Something went wrong. Please try again.',
       })
     }
   }

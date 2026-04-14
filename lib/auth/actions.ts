@@ -171,26 +171,27 @@ export async function forgotPassword(
 
 export async function resetPassword(
   password: string
-): Promise<{ status: 'success' | 'failed' }> {
+): Promise<{ status: 'success' | 'failed'; error?: string }> {
   try {
     const supabase = await createServerSupabaseClient()
 
     const {
       data: { user },
     } = await supabase.auth.getUser()
-    console.log('[resetPassword] user:', user?.id ?? 'NO SESSION')
+
+    if (!user) {
+      return { status: 'failed', error: 'No active session. Please request a new reset link.' }
+    }
 
     const { error } = await supabase.auth.updateUser({ password })
 
     if (error) {
-      console.error('[resetPassword] error:', error.message)
-      throw error
+      return { status: 'failed', error: error.message }
     }
 
     return { status: 'success' }
-  } catch (err) {
-    console.error('[resetPassword] caught:', err)
-    return { status: 'failed' }
+  } catch {
+    return { status: 'failed', error: 'Unexpected error' }
   }
 }
 
