@@ -151,50 +151,6 @@ export async function register(
   }
 }
 
-export async function forgotPassword(
-  email: string
-): Promise<{ status: 'success' | 'failed' }> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/auth/confirm?next=/reset-password`,
-    })
-
-    if (error) throw error
-
-    return { status: 'success' }
-  } catch {
-    return { status: 'failed' }
-  }
-}
-
-export async function resetPassword(
-  password: string
-): Promise<{ status: 'success' | 'failed'; error?: string }> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return { status: 'failed', error: 'No active session. Please request a new reset link.' }
-    }
-
-    const { error } = await supabase.auth.updateUser({ password })
-
-    if (error) {
-      return { status: 'failed', error: error.message }
-    }
-
-    return { status: 'success' }
-  } catch {
-    return { status: 'failed', error: 'Unexpected error' }
-  }
-}
-
 export async function updateName(
   name: string
 ): Promise<{ status: 'success' | 'failed' }> {

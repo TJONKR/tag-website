@@ -70,5 +70,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/portal/:path*', '/login', '/register', '/join', '/forgot-password', '/reset-password'],
+  matcher: ['/portal/:path*', '/login', '/register', '/join'],
 }

@@ -35,23 +35,15 @@ export default function LoginPage() {
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
-          <div className="mt-4 flex flex-col items-center gap-2 text-sm text-tag-muted">
+          <p className="mt-4 text-center text-sm text-tag-muted">
+            {"Don't have an account? "}
             <Link
-              href="/forgot-password"
-              className="text-tag-muted hover:text-tag-text hover:underline"
+              href="/join"
+              className="font-semibold text-tag-text hover:underline"
             >
-              Forgot password?
+              Sign up
             </Link>
-            <p>
-              {"Don't have an account? "}
-              <Link
-                href="/join"
-                className="font-semibold text-tag-text hover:underline"
-              >
-                Sign up
-              </Link>
-            </p>
-          </div>
+          </p>
         </AuthForm>
         <Suspense fallback={null}>
           <LoginRedirectEffects state={state} setIsSuccessful={setIsSuccessful} />
