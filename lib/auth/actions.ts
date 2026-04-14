@@ -175,12 +175,21 @@ export async function resetPassword(
   try {
     const supabase = await createServerSupabaseClient()
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    console.log('[resetPassword] user:', user?.id ?? 'NO SESSION')
+
     const { error } = await supabase.auth.updateUser({ password })
 
-    if (error) throw error
+    if (error) {
+      console.error('[resetPassword] error:', error.message)
+      throw error
+    }
 
     return { status: 'success' }
-  } catch {
+  } catch (err) {
+    console.error('[resetPassword] caught:', err)
     return { status: 'failed' }
   }
 }
