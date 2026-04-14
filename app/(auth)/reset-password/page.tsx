@@ -1,51 +1,18 @@
 'use client'
 
 import Form from 'next/form'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 import { toast } from '@components/toast'
 import { Input } from '@components/ui/input'
 import { Label } from '@components/ui/label'
 import { SubmitButton } from '@lib/auth/components/submit-button'
-import { createBrowserSupabaseClient } from '@lib/db/client'
+import { resetPassword } from '@lib/auth/actions'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [isSuccessful, setIsSuccessful] = useState(false)
-  const [isReady, setIsReady] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  // Exchange the auth code for a session on mount
-  useEffect(() => {
-    const code = searchParams.get('code')
-
-    if (!code) {
-      // No code — user might already have a session (direct visit)
-      setIsReady(true)
-      return
-    }
-
-    const exchangeCode = async () => {
-      const supabase = createBrowserSupabaseClient()
-      const { error } = await supabase.auth.exchangeCodeForSession(code)
-
-      if (error) {
-        setError('Reset link is invalid or has expired. Please request a new one.')
-        toast({
-          type: 'error',
-          description: 'Reset link is invalid or has expired.',
-        })
-      } else {
-        setIsReady(true)
-        // Clean the code from the URL
-        router.replace('/reset-password')
-      }
-    }
-
-    exchangeCode()
-  }, [searchParams, router])
 
   const handleSubmit = async (formData: FormData) => {
     const password = formData.get('password') as string
@@ -61,15 +28,9 @@ export default function ResetPasswordPage() {
       return
     }
 
-    const supabase = createBrowserSupabaseClient()
-    const { error } = await supabase.auth.updateUser({ password })
+    const result = await resetPassword(password)
 
-    if (error) {
-      toast({
-        type: 'error',
-        description: error.message,
-      })
-    } else {
+    if (result.status === 'success') {
       setIsSuccessful(true)
       toast({
         type: 'success',
@@ -78,32 +39,12 @@ export default function ResetPasswordPage() {
       setTimeout(() => {
         router.push('/login')
       }, 1500)
+    } else {
+      toast({
+        type: 'error',
+        description: result.error ?? 'Something went wrong. Please try again.',
+      })
     }
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-tag-bg p-6">
-        <div className="flex w-full max-w-md flex-col gap-6 text-center">
-          <h3 className="text-xl font-semibold text-tag-text">Link Expired</h3>
-          <p className="text-sm text-tag-muted">{error}</p>
-          <a
-            href="/forgot-password"
-            className="text-sm font-semibold text-tag-text hover:underline"
-          >
-            Request a new reset link
-          </a>
-        </div>
-      </div>
-    )
-  }
-
-  if (!isReady) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-tag-bg p-6">
-        <p className="text-sm text-tag-muted">Verifying reset link...</p>
-      </div>
-    )
   }
 
   return (

@@ -5,15 +5,6 @@ import type { NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
-  // Handle Supabase auth code on root (password recovery PKCE flow)
-  // Pass the code to /reset-password for client-side exchange
-  if (pathname === '/' && request.nextUrl.searchParams.get('code')) {
-    const code = request.nextUrl.searchParams.get('code')!
-    const url = request.nextUrl.clone()
-    url.pathname = '/reset-password'
-    url.search = `?code=${code}`
-    return NextResponse.redirect(url)
-  }
 
   let supabaseResponse = NextResponse.next({ request })
 
@@ -79,5 +70,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/portal/:path*', '/login', '/register', '/join', '/forgot-password', '/reset-password'],
+  matcher: ['/portal/:path*', '/login', '/register', '/join', '/forgot-password', '/reset-password'],
 }
