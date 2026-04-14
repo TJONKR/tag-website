@@ -2,7 +2,8 @@
 
 import Form from 'next/form'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 import { toast } from '@components/toast'
 import { Input } from '@components/ui/input'
@@ -11,7 +12,18 @@ import { SubmitButton } from '@lib/auth/components/submit-button'
 import { forgotPassword } from '@lib/auth/actions'
 
 export default function ForgotPasswordPage() {
+  const searchParams = useSearchParams()
   const [isSuccessful, setIsSuccessful] = useState(false)
+
+  useEffect(() => {
+    const error = searchParams.get('error')
+    if (error === 'invalid_link') {
+      toast({
+        type: 'error',
+        description: 'Reset link is invalid or has expired. Please request a new one.',
+      })
+    }
+  }, [searchParams])
 
   const handleSubmit = async (formData: FormData) => {
     const email = formData.get('email') as string

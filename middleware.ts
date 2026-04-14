@@ -34,6 +34,14 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname
 
+  // Handle Supabase auth errors redirected to root (e.g. expired reset links)
+  if (pathname === '/' && request.nextUrl.searchParams.get('error_code') === 'otp_expired') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/forgot-password'
+    url.search = '?error=invalid_link'
+    return NextResponse.redirect(url)
+  }
+
   // Protected routes — redirect to login if not authenticated
   if (!user && pathname.startsWith('/portal')) {
     const url = request.nextUrl.clone()
@@ -69,5 +77,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/portal/:path*', '/login', '/register', '/join', '/forgot-password', '/reset-password', '/auth/callback'],
+  matcher: ['/', '/portal/:path*', '/login', '/register', '/join', '/forgot-password', '/reset-password', '/auth/callback'],
 }

@@ -16,6 +16,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // If something went wrong, send to login with an error hint
-  return NextResponse.redirect(`${origin}/login`)
+  // If something went wrong, send to forgot-password with an error hint
+  return NextResponse.redirect(`${origin}/forgot-password?error=invalid_link`)
 }
