@@ -40,13 +40,19 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      console.log('[auth/callback] session established for:', data.user?.id)
       return response
     }
 
-    console.error('[auth/callback] exchangeCodeForSession failed:', error.message)
+    // Show exchange error in browser for debugging
+    const debugUrl = new URL(`${origin}/forgot-password`)
+    debugUrl.searchParams.set('error', 'exchange_failed')
+    debugUrl.searchParams.set('detail', error.message)
+    return NextResponse.redirect(debugUrl.toString())
   }
 
-  // If something went wrong, send to forgot-password with an error hint
-  return NextResponse.redirect(`${origin}/forgot-password?error=invalid_link`)
+  const cookieNames = request.cookies.getAll().map((c) => c.name).join(', ')
+  const debugUrl = new URL(`${origin}/forgot-password`)
+  debugUrl.searchParams.set('error', code ? 'exchange_not_reached' : 'no_code')
+  debugUrl.searchParams.set('cookies', cookieNames)
+  return NextResponse.redirect(debugUrl.toString())
 }
