@@ -34,6 +34,14 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname
 
+  // Handle Supabase auth codes landing on root (recovery, email verify, etc.)
+  if (pathname === '/' && request.nextUrl.searchParams.get('code')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/callback'
+    url.searchParams.set('next', '/reset-password')
+    return NextResponse.redirect(url)
+  }
+
   // Handle Supabase auth errors redirected to root (e.g. expired reset links)
   if (pathname === '/' && request.nextUrl.searchParams.get('error_code') === 'otp_expired') {
     const url = request.nextUrl.clone()
