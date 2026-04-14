@@ -1,13 +1,15 @@
+import { type EmailOtpType } from '@supabase/supabase-js'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type') as EmailOtpType | null
   const next = searchParams.get('next') ?? '/portal'
 
-  if (code) {
+  if (token_hash && type) {
     const redirectUrl = `${origin}${next}`
     const response = NextResponse.redirect(redirectUrl)
 
@@ -34,12 +36,12 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.verifyOtp({ type, token_hash })
 
     if (!error) {
       return response
     }
   }
 
-  return NextResponse.redirect(`${origin}/login`)
+  return NextResponse.redirect(`${origin}/forgot-password?error=invalid_link`)
 }
