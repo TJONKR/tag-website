@@ -29,7 +29,14 @@ export const AvatarWizard = ({ initialPhotos, photoUrls }: AvatarWizardProps) =>
 
   // Transition to result when generation completes
   if (job?.status === 'complete' && step === 'generating') {
-    setStep('result')
+    if (job.image_url) {
+      setStep('result')
+      toast.success('Avatar generated!')
+    } else {
+      toast.error('Avatar generation completed but no image was returned. Please try again.')
+      setStep('photos')
+      setJobId(null)
+    }
   }
 
   if (job?.status === 'error' && step === 'generating') {
