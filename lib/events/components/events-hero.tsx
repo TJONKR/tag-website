@@ -9,12 +9,14 @@ export const EventsHero = () => {
       <div className="absolute inset-0 bg-tag-bg/70" />
 
       <div className="relative z-10 px-[60px] py-24 max-md:px-8">
-        <h1 className="font-syne text-[clamp(64px,10vw,120px)] leading-none text-tag-text">
-          EVENTS
-        </h1>
-        <p className="mt-6 max-w-[500px] font-grotesk text-lg text-tag-muted">
-          TAG Night demos. Hackathons. Build sprints. The energy, made weekly.
-        </p>
+        <div className="mx-auto max-w-[1440px]">
+          <h1 className="font-syne text-[clamp(64px,10vw,120px)] leading-none text-tag-text">
+            EVENTS
+          </h1>
+          <p className="mt-6 max-w-[500px] font-grotesk text-lg text-tag-muted">
+            TAG Night demos. Hackathons. Build sprints. The energy, made weekly.
+          </p>
+        </div>
       </div>
     </section>
   )

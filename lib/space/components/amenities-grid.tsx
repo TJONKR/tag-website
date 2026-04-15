@@ -27,6 +27,7 @@ const iconMap: Record<string, LucideIcon> = {
 export const AmenitiesGrid = () => {
   return (
     <section className="px-[60px] py-24 max-md:px-8">
+      <div className="mx-auto max-w-[1440px]">
       <h2 className="mb-12 font-mono text-sm uppercase tracking-[0.08em] text-tag-muted">
         What you get
       </h2>
@@ -44,6 +45,7 @@ export const AmenitiesGrid = () => {
             </div>
           )
         })}
+      </div>
       </div>
     </section>
   )

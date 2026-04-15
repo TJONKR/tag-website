@@ -12,7 +12,7 @@ export const EventRow = ({ event, muted = false }: EventRowProps) => {
   return (
     <div
       className={cn(
-        'flex flex-col gap-2 border-l-0 border-t border-l-transparent border-t-tag-border px-[60px] py-4 transition-all duration-300 hover:border-l-[3px] hover:border-l-tag-orange max-md:px-8',
+        'group relative flex flex-col gap-2 border-t border-t-tag-border py-4',
         muted && 'opacity-50'
       )}
     >
@@ -30,6 +30,7 @@ export const EventRow = ({ event, muted = false }: EventRowProps) => {
       <div className="font-mono text-[11px] uppercase text-tag-muted">
         {event.type}
       </div>
+      <div className="pointer-events-none absolute bottom-0 left-0 w-full origin-bottom scale-y-0 border-b-2 border-tag-orange transition-transform duration-300 group-hover:h-full group-hover:scale-y-100" />
     </div>
   )
 }

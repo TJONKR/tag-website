@@ -287,9 +287,9 @@ export const PortalEventList = ({
         ) : (
           <div className="flex flex-col items-center px-4 py-12 text-center">
             <CalendarX className="size-8 text-tag-dim" />
-            <p className="mt-3 font-syne text-lg font-bold text-tag-text">No upcoming events</p>
+            <p className="mt-3 font-syne text-lg font-bold text-tag-text">Nothing announced yet</p>
             <p className="mt-1 text-sm text-tag-muted">
-              There are no events scheduled yet. Check back soon or browse past events below.
+              New events are in the works. Check back soon or browse past events below.
             </p>
           </div>
         )}

@@ -6,6 +6,7 @@ import { pricingTiers } from '@lib/space/data'
 export const PricingTiers = () => {
   return (
     <section className="border-t border-tag-border px-[60px] py-24 max-md:px-8">
+      <div className="mx-auto max-w-[1440px]">
       <h2 className="mb-12 font-mono text-sm uppercase tracking-[0.08em] text-tag-muted">
         Pricing
       </h2>
@@ -46,6 +47,7 @@ export const PricingTiers = () => {
             </Link>
           </div>
         ))}
+      </div>
       </div>
     </section>
   )

@@ -79,11 +79,13 @@ export const JoinForm = () => {
   if (submitted) {
     return (
       <section className="px-[60px] pb-32 max-md:px-8">
+        <div className="mx-auto max-w-[1440px]">
         <div className="max-w-[600px]">
           <h2 className="font-syne text-3xl font-bold text-tag-text">You&apos;re in the queue.</h2>
           <p className="mt-4 font-grotesk text-lg text-tag-muted">
             We read every application. If the energy fits, we&apos;ll reach out.
           </p>
+        </div>
         </div>
       </section>
     )
@@ -91,6 +93,7 @@ export const JoinForm = () => {
 
   return (
     <section className="px-[60px] pb-32 max-md:px-8">
+      <div className="mx-auto max-w-[1440px]">
       <form onSubmit={handleSubmit} className="max-w-[600px] space-y-8">
         {/* Name */}
         <div className="space-y-2">
@@ -275,6 +278,7 @@ export const JoinForm = () => {
           We read every application. If the energy fits, we&apos;ll reach out.
         </p>
       </form>
+      </div>
     </section>
   )
 }

@@ -4,6 +4,7 @@ import { partners } from '@lib/ecosystem/data'
 export const PartnerGrid = () => {
   return (
     <section className="px-[60px] py-24 max-md:px-8">
+      <div className="mx-auto max-w-[1440px]">
       <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">
         {partners.map((partner) => (
           <div
@@ -52,6 +53,7 @@ export const PartnerGrid = () => {
         >
           Get in touch &rarr;
         </a>
+      </div>
       </div>
     </section>
   )

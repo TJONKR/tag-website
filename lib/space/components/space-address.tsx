@@ -3,6 +3,7 @@ import { MapPin, ExternalLink } from 'lucide-react'
 export const SpaceAddress = () => {
   return (
     <section className="border-t border-tag-border px-[60px] py-24 max-md:px-8">
+      <div className="mx-auto max-w-[1440px]">
       <h2 className="mb-12 font-mono text-sm uppercase tracking-[0.08em] text-tag-muted">
         Location
       </h2>
@@ -27,6 +28,7 @@ export const SpaceAddress = () => {
           Open in Maps
           <ExternalLink className="size-3" />
         </a>
+      </div>
       </div>
     </section>
   )

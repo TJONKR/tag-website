@@ -11,26 +11,31 @@ export const Footer = () => {
   return (
     <footer className="border-t-[3px] border-tag-border bg-tag-bg-deep">
       {/* Row 1: Logo + Year */}
-      <div className="flex items-center justify-between px-[60px] py-6 max-md:px-8">
-        <div className="font-syne text-xl text-tag-text">TAG</div>
-        <div className="font-mono text-[11px] text-tag-dim">2026</div>
+      <div className="px-[60px] py-6 max-md:px-8">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between">
+          <div className="font-syne text-xl text-tag-text">TAG</div>
+          <div className="font-mono text-[11px] text-tag-dim">2026</div>
+        </div>
       </div>
 
       {/* Row 2: Nav links */}
-      <div className="flex items-center gap-6 border-t border-tag-border px-[60px] py-4 max-md:px-8">
-        {footerLinks.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="font-mono text-[11px] uppercase tracking-[0.08em] text-tag-dim transition-colors hover:text-tag-text"
-          >
-            {link.label}
-          </Link>
-        ))}
+      <div className="border-t border-tag-border px-[60px] py-4 max-md:px-8">
+        <div className="mx-auto flex max-w-[1440px] items-center gap-6">
+          {footerLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="font-mono text-[11px] uppercase tracking-[0.08em] text-tag-dim transition-colors hover:text-tag-text"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Row 3: Socials + Location */}
-      <div className="flex items-center justify-between border-t border-tag-border px-[60px] py-4 max-md:px-8">
+      <div className="border-t border-tag-border px-[60px] py-4 max-md:px-8">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between">
         <div className="flex gap-2">
           {/* X (Twitter) */}
           <a
@@ -64,6 +69,7 @@ export const Footer = () => {
         >
           Jacob Bontiusplaats 9, 1018 LL Amsterdam
         </a>
+        </div>
       </div>
     </footer>
   )
