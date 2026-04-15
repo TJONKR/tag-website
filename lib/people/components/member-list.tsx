@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import Image from 'next/image'
-import { Search, Loader2, Trash2 } from 'lucide-react'
+import { ExternalLink, Search, Loader2, Trash2 } from 'lucide-react'
 
 import {
   AlertDialog,
@@ -356,7 +356,20 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
                   Joined {new Date(selected.created_at).toLocaleDateString()}
                 </p>
 
-                <div className="border-t border-tag-border pt-4">
+                <div className="flex items-center gap-2 border-t border-tag-border pt-4">
+                  {selected.name && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 border-tag-border text-tag-text hover:border-tag-orange hover:text-tag-orange"
+                      onClick={() => {
+                        window.open(`/profile/${slugifyName(selected.name!)}`, '_blank')
+                      }}
+                    >
+                      <ExternalLink className="size-4" />
+                      View profile
+                    </Button>
+                  )}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button

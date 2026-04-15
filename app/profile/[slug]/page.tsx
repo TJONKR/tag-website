@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
   ArrowLeft,
-  Calendar,
   Github,
   Globe,
   Instagram,
@@ -125,7 +124,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       />
 
       <div className="px-[60px] py-16 max-md:px-8">
-        <div className="mx-auto max-w-[1440px]">
+        <div className="mx-auto max-w-2xl">
           <Link
             href="/"
             className="inline-flex items-center gap-2 font-grotesk text-sm text-tag-muted transition-colors hover:text-tag-orange"
@@ -137,7 +136,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <article className="mt-12">
             {/* Header: Avatar + Info */}
             <header className="flex items-start gap-8 max-md:flex-col">
-              <div className="relative size-32 shrink-0 overflow-hidden rounded-lg border border-tag-border bg-tag-card max-md:size-24">
+              <div className="relative size-32 shrink-0 overflow-hidden rounded-full border border-tag-border bg-tag-card max-md:size-24">
                 {profile.avatar_url ? (
                   <Image
                     src={profile.avatar_url}
@@ -229,17 +228,16 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.08em] text-tag-muted">
                     Events attended
                   </h2>
-                  <div className="space-y-2">
+                  <div>
                     {events.map((event) => (
                       <div
                         key={event.id}
-                        className="flex items-center gap-3 rounded-lg border border-tag-border px-4 py-3"
+                        className="flex flex-col gap-1 border-t border-t-tag-border py-3"
                       >
-                        <Calendar className="size-4 shrink-0 text-tag-orange" />
-                        <span className="font-mono text-sm font-bold text-tag-orange">
+                        <div className="font-mono text-sm font-bold text-tag-orange">
                           {formatDateDisplay(event.date_iso)}
-                        </span>
-                        <span className="text-sm text-tag-text">
+                        </div>
+                        <span className="font-syne text-base text-tag-text">
                           {event.title}
                         </span>
                       </div>
