@@ -144,16 +144,19 @@ export const PhotoUpload = ({ initialPhotos, photoUrls, context = 'lootbox' }: P
                 </div>
               )}
 
-              {/* Delete overlay */}
+              {/* Delete button */}
               <button
-                onClick={() => handleDelete(photo.id)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDelete(photo.id)
+                }}
                 disabled={deletingId === photo.id}
-                className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100"
+                className="absolute right-1 top-1 flex size-6 items-center justify-center rounded-full bg-black/70 opacity-0 transition-opacity hover:bg-red-600 group-hover:opacity-100"
               >
                 {deletingId === photo.id ? (
-                  <Loader2 className="size-5 animate-spin text-white" />
+                  <Loader2 className="size-3 animate-spin text-white" />
                 ) : (
-                  <Trash2 className="size-5 text-white" />
+                  <Trash2 className="size-3 text-white" />
                 )}
               </button>
             </div>
