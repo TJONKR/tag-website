@@ -25,7 +25,7 @@ export const AvatarWizard = ({ initialPhotos, photoUrls }: AvatarWizardProps) =>
   const [jobId, setJobId] = useState<string | null>(null)
   const [generating, setGenerating] = useState(false)
 
-  const { job } = useAvatarStatus({ jobId: step === 'generating' ? jobId : null })
+  const { job } = useAvatarStatus({ jobId: step === 'generating' || step === 'result' ? jobId : null })
 
   // Transition to result when generation completes
   if (job?.status === 'complete' && step === 'generating') {
