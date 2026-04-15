@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ExternalLink, Pencil, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react'
+import { CalendarX, ExternalLink, Pencil, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { toast } from '@components/toast'
@@ -58,23 +58,20 @@ const PortalEventRow = ({
   return (
     <div
       className={cn(
-        'flex items-center border-t border-tag-border px-4 py-4 transition-all duration-300 hover:translate-x-1 hover:border-l-2 hover:border-l-tag-orange max-md:flex-wrap max-md:gap-1',
+        'flex flex-col gap-2 border-t border-tag-border px-4 py-4 transition-all duration-300 hover:border-l-2 hover:border-l-tag-orange',
         muted && 'opacity-50'
       )}
     >
       <div
         className={cn(
-          'w-20 shrink-0 font-mono text-sm font-bold',
+          'font-mono text-sm font-bold',
           muted ? 'text-tag-dim' : 'text-tag-orange'
         )}
       >
         {formatDateDisplay(event.date_iso)}
       </div>
-      <div className="flex flex-1 flex-col gap-0.5">
-        <span className="font-syne text-lg text-tag-text">{event.title}</span>
-        <span className="text-sm text-tag-muted">{event.description}</span>
-      </div>
-      <div className="flex shrink-0 items-center gap-2 max-md:w-auto max-md:text-left md:w-36 md:justify-end">
+      <span className="font-syne text-base text-tag-text">{event.title}</span>
+      <div className="flex items-center gap-2">
         {muted && attendanceSummary && attendanceSummary.total > 0 && (
           <span className="font-mono text-sm text-tag-muted">
             {attendanceSummary.checkedIn}/{attendanceSummary.total} checked in
@@ -88,55 +85,55 @@ const PortalEventRow = ({
         <span className="font-mono text-xs uppercase tracking-wider text-tag-dim">
           {event.type}
         </span>
-      </div>
-      {isAdmin && (
-        <div className="ml-3 flex shrink-0 items-center gap-1">
-          {event.luma_url && (
-            <a
-              href={event.luma_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-orange"
-              aria-label="Open on Luma"
-            >
-              <ExternalLink className="size-3.5" />
-            </a>
-          )}
-          {muted && (
-            <AttendanceDialog
-              eventId={event.id}
-              eventTitle={event.title}
-              isLumaLinked={!!event.luma_event_id}
+        {isAdmin && (
+          <>
+            {event.luma_url && (
+              <a
+                href={event.luma_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-orange"
+                aria-label="Open on Luma"
+              >
+                <ExternalLink className="size-3.5" />
+              </a>
+            )}
+            {muted && (
+              <AttendanceDialog
+                eventId={event.id}
+                eventTitle={event.title}
+                isLumaLinked={!!event.luma_event_id}
+              />
+            )}
+            <EventFormDialog
+              event={event}
+              isAdmin={isAdmin}
+              trigger={
+                <button
+                  className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
+                  aria-label="Edit event"
+                >
+                  <Pencil className="size-3.5" />
+                </button>
+              }
             />
-          )}
-          <EventFormDialog
-            event={event}
-            isAdmin={isAdmin}
-            trigger={
-              <button
-                className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
-                aria-label="Edit event"
-              >
-                <Pencil className="size-3.5" />
-              </button>
-            }
-          />
-          <ConfirmDialog
-            trigger={
-              <button
-                disabled={deleting}
-                className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-destructive"
-                aria-label="Delete event"
-              >
-                <Trash2 className="size-3.5" />
-              </button>
-            }
-            title="Delete event?"
-            description="This action cannot be undone."
-            onConfirm={handleDelete}
-          />
-        </div>
-      )}
+            <ConfirmDialog
+              trigger={
+                <button
+                  disabled={deleting}
+                  className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-destructive"
+                  aria-label="Delete event"
+                >
+                  <Trash2 className="size-3.5" />
+                </button>
+              }
+              title="Delete event?"
+              description="This action cannot be undone."
+              onConfirm={handleDelete}
+            />
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -229,7 +226,7 @@ export const PortalEventList = ({
   attendanceSummaries,
 }: PortalEventListProps) => {
   const router = useRouter()
-  const [showPast, setShowPast] = useState(false)
+  const [showPast, setShowPast] = useState(upcoming.length === 0)
   const [syncing, setSyncing] = useState(false)
 
   const handleLumaSync = async () => {
@@ -288,7 +285,13 @@ export const PortalEventList = ({
             <PortalEventRow key={event.id} event={event} isAdmin={isAdmin} attendanceSummary={attendanceSummaries?.[event.id]} />
           ))
         ) : (
-          <div className="px-4 py-8 text-center text-sm text-tag-muted">No upcoming events</div>
+          <div className="flex flex-col items-center px-4 py-12 text-center">
+            <CalendarX className="size-8 text-tag-dim" />
+            <p className="mt-3 font-syne text-lg font-bold text-tag-text">No upcoming events</p>
+            <p className="mt-1 text-sm text-tag-muted">
+              There are no events scheduled yet. Check back soon or browse past events below.
+            </p>
+          </div>
         )}
 
         {/* Past */}
