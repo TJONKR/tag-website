@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Check, Loader2, RefreshCw, ImagePlus } from 'lucide-react'
@@ -26,6 +26,16 @@ export const AvatarWizard = ({ initialPhotos, photoUrls }: AvatarWizardProps) =>
   const [generating, setGenerating] = useState(false)
 
   const { job } = useAvatarStatus({ jobId: step === 'generating' || step === 'result' ? jobId : null })
+
+  // Warn user before leaving during generation
+  useEffect(() => {
+    if (step !== 'generating') return
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [step])
 
   // Transition to result when generation completes
   if (job?.status === 'complete' && step === 'generating') {
@@ -105,7 +115,12 @@ export const AvatarWizard = ({ initialPhotos, photoUrls }: AvatarWizardProps) =>
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
-          onClick={() => router.push('/portal/profile')}
+          onClick={() => {
+            if (step === 'generating') {
+              if (!confirm('Avatar is still being generated. Are you sure you want to leave?')) return
+            }
+            router.push('/portal/profile')
+          }}
           className="flex size-8 items-center justify-center rounded-lg border border-tag-border bg-tag-card transition-colors hover:bg-tag-border/50"
         >
           <ArrowLeft className="size-4 text-tag-muted" />
