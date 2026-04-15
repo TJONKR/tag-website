@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 
-import { createServerSupabaseClient } from '@lib/db'
+import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
 
-import type { AuthUser, UserRole } from './types'
+import type { AuthUser, PublicProfile, UserRole } from './types'
 
 export async function getSession() {
   const supabase = await createServerSupabaseClient()
@@ -69,6 +69,39 @@ export async function getOptionalUser(): Promise<AuthUser | null> {
     avatar_url: profile.avatar_url,
     created_at: profile.created_at,
     is_super_admin: profile.is_super_admin,
+  }
+}
+
+export async function getPublicProfile(slug: string): Promise<PublicProfile | null> {
+  const supabase = createServiceRoleClient()
+
+  // Convert slug back to name pattern for case-insensitive matching
+  const namePattern = slug.replace(/-/g, ' ')
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select(
+      'id, name, role, avatar_url, building, why_tag, linkedin_url, twitter_url, github_url, website_url, instagram_url, created_at'
+    )
+    .ilike('name', `${namePattern}`)
+    .limit(1)
+    .maybeSingle()
+
+  if (error || !data) return null
+
+  return {
+    id: data.id,
+    name: data.name,
+    role: data.role as UserRole,
+    avatar_url: data.avatar_url,
+    building: data.building,
+    why_tag: data.why_tag,
+    linkedin_url: data.linkedin_url,
+    twitter_url: data.twitter_url,
+    github_url: data.github_url,
+    website_url: data.website_url,
+    instagram_url: data.instagram_url,
+    created_at: data.created_at,
   }
 }
 

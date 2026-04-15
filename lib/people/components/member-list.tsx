@@ -36,6 +36,7 @@ import { toast } from '@components/toast'
 
 import type { Member, MemberCounts } from '../types'
 import type { UserRole } from '@lib/auth/types'
+import { slugifyName } from '@lib/utils'
 
 interface MemberListProps {
   initialMembers: Member[]
@@ -199,13 +200,17 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {filtered.map((member) => (
+          {filtered.map((member) => {
+            const profileSlug = member.name ? slugifyName(member.name) : null
+            const profileHref = profileSlug ? `/profile/${profileSlug}` : null
+
+            return (
             <div
               key={member.id}
               className={`group flex flex-col items-center rounded-lg border border-tag-border bg-tag-card p-4 transition-all duration-300 hover:border-tag-orange/30 hover:shadow-[0_0_24px_rgba(255,95,31,0.15)] ${
-                isOperator ? 'cursor-pointer' : ''
+                isOperator || profileHref ? 'cursor-pointer' : ''
               }`}
-              onClick={isOperator ? () => setSelected(member) : undefined}
+              onClick={isOperator ? () => setSelected(member) : profileHref ? () => window.location.href = profileHref : undefined}
             >
               <button
                 type="button"
@@ -244,7 +249,8 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
                 </Badge>
               )}
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

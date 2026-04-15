@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, Check, Shield, Star } from 'lucide-react'
+import { Calendar, Check, ExternalLink, Shield, Star } from 'lucide-react'
 
-import { cn } from '@lib/utils'
+import { cn, slugifyName } from '@lib/utils'
 import { PortalHeader, FadeIn } from '@lib/portal/components'
 import { EditNameForm } from '@lib/auth/components/edit-name-form'
 import { EditProfileForm } from '@lib/auth/components/edit-profile-form'
@@ -122,7 +122,18 @@ export default async function ProfilePage() {
   return (
     <>
       <FadeIn>
-        <PortalHeader title="Profile" description="Your account and membership details." />
+        <div className="flex items-center justify-between">
+          <PortalHeader title="Profile" description="Your account and membership details." />
+          {user.name && (
+            <Link
+              href={`/profile/${slugifyName(user.name)}`}
+              className="flex items-center gap-1.5 font-mono text-xs text-tag-muted transition-colors hover:text-tag-orange"
+            >
+              View public profile
+              <ExternalLink className="size-3" />
+            </Link>
+          )}
+        </div>
       </FadeIn>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-[336px_1fr]">
