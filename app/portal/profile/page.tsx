@@ -339,7 +339,9 @@ export default async function ProfilePage() {
                 <span className="text-sm text-tag-muted">Email Address</span>
                 <p className="text-sm text-tag-text">{user.email}</p>
               </div>
-              <SignOutForm />
+              <div className="px-6 pb-5 pt-4">
+                <SignOutForm />
+              </div>
             </div>
           </div>
           </FadeIn>
