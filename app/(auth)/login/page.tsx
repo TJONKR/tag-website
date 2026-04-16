@@ -85,10 +85,26 @@ function LoginRedirectEffects({
       return
     }
 
-    if (state.status === 'failed') {
+    if (state.status === 'invalid_credentials') {
       toast({
         type: 'error',
-        description: 'Invalid credentials!',
+        description: 'Invalid email or password.',
+      })
+    } else if (state.status === 'email_not_confirmed') {
+      toast({
+        type: 'error',
+        description:
+          'Please confirm your email before signing in. Check your inbox for the confirmation link.',
+      })
+    } else if (state.status === 'rate_limited') {
+      toast({
+        type: 'error',
+        description: 'Too many attempts. Wait a minute and try again.',
+      })
+    } else if (state.status === 'failed') {
+      toast({
+        type: 'error',
+        description: state.message ?? 'Sign-in failed. Try again.',
       })
     } else if (state.status === 'invalid_data') {
       toast({

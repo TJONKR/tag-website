@@ -26,5 +26,13 @@ export interface PublicProfile {
 }
 
 export interface LoginActionState {
-  status: 'idle' | 'invalid_data' | 'failed' | 'success'
+  status:
+    | 'idle'
+    | 'invalid_data'
+    | 'invalid_credentials'
+    | 'email_not_confirmed'
+    | 'rate_limited'
+    | 'failed'
+    | 'success'
+  message?: string
 }

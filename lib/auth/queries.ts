@@ -15,23 +15,64 @@ export async function getSession() {
   return session
 }
 
-async function fetchProfile(supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>, userId: string) {
+// Lazily creates a minimal profile if one is missing. Covers the rare case
+// where the auth user exists but the handle_new_user trigger didn't produce
+// a profile row (e.g., trigger was disabled, manual auth.users insert via
+// dashboard, or hardened trigger fell through to the safety-net branch).
+async function healMissingProfile(
+  userId: string,
+  fallbackName: string | null
+): Promise<void> {
+  const service = createServiceRoleClient()
+  const { error } = await service
+    .from('profiles')
+    .insert({ id: userId, name: fallbackName, onboarding_completed: false })
+
+  if (error && !error.message.toLowerCase().includes('duplicate')) {
+    console.error('[healMissingProfile] insert failed:', error.message, 'userId:', userId)
+  }
+}
+
+async function fetchProfile(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  userId: string,
+  fallbackName: string | null = null
+) {
   const { data, error } = await supabase
     .from('profiles')
     .select('role, name, avatar_url, created_at, is_super_admin')
     .eq('id', userId)
-    .single()
+    .maybeSingle()
 
   if (error) {
     console.error('fetchProfile error:', error.message, 'userId:', userId)
   }
 
+  if (!data) {
+    console.warn('[fetchProfile] no profile for user, healing:', userId)
+    await healMissingProfile(userId, fallbackName)
+
+    const { data: healed } = await supabase
+      .from('profiles')
+      .select('role, name, avatar_url, created_at, is_super_admin')
+      .eq('id', userId)
+      .maybeSingle()
+
+    return {
+      role: (healed?.role as UserRole) ?? 'ambassador',
+      name: (healed?.name as string | null) ?? fallbackName,
+      avatar_url: (healed?.avatar_url as string | null) ?? null,
+      created_at: (healed?.created_at as string) ?? new Date().toISOString(),
+      is_super_admin: Boolean(healed?.is_super_admin),
+    }
+  }
+
   return {
-    role: (data?.role as UserRole) ?? 'ambassador',
-    name: (data?.name as string | null) ?? null,
-    avatar_url: (data?.avatar_url as string | null) ?? null,
-    created_at: (data?.created_at as string) ?? new Date().toISOString(),
-    is_super_admin: Boolean(data?.is_super_admin),
+    role: (data.role as UserRole) ?? 'ambassador',
+    name: (data.name as string | null) ?? null,
+    avatar_url: (data.avatar_url as string | null) ?? null,
+    created_at: (data.created_at as string) ?? new Date().toISOString(),
+    is_super_admin: Boolean(data.is_super_admin),
   }
 }
 
@@ -59,7 +100,8 @@ export async function getOptionalUser(): Promise<AuthUser | null> {
 
   if (!user) return null
 
-  const profile = await fetchProfile(supabase, user.id)
+  const fallbackName = (user.user_metadata?.name as string | undefined) ?? null
+  const profile = await fetchProfile(supabase, user.id, fallbackName)
 
   return {
     id: user.id,
@@ -117,7 +159,8 @@ export async function getUser(): Promise<AuthUser> {
     redirect('/login')
   }
 
-  const profile = await fetchProfile(supabase, user.id)
+  const fallbackName = (user.user_metadata?.name as string | undefined) ?? null
+  const profile = await fetchProfile(supabase, user.id, fallbackName)
 
   return {
     id: user.id,
