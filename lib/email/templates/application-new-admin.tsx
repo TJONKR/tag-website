@@ -1,6 +1,6 @@
-import { EmailLayout } from './_layout'
-import { Callout, H1, P, PrimaryButton } from './_components'
 import { SITE_URL } from '../config'
+import { Divider, H1, LabeledSection, P, PrimaryButton } from './_components'
+import { EmailLayout } from './_layout'
 
 interface ApplicationNewAdminProps {
   applicantName: string
@@ -22,22 +22,17 @@ export const ApplicationNewAdmin = ({
       <H1>New application — {applicantName}</H1>
       <P muted>{applicantEmail}</P>
 
-      <Callout>
-        <strong>What they&apos;re building:</strong>
-        <br />
-        {building}
-      </Callout>
+      <LabeledSection label="What they're building">{building}</LabeledSection>
 
-      <Callout>
-        <strong>Why TAG:</strong>
-        <br />
-        {whyTag}
-      </Callout>
+      <Divider />
+
+      <LabeledSection label="Why TAG">{whyTag}</LabeledSection>
 
       {referral ? (
-        <P muted>
-          <strong>Referred by:</strong> {referral}
-        </P>
+        <>
+          <Divider />
+          <LabeledSection label="Referred by">{referral}</LabeledSection>
+        </>
       ) : null}
 
       <PrimaryButton href={`${SITE_URL}/portal/people?tab=applications`}>

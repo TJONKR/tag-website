@@ -34,18 +34,6 @@ export async function completeOnboarding(userId: string, input: OnboardingInput)
 
   if (profileError) throw new Error(profileError.message)
 
-  // Set password if provided
-  if (input.password && input.password.length >= 6) {
-    const { error: passwordError } = await supabase.auth.updateUser({
-      password: input.password,
-    })
-
-    if (passwordError) {
-      console.error('[onboarding] Password update error:', passwordError)
-      // Don't fail the whole request — profile is already saved
-    }
-  }
-
   if (!wasCompleted) {
     const email = await getUserEmail(userId)
     if (email) {

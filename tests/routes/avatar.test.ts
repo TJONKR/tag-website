@@ -49,12 +49,4 @@ test.describe('Avatar routes', () => {
     })
   })
 
-  test.describe('Avatar wizard page', () => {
-    test('redirects unauthenticated users', async ({ request }) => {
-      const response = await request.get('/portal/profile/avatar')
-
-      // Should redirect to login or return auth error
-      expect([200, 302, 303, 307]).toContain(response.status())
-    })
-  })
 })

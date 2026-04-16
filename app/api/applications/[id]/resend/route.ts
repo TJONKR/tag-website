@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 
 import { getOptionalUser } from '@lib/auth/queries'
-import { directInviteSchema } from '@lib/applications/schema'
-import { directInviteApplication } from '@lib/applications/mutations'
+import { resendApprovalEmail } from '@lib/applications/mutations'
 
-export async function POST(req: Request) {
+export async function POST(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const user = await getOptionalUser()
 
@@ -12,14 +14,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 
-    const body = await req.json()
-    const result = directInviteSchema.safeParse(body)
-
-    if (!result.success) {
-      return NextResponse.json({ errors: result.error.issues }, { status: 400 })
-    }
-
-    await directInviteApplication(result.data.email, user.id, result.data.name)
+    const { id } = await params
+    await resendApprovalEmail(id)
 
     return NextResponse.json({ success: true })
   } catch (error) {

@@ -3,10 +3,10 @@ import { H1, P, PrimaryButton } from './_components'
 
 interface ApplicationApprovedProps {
   name: string
-  inviteUrl?: string
+  signupUrl: string
 }
 
-export const ApplicationApproved = ({ name, inviteUrl }: ApplicationApprovedProps) => {
+export const ApplicationApproved = ({ name, signupUrl }: ApplicationApprovedProps) => {
   const firstName = name.split(' ')[0]
 
   return (
@@ -17,12 +17,9 @@ export const ApplicationApproved = ({ name, inviteUrl }: ApplicationApprovedProp
         community.
       </P>
       <P>
-        You&apos;ll receive a separate email with a magic link to set up your account.
-        Once you&apos;re in, finish your onboarding and you&apos;re good to go.
+        Click below to set up your account. Use the same email you applied with.
       </P>
-      {inviteUrl ? (
-        <PrimaryButton href={inviteUrl}>Set up your account</PrimaryButton>
-      ) : null}
+      <PrimaryButton href={signupUrl}>Create your account</PrimaryButton>
       <P muted>
         See you in the space.
       </P>

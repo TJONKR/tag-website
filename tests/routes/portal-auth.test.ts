@@ -17,10 +17,11 @@ test.describe('Portal authentication', () => {
     expect(url.searchParams.get('redirect')).toBe('/portal/events')
   })
 
-  test('register page is not accessible', async ({ page }) => {
-    const response = await page.goto('/register')
+  test('/register redirects to /join (no public signup)', async ({ page }) => {
+    await page.goto('/register')
+    const url = new URL(page.url())
 
-    expect(response?.status()).toBe(404)
+    expect(url.pathname).toBe('/join')
   })
 
   test('login page is accessible', async ({ page }) => {
@@ -30,9 +31,15 @@ test.describe('Portal authentication', () => {
     await expect(page.getByRole('heading', { name: 'Sign In' })).toBeVisible()
   })
 
-  test('login page does not have register link', async ({ page }) => {
+  test('login page shows signup and apply CTAs', async ({ page }) => {
     await page.goto('/login')
 
-    await expect(page.getByRole('link', { name: 'Sign up' })).not.toBeVisible()
+    const setUp = page.getByRole('link', { name: 'Set up your account' })
+    await expect(setUp).toBeVisible()
+    await expect(setUp).toHaveAttribute('href', '/signup')
+
+    const apply = page.getByRole('link', { name: 'Apply for membership' })
+    await expect(apply).toBeVisible()
+    await expect(apply).toHaveAttribute('href', '/join')
   })
 })

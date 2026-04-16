@@ -36,12 +36,29 @@ export default function LoginPage() {
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
           <p className="mt-4 text-center text-sm text-tag-muted">
-            {"Don't have an account? "}
+            <Link
+              href="/forgot-password"
+              className="font-semibold text-tag-text hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </p>
+          <p className="text-center text-sm text-tag-muted">
+            {'Just approved? '}
+            <Link
+              href="/signup"
+              className="font-semibold text-tag-text hover:underline"
+            >
+              Set up your account
+            </Link>
+          </p>
+          <p className="text-center text-sm text-tag-muted">
+            {'New here? '}
             <Link
               href="/join"
               className="font-semibold text-tag-text hover:underline"
             >
-              Sign up
+              Apply for membership
             </Link>
           </p>
         </AuthForm>

@@ -115,7 +115,7 @@ export async function saveProfileResult(
   const { error } = await supabase
     .from('builder_profiles')
     .update({
-      status: 'generating_skin' as ProfileStatus,
+      status: 'complete' as ProfileStatus,
       headline: result.headline,
       bio: result.bio,
       tags: result.tags,
@@ -126,20 +126,6 @@ export async function saveProfileResult(
       key_links: result.keyLinks,
       data_sources: result.dataSources,
       avatar_url: result.avatarUrl,
-    })
-    .eq('user_id', userId)
-
-  if (error) throw new Error(error.message)
-}
-
-export async function saveSkinResult(userId: string, skinUrl: string | null) {
-  const supabase = createServiceRoleClient()
-
-  const { error } = await supabase
-    .from('builder_profiles')
-    .update({
-      skin_url: skinUrl,
-      status: 'complete' as ProfileStatus,
       completed_at: new Date().toISOString(),
     })
     .eq('user_id', userId)

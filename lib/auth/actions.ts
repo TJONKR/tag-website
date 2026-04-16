@@ -1,11 +1,78 @@
 'use server'
 
-import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
-import { createOrResetProfile } from '@lib/taste/mutations'
-import { runProfilePipeline } from '@lib/taste/pipeline/run'
+import { headers } from 'next/headers'
 
-import { loginSchema, registerSchema } from './schema'
-import type { LoginActionState, RegisterActionState } from './types'
+import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
+
+import {
+  forgotPasswordSchema,
+  loginSchema,
+  resetPasswordSchema,
+  signupSchema,
+} from './schema'
+import type { LoginActionState } from './types'
+
+export type SignupResult = { status: 'success' | 'invalid' | 'no_match' | 'failed' }
+
+export async function signup(formData: FormData): Promise<SignupResult> {
+  const parsed = signupSchema.safeParse({
+    name: formData.get('name'),
+    email: formData.get('email'),
+    password: formData.get('password'),
+  })
+
+  if (!parsed.success) {
+    return { status: 'invalid' }
+  }
+
+  const { name, password } = parsed.data
+  const email = parsed.data.email.trim().toLowerCase()
+
+  try {
+    const serviceClient = createServiceRoleClient()
+
+    // Pick the most recent accepted application for this email. Users may apply
+    // more than once; we want the latest approval.
+    const { data: applications, error: lookupError } = await serviceClient
+      .from('applications')
+      .select('id, status')
+      .ilike('email', email)
+      .eq('status', 'accepted')
+      .order('created_at', { ascending: false })
+      .limit(1)
+
+    if (lookupError) {
+      console.error('[signup] application lookup failed:', lookupError.message)
+      return { status: 'failed' }
+    }
+
+    const application = applications?.[0]
+    if (!application) {
+      console.warn('[signup] no accepted application found for email:', email)
+      return { status: 'no_match' }
+    }
+
+    const supabase = await createServerSupabaseClient()
+
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name, application_id: application.id },
+      },
+    })
+
+    if (signUpError) {
+      console.warn('[signup] signUp error:', signUpError.message)
+      return { status: 'no_match' }
+    }
+
+    return { status: 'success' }
+  } catch (error) {
+    console.error('[signup] unexpected error:', error)
+    return { status: 'failed' }
+  }
+}
 
 export async function login(
   prevState: LoginActionState,
@@ -32,117 +99,6 @@ export async function login(
 
     if (error) {
       throw error
-    }
-
-    return { status: 'success' }
-  } catch {
-    return { status: 'failed' }
-  }
-}
-
-export async function register(
-  prevState: RegisterActionState,
-  formData: FormData
-): Promise<RegisterActionState> {
-  const validatedFields = registerSchema.safeParse({
-    name: formData.get('name'),
-    email: formData.get('email'),
-    password: formData.get('password'),
-    building: formData.get('building'),
-    whyTag: formData.get('whyTag'),
-    referral: formData.get('referral') || undefined,
-    linkedinUrl: formData.get('linkedinUrl') || '',
-    twitterUrl: formData.get('twitterUrl') || '',
-    githubUrl: formData.get('githubUrl') || '',
-    websiteUrl: formData.get('websiteUrl') || '',
-    instagramUrl: formData.get('instagramUrl') || '',
-  })
-
-  if (!validatedFields.success) {
-    return { status: 'invalid_data' }
-  }
-
-  const {
-    name,
-    email,
-    password,
-    building,
-    whyTag,
-    referral,
-    linkedinUrl,
-    twitterUrl,
-    githubUrl,
-    websiteUrl,
-    instagramUrl,
-  } = validatedFields.data
-
-  try {
-    const supabase = await createServerSupabaseClient()
-
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { name },
-        emailRedirectTo: `${siteUrl}/auth/callback?next=/portal`,
-      },
-    })
-
-    if (error) throw error
-
-    // Update profile with additional fields using service role
-    // (the trigger creates the profile row, we update it with extras)
-    if (data.user) {
-      const serviceClient = createServiceRoleClient()
-      const { error: profileError } = await serviceClient
-        .from('profiles')
-        .update({
-          building,
-          why_tag: whyTag,
-          referral: referral || null,
-          linkedin_url: linkedinUrl || null,
-          twitter_url: twitterUrl || null,
-          github_url: githubUrl || null,
-          website_url: websiteUrl || null,
-          instagram_url: instagramUrl || null,
-        })
-        .eq('id', data.user.id)
-
-      if (profileError) {
-        console.error('[register] Profile update error:', profileError)
-      }
-
-      // Fire-and-forget taste evaluation if enough data
-      // Call pipeline directly (bypasses API route which requires auth cookies)
-      if (twitterUrl || linkedinUrl) {
-        const userId = data.user.id
-        createOrResetProfile({
-          userId,
-          name,
-          twitterUrl: twitterUrl || null,
-          linkedinUrl: linkedinUrl || null,
-          githubUrl: githubUrl || null,
-          websiteUrl: websiteUrl || null,
-          building,
-        })
-          .then(() =>
-            runProfilePipeline({
-              userId,
-              name,
-              twitterUrl,
-              linkedinUrl,
-              githubUrl,
-              websiteUrl,
-              building,
-            })
-          )
-          .catch((err) => {
-            console.error('[register] Taste evaluation error:', err)
-          })
-      }
     }
 
     return { status: 'success' }
@@ -231,23 +187,80 @@ export async function updateAvatar(
   }
 }
 
-export async function setPassword(
-  password: string
-): Promise<{ status: 'success' | 'failed' }> {
-  try {
-    const supabase = await createServerSupabaseClient()
-
-    const { error } = await supabase.auth.updateUser({ password })
-
-    if (error) throw error
-
-    return { status: 'success' }
-  } catch {
-    return { status: 'failed' }
-  }
-}
-
 export async function signOutAction(): Promise<void> {
   const supabase = await createServerSupabaseClient()
   await supabase.auth.signOut()
+}
+
+export type RequestPasswordResetResult = { status: 'success' | 'invalid' }
+
+export async function requestPasswordReset(
+  formData: FormData
+): Promise<RequestPasswordResetResult> {
+  const parsed = forgotPasswordSchema.safeParse({
+    email: formData.get('email'),
+  })
+
+  if (!parsed.success) {
+    return { status: 'invalid' }
+  }
+
+  const email = parsed.data.email.trim().toLowerCase()
+
+  try {
+    const supabase = await createServerSupabaseClient()
+    const headerList = await headers()
+    const host = headerList.get('host')
+    const protocol = headerList.get('x-forwarded-proto') ?? 'https'
+    const origin =
+      process.env.NEXT_PUBLIC_SITE_URL ?? (host ? `${protocol}://${host}` : '')
+    const redirectTo = `${origin}/reset-password`
+
+    await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+  } catch (error) {
+    console.error('[requestPasswordReset] unexpected error:', error)
+  }
+
+  // Always return success to avoid leaking which emails have accounts.
+  return { status: 'success' }
+}
+
+export type UpdatePasswordResult = {
+  status: 'success' | 'invalid' | 'unauthenticated' | 'failed'
+}
+
+export async function updatePassword(
+  formData: FormData
+): Promise<UpdatePasswordResult> {
+  const parsed = resetPasswordSchema.safeParse({
+    password: formData.get('password'),
+  })
+
+  if (!parsed.success) {
+    return { status: 'invalid' }
+  }
+
+  try {
+    const supabase = await createServerSupabaseClient()
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { status: 'unauthenticated' }
+
+    const { error } = await supabase.auth.updateUser({
+      password: parsed.data.password,
+    })
+
+    if (error) {
+      console.warn('[updatePassword] updateUser error:', error.message)
+      return { status: 'failed' }
+    }
+
+    return { status: 'success' }
+  } catch (error) {
+    console.error('[updatePassword] unexpected error:', error)
+    return { status: 'failed' }
+  }
 }

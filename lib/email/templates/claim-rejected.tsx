@@ -1,4 +1,4 @@
-import { Callout, H1, P } from './_components'
+import { Divider, H1, LabeledSection, P } from './_components'
 import { EmailLayout } from './_layout'
 
 interface ClaimRejectedProps {
@@ -14,13 +14,14 @@ export const ClaimRejected = ({ name, notes }: ClaimRejectedProps) => {
         We&apos;ve reviewed your AI/AM membership claim and we&apos;re not able to
         approve it at this time.
       </P>
+
       {notes ? (
-        <Callout>
-          <strong>Note from the admin team:</strong>
-          <br />
-          {notes}
-        </Callout>
+        <>
+          <Divider />
+          <LabeledSection label="Note from the admin team">{notes}</LabeledSection>
+        </>
       ) : null}
+
       <P>
         If you think this was a mistake or the situation changes, reply to this email
         and we&apos;ll take another look.

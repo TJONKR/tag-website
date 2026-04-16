@@ -10,7 +10,6 @@ export const onboardingSchema = z.object({
   githubUrl: z.string().url().optional().or(z.literal('')),
   websiteUrl: z.string().url().optional().or(z.literal('')),
   instagramUrl: z.string().url().optional().or(z.literal('')),
-  password: z.string().min(6, 'Password must be at least 6 characters').optional().or(z.literal('')),
 })
 
 export type OnboardingInput = z.infer<typeof onboardingSchema>

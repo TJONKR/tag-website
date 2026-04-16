@@ -36,14 +36,9 @@ export const updateApplicationStatus = async (
   }
 }
 
-export const acceptApplication = async (
-  id: string,
-  reviewedBy: string
-) => {
-  // Update status
+export const acceptApplication = async (id: string, reviewedBy: string) => {
   await updateApplicationStatus(id, 'accepted', reviewedBy)
 
-  // Get the application to find the email
   const supabase = await createServerSupabaseClient()
   const { data: application, error } = await supabase
     .from('applications')
@@ -55,45 +50,48 @@ export const acceptApplication = async (
     throw new Error('Application not found')
   }
 
-  // Send invite via Supabase Auth admin
-  const serviceClient = createServiceRoleClient()
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-
-  const { error: inviteError } = await serviceClient.auth.admin.inviteUserByEmail(
-    application.email,
-    {
-      data: {
-        name: application.name,
-        application_id: id,
-      },
-      redirectTo: `${siteUrl}/auth/callback?next=/portal/onboarding`,
-    }
-  )
-
-  if (inviteError) throw new Error(inviteError.message)
-
-  // Custom welcome email sent alongside the Supabase magic-link invite.
   await sendApplicationApproved({ to: application.email, name: application.name })
 }
 
-export const inviteUserByEmail = async (
+export const resendApprovalEmail = async (id: string) => {
+  const supabase = await createServerSupabaseClient()
+  const { data: application, error } = await supabase
+    .from('applications')
+    .select('email, name, status')
+    .eq('id', id)
+    .single()
+
+  if (error || !application) {
+    throw new Error('Application not found')
+  }
+
+  if (application.status !== 'accepted') {
+    throw new Error('Application is not accepted')
+  }
+
+  await sendApplicationApproved({ to: application.email, name: application.name })
+}
+
+// Operator path: pre-approve someone who didn't go through /join. Inserts an
+// applications row marked accepted so the user can self-serve at /signup.
+export const directInviteApplication = async (
   email: string,
+  reviewedBy: string,
   name?: string
 ) => {
   const serviceClient = createServiceRoleClient()
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-
-  const { error } = await serviceClient.auth.admin.inviteUserByEmail(
+  const { error: insertError } = await serviceClient.from('applications').insert({
     email,
-    {
-      data: {
-        ...(name ? { name } : {}),
-      },
-      redirectTo: `${siteUrl}/auth/callback?next=/portal/onboarding`,
-    }
-  )
+    name: name ?? email,
+    building: '(direct invite)',
+    why_tag: '(direct invite)',
+    status: 'accepted',
+    reviewed_at: new Date().toISOString(),
+    reviewed_by: reviewedBy,
+  })
 
-  if (error) throw new Error(error.message)
+  if (insertError) throw new Error(insertError.message)
+
+  await sendApplicationApproved({ to: email, name: name ?? email })
 }

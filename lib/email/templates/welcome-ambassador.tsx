@@ -1,5 +1,5 @@
 import { SITE_URL } from '../config'
-import { Callout, H1, H2, P, PrimaryButton } from './_components'
+import { Divider, H1, LabeledSection, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
 interface WelcomeAmbassadorProps {
@@ -17,24 +17,27 @@ export const WelcomeAmbassador = ({ name }: WelcomeAmbassadorProps) => {
         the portal, the space, and the community.
       </P>
 
-      <H2>A few things to try</H2>
-      <Callout>
-        <strong>Come to an event.</strong> Check the portal calendar and RSVP via Luma.
-        Showing up gets you lootbox drops.
-      </Callout>
-      <Callout>
-        <strong>Set up your profile.</strong> Your Taste profile is how the rest of TAG
-        finds out what you&apos;re working on.
-      </Callout>
-      <Callout>
-        <strong>Ship something.</strong> That&apos;s the whole point.
-      </Callout>
+      <Divider />
+
+      <LabeledSection label="Come to an event">
+        Check the portal calendar and RSVP via Luma. Showing up gets you lootbox drops.
+      </LabeledSection>
+
+      <Divider />
+
+      <LabeledSection label="Set up your profile">
+        Your Taste profile is how the rest of TAG finds out what you&apos;re working on.
+      </LabeledSection>
+
+      <Divider />
+
+      <LabeledSection label="Ship something">
+        That&apos;s the whole point.
+      </LabeledSection>
 
       <PrimaryButton href={`${SITE_URL}/portal`}>Go to the portal</PrimaryButton>
 
-      <P muted>
-        Questions? Reply to this email — it goes straight to the team.
-      </P>
+      <P muted>Questions? Reply to this email — it goes straight to the team.</P>
     </EmailLayout>
   )
 }

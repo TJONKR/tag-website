@@ -49,7 +49,6 @@ export const OnboardingForm = ({ profile }: OnboardingFormProps) => {
       githubUrl: (formData.get('githubUrl') as string) || '',
       websiteUrl: (formData.get('websiteUrl') as string) || '',
       instagramUrl: (formData.get('instagramUrl') as string) || '',
-      password: (formData.get('password') as string) || '',
     }
 
     try {
@@ -242,30 +241,6 @@ export const OnboardingForm = ({ profile }: OnboardingFormProps) => {
             placeholder="https://instagram.com/you"
             className={inputClass}
           />
-        </div>
-      </div>
-
-      {/* Password */}
-      <div className="space-y-6">
-        <h2 className="font-syne text-lg font-bold text-tag-text">Set a Password</h2>
-        <p className="font-grotesk text-sm text-tag-muted">
-          Set a password so you can log in with email and password going forward.
-        </p>
-
-        <div className="space-y-2">
-          <Label htmlFor="password" className={labelClass}>
-            Password
-          </Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="At least 6 characters"
-            className={inputClass}
-          />
-          {errors.password && (
-            <p className="font-mono text-xs text-red-400">{errors.password}</p>
-          )}
         </div>
       </div>
 

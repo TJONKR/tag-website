@@ -28,7 +28,3 @@ export interface PublicProfile {
 export interface LoginActionState {
   status: 'idle' | 'invalid_data' | 'failed' | 'success'
 }
-
-export interface RegisterActionState {
-  status: 'idle' | 'invalid_data' | 'failed' | 'success'
-}

@@ -47,11 +47,6 @@ export interface GitHubData {
   }[]
 }
 
-export interface YouTubeTranscriptData {
-  videoId: string
-  title?: string
-  transcript: string
-}
 
 async function runApifyActor(
   actorId: string,
@@ -385,82 +380,6 @@ export async function scrapeGitHub(username: string): Promise<GitHubData> {
   }
 
   return result
-}
-
-export async function fetchYouTubeTranscript(
-  videoUrl: string
-): Promise<YouTubeTranscriptData | null> {
-  try {
-    const videoId = extractVideoId(videoUrl)
-    if (!videoId) return null
-
-    const { YoutubeTranscript } = await import('youtube-transcript')
-    const items = await YoutubeTranscript.fetchTranscript(videoId)
-    if (!items || items.length === 0) return null
-
-    const transcript = items
-    
-      .map((item: any) => item.text)
-      .join(' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 10000)
-
-    console.log(`YouTube transcript: ${videoId} — ${transcript.length} chars`)
-    return { videoId, transcript }
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : 'Unknown error'
-    console.error(`YouTube transcript error:`, message)
-    return null
-  }
-}
-
-function extractVideoId(url: string): string | null {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
-    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-    /(?:youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
-  ]
-  for (const pattern of patterns) {
-    const match = url.match(pattern)
-    if (match) return match[1]
-  }
-  if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url
-  return null
-}
-
-export function getScreenshotUrl(url: string): string {
-  return `https://image.thum.io/get/width/1280/${url}`
-}
-
-export async function fetchScreenshotAsBase64(
-  url: string
-): Promise<{ base64: string; mediaType: string } | null> {
-  try {
-    const screenshotUrl = getScreenshotUrl(url)
-    console.log(`Fetching screenshot for ${url}...`)
-    const res = await fetch(screenshotUrl, {
-      signal: AbortSignal.timeout(15000),
-    })
-    if (!res.ok) {
-      console.error(`Screenshot fetch failed for ${url}: ${res.status}`)
-      return null
-    }
-    const buffer = await res.arrayBuffer()
-    const base64 = Buffer.from(buffer).toString('base64')
-    const mediaType = (res.headers.get('content-type') || 'image/png').split(
-      ';'
-    )[0]
-    console.log(
-      `Screenshot captured for ${url} (${Math.round(buffer.byteLength / 1024)}KB)`
-    )
-    return { base64, mediaType }
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : 'Unknown error'
-    console.error(`Screenshot fetch error for ${url}:`, message)
-    return null
-  }
 }
 
 export function getAvatarUrl(

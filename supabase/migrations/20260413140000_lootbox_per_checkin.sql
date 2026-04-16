@@ -23,7 +23,7 @@ begin
      and (tg_op = 'INSERT' or old.checked_in_at is null) then
     insert into user_lootboxes (user_id, source_event_id, status)
     values (new.user_id, new.event_id, 'available')
-    on conflict (user_id, source_event_id) do nothing;
+    on conflict (user_id, source_event_id) where source_event_id is not null do nothing;
   end if;
   return new;
 end;
@@ -39,7 +39,7 @@ insert into user_lootboxes (user_id, source_event_id, status)
 select user_id, event_id, 'available'
 from event_attendance
 where checked_in_at is not null
-on conflict (user_id, source_event_id) do nothing;
+on conflict (user_id, source_event_id) where source_event_id is not null do nothing;
 
 -- 4. Extra test lootboxes for tijs@lerai.nl (unsourced, just for trying things)
 do $$

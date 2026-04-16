@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Calendar, Check, ExternalLink, Shield, Star } from 'lucide-react'
 
 import { cn, slugifyName } from '@lib/utils'
+import { createServerSupabaseClient } from '@lib/db'
 import { PortalHeader, FadeIn } from '@lib/portal/components'
 import { EditNameForm } from '@lib/auth/components/edit-name-form'
 import { EditProfileForm } from '@lib/auth/components/edit-profile-form'
@@ -22,12 +23,14 @@ import { getBuilderProfile } from '@lib/taste/queries'
 import { LootboxProgress } from '@lib/portal/components/lootbox-progress'
 import { ProfileEventTimeline } from '@lib/events/components'
 import { getUserPhotos } from '@lib/photos/queries'
+import { PhotosModal } from '@lib/photos/components'
 import {
   getEquippedSkin,
   getUserSkins,
   getPendingSkin,
   getAvailableLootboxCount,
 } from '@lib/lootbox/queries'
+import { ensureFirstLootbox } from '@lib/lootbox/mutations'
 import { LootboxOpening, SkinsCollection } from '@lib/lootbox/components'
 import { MAX_PHOTOS } from '@lib/photos/types'
 import type { UserRole } from '@lib/auth/types'
@@ -71,7 +74,7 @@ export default async function ProfilePage() {
     equippedSkin,
     userSkins,
     pendingSkin,
-    availableLootboxCount,
+    initialAvailableLootboxCount,
   ] = await Promise.all([
     getUserAttendedEvents(user.id),
     getMembershipStatus(user.id, user.role),
@@ -87,6 +90,18 @@ export default async function ProfilePage() {
   const config = roleConfig[user.role]
   const Icon = config.icon
   const isBuilder = user.role === 'builder' || user.role === 'operator'
+
+  // Signed URLs for the photos modal
+  const supabase = await createServerSupabaseClient()
+  const photoUrls: Record<string, string> = {}
+  for (const photo of userPhotos) {
+    const { data } = await supabase.storage
+      .from('user-photos')
+      .createSignedUrl(photo.storage_path, 3600)
+    if (data?.signedUrl) {
+      photoUrls[photo.id] = data.signedUrl
+    }
+  }
 
   // Use equipped skin from new lootbox system, fall back to old builder_profiles.skin_url
   const equippedSkinUrl = equippedSkin?.image_url ?? builderProfile?.skin_url
@@ -112,6 +127,14 @@ export default async function ProfilePage() {
   const lootboxCompleted = lootboxSteps.filter((s) => s.done).length
   const lootboxTotal = lootboxSteps.length
   const lootboxAllDone = lootboxCompleted === lootboxTotal
+
+  // Grant the first lootbox the moment onboarding is fully complete.
+  // Idempotent — only inserts on the first eligible render.
+  let availableLootboxCount = initialAvailableLootboxCount
+  if (lootboxAllDone) {
+    const granted = await ensureFirstLootbox(user.id)
+    if (granted) availableLootboxCount += 1
+  }
 
   // Stats
   const participationRate =
@@ -142,26 +165,32 @@ export default async function ProfilePage() {
           {/* Hero Identity Card */}
           <FadeIn delay={75}>
           <div className="rounded-lg border border-tag-border bg-tag-card">
-            <Link href="/portal/profile/avatar" className="group block">
-              {hasSkin ? (
-                /* Equipped skin hero */
-                <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
-                  <Image
-                    src={equippedSkinUrl!}
-                    alt={user.name ?? 'Profile skin'}
-                    fill
-                    className="object-cover transition-opacity group-hover:opacity-80"
-                    sizes="336px"
-                    unoptimized
-                  />
-                </div>
-              ) : (
-                /* Avatar fallback */
-                <div className="flex justify-center pt-8 pb-2">
-                  <AvatarUpload name={user.name} avatarUrl={user.avatar_url} />
-                </div>
-              )}
-            </Link>
+            <PhotosModal
+              photos={userPhotos}
+              photoUrls={photoUrls}
+              trigger={
+                <button type="button" className="group block w-full text-left">
+                  {hasSkin ? (
+                    /* Equipped skin hero */
+                    <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
+                      <Image
+                        src={equippedSkinUrl!}
+                        alt={user.name ?? 'Profile skin'}
+                        fill
+                        className="object-cover transition-opacity group-hover:opacity-80"
+                        sizes="336px"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    /* Avatar fallback */
+                    <div className="flex justify-center pt-8 pb-2">
+                      <AvatarUpload name={user.name} avatarUrl={user.avatar_url} />
+                    </div>
+                  )}
+                </button>
+              }
+            />
 
             <div className="p-5">
               <h2 className="font-syne text-xl font-bold text-tag-text">
@@ -237,6 +266,8 @@ export default async function ProfilePage() {
             <FadeIn delay={225}>
               <LootboxOpening
                 hasPhotos={hasEnoughPhotos}
+                photos={userPhotos}
+                photoUrls={photoUrls}
                 availableCount={availableLootboxCount}
                 pendingSkinId={pendingSkin?.id ?? null}
               />

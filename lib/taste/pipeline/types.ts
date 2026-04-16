@@ -1,14 +1,7 @@
-export interface ScreenshotImage {
-  source: string
-  base64: string
-  mediaType: string
-}
-
 export interface StatusData {
   tweetCount?: number
   linkedinPostCount?: number
   dataSources?: string[]
-  screenshotsCaptured?: number
 }
 
 export interface VerifiedData {

@@ -2,15 +2,12 @@ import Anthropic from '@anthropic-ai/sdk'
 
 import { updateEvaluationStatus } from '../mutations'
 
-import type { VerifiedData, ScreenshotImage, StatusData } from './types'
+import type { VerifiedData, StatusData } from './types'
 import {
   scrapeTwitter,
   scrapeLinkedIn,
   scrapeWebsite,
   scrapeGitHub,
-  fetchYouTubeTranscript,
-  fetchScreenshotAsBase64,
-  getScreenshotUrl,
   getAvatarUrl,
   type TwitterData,
 } from './scrape'
@@ -76,34 +73,6 @@ const TOOLS: Anthropic.Messages.Tool[] = [
     },
   },
   {
-    name: 'fetch_youtube_transcript',
-    description:
-      'Fetch the transcript/captions of a YouTube video. Returns up to 10000 characters.',
-    input_schema: {
-      type: 'object' as const,
-      properties: {
-        video_url: { type: 'string', description: 'YouTube video URL' },
-      },
-      required: ['video_url'],
-    },
-  },
-  {
-    name: 'capture_screenshot',
-    description:
-      'Capture a visual screenshot of a webpage for later vision analysis.',
-    input_schema: {
-      type: 'object' as const,
-      properties: {
-        url: { type: 'string', description: 'URL to screenshot' },
-        label: {
-          type: 'string',
-          description: "Short label (e.g. 'Website', 'Twitter Profile')",
-        },
-      },
-      required: ['url', 'label'],
-    },
-  },
-  {
     name: 'done',
     description:
       'Call when you have gathered enough data. Pass the final VerifiedData JSON.',
@@ -136,25 +105,6 @@ async function executeTool(name: string, input: any): Promise<string> {
         const data = await scrapeGitHub(input.username)
         return JSON.stringify(data)
       }
-      case 'fetch_youtube_transcript': {
-        const data = await fetchYouTubeTranscript(input.video_url)
-        if (!data)
-          return JSON.stringify({
-            error: 'Could not fetch transcript — video may not have captions',
-          })
-        return JSON.stringify(data)
-      }
-      case 'capture_screenshot': {
-        const result = await fetchScreenshotAsBase64(input.url)
-        if (!result) return JSON.stringify({ error: 'Failed to capture screenshot' })
-        return JSON.stringify({
-          success: true,
-          label: input.label,
-          sizeKB: Math.round(
-            Buffer.from(result.base64, 'base64').length / 1024
-          ),
-        })
-      }
       default:
         return JSON.stringify({ error: `Unknown tool: ${name}` })
     }
@@ -167,8 +117,6 @@ async function executeTool(name: string, input: any): Promise<string> {
 export interface ResearchResult {
   verifiedData: VerifiedData
   twitterData: TwitterData | null
-  screenshots: { url: string; source: string }[]
-  screenshotImages: ScreenshotImage[]
   avatarUrl: string
   stats: StatusData
 }
@@ -182,8 +130,6 @@ export async function runResearchAgent(
   description?: string
 ): Promise<ResearchResult> {
   const stats: StatusData = { dataSources: [] }
-  const screenshots: { url: string; source: string }[] = []
-  const screenshotImages: ScreenshotImage[] = []
   let twitterData: TwitterData | null = null
 
   const inputLines = [`Name: ${name}`]
@@ -192,25 +138,22 @@ export async function runResearchAgent(
   if (website) inputLines.push(`Website: ${website}`)
   if (description) inputLines.push(`Self-description: ${description}`)
 
-  const systemPrompt = `You are a deep research agent for The Taste Bench — the internet's taste evaluation platform.
+  const systemPrompt = `You are a research agent for TAG — a community of builders.
 
-Your job is to build a comprehensive dossier on "${name}" by scraping their digital presence and researching them online. You have tools to scrape Twitter, LinkedIn, websites, GitHub, fetch YouTube transcripts, search the web, and capture screenshots.
+Your job: build a focused dossier on "${name}" so we can write a good builder profile.
+Tools: scrape Twitter, LinkedIn, websites, GitHub, plus web search.
 
-RESEARCH STRATEGY (follow this order strictly):
-PHASE 1 — SCRAPE: Start by scraping the provided profiles (Twitter, LinkedIn, website). If they're a tech person, scrape their GitHub too (starred repos reveal taste!). Do ONLY scraping in this phase — no web searches yet.
-PHASE 2 — ASSESS: After seeing the scrape results, check the Twitter dateRangeSummary. If tweets span less than 90 days, you MUST do 3+ web searches for historical content.
-PHASE 3 — GET TO KNOW THEM: Do 4-8 web searches across influences, interviews, creative output, strong positions, and what others say. Follow leads — if you find YouTube videos, FETCH THE TRANSCRIPT.
-PHASE 4 — VISUAL: Capture screenshots of their most visually interesting pages.
-PHASE 5 — DONE: Call the "done" tool with a comprehensive VerifiedData JSON.
+STRATEGY (be efficient, don't over-research):
+1. Scrape the provided profiles first (Twitter, LinkedIn, website, and GitHub if relevant).
+2. Do 1-3 targeted web searches only if the scrape data is thin or you spot a clear lead worth following.
+3. Call the "done" tool as soon as you have enough to write a solid profile.
 
-QUALITY STANDARDS:
-- Verify content ownership — make sure scraped content actually belongs to this person
-- Separate tweets into original/retweets/quote tweets
-- Flag notable content — unusual takes, revealing statements, strong opinions
-- Aim for 8-12 tool calls minimum
-- Be cost-efficient: don't repeat searches or scrape the same URL twice
+QUALITY:
+- Verify content actually belongs to this person.
+- Aim for 3-6 tool calls total. Don't repeat searches or scrape the same URL twice.
+- Skip searches if the provided profiles already give you a clear picture.
 
-OUTPUT: When done, call the "done" tool with a JSON object matching the VerifiedData structure with fields: name, confidence, excludedSources, twitter, linkedin, website, selfDescription, webResearch, researcherNotes.`
+OUTPUT: Call "done" with a JSON object matching VerifiedData: name, confidence, excludedSources, twitter, linkedin, website, selfDescription, webResearch, researcherNotes.`
 
   const messages: Anthropic.Messages.MessageParam[] = [
     {
@@ -222,7 +165,7 @@ OUTPUT: When done, call the "done" tool with a JSON object matching the Verified
   await updateEvaluationStatus(userId, 'researching', 'Starting research...')
 
   let iterations = 0
-  const MAX_ITERATIONS = 15
+  const MAX_ITERATIONS = 8
 
   while (iterations < MAX_ITERATIONS) {
     iterations++
@@ -276,15 +219,7 @@ OUTPUT: When done, call the "done" tool with a JSON object matching the Verified
       if (textBlock) {
         try {
           const result = JSON.parse(textBlock.text)
-          return buildResult(
-            result,
-            twitterData,
-            screenshots,
-            screenshotImages,
-            stats,
-            name,
-            twitter
-          )
+          return buildResult(result, twitterData, stats, name, twitter)
         } catch {
           // couldn't parse text output
         }
@@ -300,15 +235,7 @@ OUTPUT: When done, call the "done" tool with a JSON object matching the Verified
 
       if (toolUse.name === 'done') {
         console.log(`[research-agent] Done after ${iterations} iterations`)
-        return buildResult(
-          input.result,
-          twitterData,
-          screenshots,
-          screenshotImages,
-          stats,
-          name,
-          twitter
-        )
+        return buildResult(input.result, twitterData, stats, name, twitter)
       }
 
       const statusLabel = getStatusLabel(toolUse.name, input)
@@ -350,27 +277,6 @@ OUTPUT: When done, call the "done" tool with a JSON object matching the Verified
           new Set([...(stats.dataSources || []), 'github'])
         )
       }
-      if (toolUse.name === 'fetch_youtube_transcript') {
-        stats.dataSources = Array.from(
-          new Set([...(stats.dataSources || []), 'youtube'])
-        )
-      }
-      if (toolUse.name === 'capture_screenshot') {
-        const screenshotData = await fetchScreenshotAsBase64(input.url)
-        if (screenshotData) {
-          screenshotImages.push({
-            source: input.label || 'Page',
-            base64: screenshotData.base64,
-            mediaType: screenshotData.mediaType,
-          })
-          screenshots.push({
-            url: getScreenshotUrl(input.url),
-            source: input.label || 'Page',
-          })
-          stats.screenshotsCaptured = screenshotImages.length
-        }
-      }
-
       toolResults.push({
         type: 'tool_result',
         tool_use_id: toolUse.id,
@@ -401,21 +307,14 @@ function getStatusLabel(toolName: string, input: any): string {
       }
     case 'scrape_github':
       return `Scraping GitHub: ${(input.username || '').replace(/.*github\.com\//, '')}`
-    case 'fetch_youtube_transcript':
-      return `Fetching YouTube transcript`
-    case 'capture_screenshot':
-      return `Capturing screenshot: ${input.label || input.url}`
     default:
       return `Running ${toolName}`
   }
 }
 
 function buildResult(
-
   verifiedData: any,
   twitterData: TwitterData | null,
-  screenshots: { url: string; source: string }[],
-  screenshotImages: ScreenshotImage[],
   stats: StatusData,
   name: string,
   twitter?: string
@@ -425,8 +324,6 @@ function buildResult(
   return {
     verifiedData: verifiedData as VerifiedData,
     twitterData,
-    screenshots,
-    screenshotImages,
     avatarUrl,
     stats,
   }

@@ -67,11 +67,35 @@ export const ApplicationList = ({
 
       toast({
         type: 'success',
-        description: status === 'accepted' ? 'Application accepted — invite sent.' : 'Application rejected.',
+        description:
+          status === 'accepted'
+            ? 'Application accepted — approval email sent.'
+            : 'Application rejected.',
       })
 
       setSelected(null)
       await fetchApplications()
+    } catch (error) {
+      toast({
+        type: 'error',
+        description: error instanceof Error ? error.message : 'Something went wrong.',
+      })
+    } finally {
+      setLoading(null)
+    }
+  }
+
+  const handleResend = async (id: string) => {
+    setLoading(id)
+    try {
+      const res = await fetch(`/api/applications/${id}/resend`, { method: 'POST' })
+
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.errors?.[0]?.message || 'Failed')
+      }
+
+      toast({ type: 'success', description: 'Approval email resent.' })
     } catch (error) {
       toast({
         type: 'error',
@@ -301,6 +325,23 @@ export const ApplicationList = ({
                   >
                     <X className="size-4" />
                     Reject
+                  </button>
+                </div>
+              )}
+
+              {selected.status === 'accepted' && (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleResend(selected.id)}
+                    disabled={loading === selected.id}
+                    className="flex items-center gap-2 border border-tag-border px-6 py-2.5 font-grotesk font-medium text-tag-text transition-colors hover:bg-tag-card disabled:opacity-50"
+                  >
+                    {loading === selected.id ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Mail className="size-4" />
+                    )}
+                    Resend approval email
                   </button>
                 </div>
               )}

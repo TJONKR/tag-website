@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Auth pages — redirect to portal if already logged in
-  const authPages = ['/login', '/register']
+  const authPages = ['/login', '/register', '/signup']
   if (user && authPages.includes(pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = '/portal'
@@ -70,5 +70,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/portal/:path*', '/login', '/register', '/join'],
+  matcher: ['/portal/:path*', '/login', '/register', '/join', '/signup'],
 }

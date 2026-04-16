@@ -11,6 +11,8 @@ import {
 } from '@components/ui/dialog'
 
 import { cn } from '@lib/utils'
+import { PhotosModal } from '@lib/photos/components'
+import type { UserPhoto } from '@lib/photos/types'
 
 import type { RolledCard } from '../types'
 import { useSkinStatus } from '../hooks'
@@ -20,18 +22,21 @@ type ModalPhase = 'opening' | 'reveal' | 'pick'
 
 interface LootboxOpeningProps {
   hasPhotos: boolean
+  /** Photos for the upload modal shown when user is missing reference photos */
+  photos: UserPhoto[]
+  photoUrls: Record<string, string>
   /** Number of unopened lootboxes available to roll */
   availableCount?: number
   /** If a skin is already generating/errored from a previous session */
   pendingSkinId?: string | null
-  onNeedPhotos?: () => void
 }
 
 export const LootboxOpening = ({
   hasPhotos,
+  photos,
+  photoUrls,
   availableCount = 0,
   pendingSkinId = null,
-  onNeedPhotos,
 }: LootboxOpeningProps) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalPhase, setModalPhase] = useState<ModalPhase>('opening')
@@ -58,10 +63,7 @@ export const LootboxOpening = ({
 
   // ── Open lootbox → launch modal ──
   const handleOpenLootbox = useCallback(async () => {
-    if (!hasPhotos) {
-      onNeedPhotos?.()
-      return
-    }
+    if (!hasPhotos) return
 
     setModalOpen(true)
     setModalPhase('opening')
@@ -90,7 +92,7 @@ export const LootboxOpening = ({
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setModalOpen(false)
     }
-  }, [hasPhotos, onNeedPhotos])
+  }, [hasPhotos])
 
   // ── Pick a card → start generation → close modal ──
   const handlePick = useCallback(
@@ -264,17 +266,27 @@ export const LootboxOpening = ({
 
               {error && <p className="text-center text-xs text-destructive">{error}</p>}
 
-              <button
-                onClick={handleOpenLootbox}
-                className={cn(
-                  'rounded-lg px-6 py-2 font-mono text-xs font-semibold uppercase tracking-wider transition-all',
-                  hasPhotos
-                    ? 'bg-tag-orange text-tag-bg hover:bg-tag-orange/90 hover:shadow-[0_0_20px_rgba(255,95,31,0.3)]'
-                    : 'bg-tag-border text-tag-muted'
-                )}
-              >
-                Open Lootbox
-              </button>
+              {hasPhotos ? (
+                <button
+                  onClick={handleOpenLootbox}
+                  className="rounded-lg bg-tag-orange px-6 py-2 font-mono text-xs font-semibold uppercase tracking-wider text-tag-bg transition-all hover:bg-tag-orange/90 hover:shadow-[0_0_20px_rgba(255,95,31,0.3)]"
+                >
+                  Open Lootbox
+                </button>
+              ) : (
+                <PhotosModal
+                  photos={photos}
+                  photoUrls={photoUrls}
+                  trigger={
+                    <button
+                      type="button"
+                      className="rounded-lg bg-tag-orange/90 px-6 py-2 font-mono text-xs font-semibold uppercase tracking-wider text-tag-bg transition-all hover:bg-tag-orange"
+                    >
+                      Upload Photos
+                    </button>
+                  }
+                />
+              )}
             </motion.div>
           )}
         </AnimatePresence>

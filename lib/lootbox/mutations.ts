@@ -286,6 +286,53 @@ export async function rollLootboxCards(userId: string, lootboxId: string) {
   return { lootboxId: lootbox.id, cards }
 }
 
+/**
+ * Grant a user their first lootbox once they've completed onboarding.
+ * Uses the og-day-one styles. Idempotent: a user gets at most one
+ * profile-completion lootbox (event_id = og-day-one, source_event_id IS NULL).
+ * Returns true if a new lootbox was granted, false if one already existed.
+ */
+export async function ensureFirstLootbox(userId: string): Promise<boolean> {
+  const supabase = createServiceRoleClient()
+
+  const { data: event } = await supabase
+    .from('lootbox_events')
+    .select('id')
+    .eq('slug', 'og-day-one')
+    .eq('active', true)
+    .single()
+
+  if (!event) return false
+
+  // A profile-completion lootbox is one tied to og-day-one with no source event.
+  // Check-in lootboxes are tracked via source_event_id, so they don't collide.
+  // We use limit(1) (not maybeSingle) because legacy data may have >1 matching
+  // row — single/maybeSingle would error and fall through to a duplicate insert.
+  const { data: existing } = await supabase
+    .from('user_lootboxes')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('event_id', event.id)
+    .is('source_event_id', null)
+    .limit(1)
+
+  if (existing && existing.length > 0) return false
+
+  const { error } = await supabase
+    .from('user_lootboxes')
+    .insert({
+      user_id: userId,
+      event_id: event.id,
+      status: 'available',
+    })
+
+  if (error) {
+    console.error('[ensureFirstLootbox] insert failed:', error.message)
+    return false
+  }
+  return true
+}
+
 export async function grantLootbox(userId: string, eventSlug: string) {
   const supabase = createServiceRoleClient()
 

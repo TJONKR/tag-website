@@ -1,4 +1,4 @@
-import { Button as REButton, Heading, Section, Text } from '@react-email/components'
+import { Button as REButton, Heading, Hr, Section, Text } from '@react-email/components'
 import type { CSSProperties, ReactNode } from 'react'
 
 import { BRAND } from '../config'
@@ -41,15 +41,25 @@ export const PrimaryButton = ({ href, children }: PrimaryButtonProps) => (
   </Section>
 )
 
-interface CalloutProps {
+interface LabelProps {
   children: ReactNode
 }
 
-export const Callout = ({ children }: CalloutProps) => (
-  <Section style={callout}>
-    <Text style={calloutText}>{children}</Text>
-  </Section>
+export const Label = ({ children }: LabelProps) => <Text style={label}>{children}</Text>
+
+interface LabeledSectionProps {
+  label: string
+  children: ReactNode
+}
+
+export const LabeledSection = ({ label: labelText, children }: LabeledSectionProps) => (
+  <>
+    <Text style={label}>{labelText}</Text>
+    <Text style={labeledBody}>{children}</Text>
+  </>
 )
+
+export const Divider = () => <Hr style={divider} />
 
 const h1: CSSProperties = {
   color: BRAND.colors.foreground,
@@ -69,7 +79,7 @@ const h2: CSSProperties = {
 
 const p: CSSProperties = {
   color: BRAND.colors.foreground,
-  fontSize: '15px',
+  fontSize: '14px',
   lineHeight: 1.6,
   margin: '0 0 14px',
 }
@@ -90,23 +100,31 @@ const button: CSSProperties = {
   color: BRAND.colors.primaryForeground,
   fontSize: '15px',
   fontWeight: 600,
-  padding: '12px 22px',
-  borderRadius: '6px',
+  padding: '14px 28px',
+  borderRadius: 0,
   textDecoration: 'none',
   display: 'inline-block',
+  lineHeight: '120%',
 }
 
-const callout: CSSProperties = {
-  backgroundColor: BRAND.colors.muted,
-  borderRadius: '8px',
-  padding: '16px 18px',
-  margin: '20px 0',
-  border: `1px solid ${BRAND.colors.border}`,
+const label: CSSProperties = {
+  color: BRAND.colors.mutedForeground,
+  fontSize: '12px',
+  lineHeight: 1,
+  margin: '0 0 8px',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
 }
 
-const calloutText: CSSProperties = {
+const labeledBody: CSSProperties = {
   color: BRAND.colors.foreground,
   fontSize: '14px',
-  lineHeight: 1.5,
+  lineHeight: 1.6,
   margin: 0,
+}
+
+const divider: CSSProperties = {
+  border: 'none',
+  borderTop: `1px solid ${BRAND.colors.border}`,
+  margin: '24px 0',
 }

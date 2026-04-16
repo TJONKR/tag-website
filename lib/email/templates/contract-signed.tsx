@@ -1,4 +1,4 @@
-import { Callout, H1, P } from './_components'
+import { Divider, H1, LabeledSection, P } from './_components'
 import { EmailLayout } from './_layout'
 
 interface ContractSignedProps {
@@ -22,9 +22,11 @@ export const ContractSigned = ({
         <strong>{companyName}</strong>. A signed PDF copy is attached to this email for
         your records.
       </P>
-      <Callout>
-        Signed on {signedOn}. Keep this email — it&apos;s your reference copy.
-      </Callout>
+
+      <Divider />
+
+      <LabeledSection label="Signed on">{signedOn}</LabeledSection>
+
       <P muted>
         If anything in the contract needs adjusting, reply to this email and we&apos;ll
         sort it.

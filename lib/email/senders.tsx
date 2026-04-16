@@ -65,13 +65,15 @@ export const sendApplicationNewAdmin = async (args: {
 export const sendApplicationApproved = (args: {
   to: string
   name: string
-}): Promise<SendEmailResult> =>
-  sendEmail({
+}): Promise<SendEmailResult> => {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  return sendEmail({
     to: args.to,
     subject: "You're in — welcome to TAG",
-    react: <ApplicationApproved name={args.name} />,
+    react: <ApplicationApproved name={args.name} signupUrl={`${siteUrl}/signup`} />,
     tag: 'application-approved',
   })
+}
 
 export const sendApplicationRejected = (args: {
   to: string

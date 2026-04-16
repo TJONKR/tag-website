@@ -4,6 +4,7 @@ import {
   Head,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -26,7 +27,7 @@ export const EmailLayout = ({ preview, children }: EmailLayoutProps) => {
       <Body style={body}>
         <Container style={container}>
           <Section style={header}>
-            <Text style={headerBrand}>{BRAND.name}</Text>
+            <Img src={BRAND.logoUrl} alt={BRAND.name} width="80" style={headerLogo} />
             <Text style={headerTagline}>{BRAND.tagline}</Text>
           </Section>
 
@@ -36,7 +37,10 @@ export const EmailLayout = ({ preview, children }: EmailLayoutProps) => {
 
           <Section style={footer}>
             <Text style={footerText}>
-              {BRAND.name} — <Link href={SITE_URL} style={footerLink}>tag.space</Link>
+              {BRAND.name} —{' '}
+              <Link href={SITE_URL} style={footerLink}>
+                tag.space
+              </Link>
             </Text>
             <Text style={footerSmall}>
               You received this because you&apos;re part of the TAG community.
@@ -68,18 +72,17 @@ const header = {
   paddingBottom: '32px',
 }
 
-const headerBrand = {
-  color: BRAND.colors.primary,
-  fontSize: '24px',
-  fontWeight: 700,
-  letterSpacing: '0.02em',
-  margin: 0,
+const headerLogo = {
+  display: 'block',
+  border: 0,
+  outline: 'none',
 }
 
 const headerTagline = {
   color: BRAND.colors.mutedForeground,
   fontSize: '13px',
-  margin: '2px 0 0',
+  lineHeight: '24px',
+  margin: '8px 0 0',
 }
 
 const content = {
@@ -99,6 +102,7 @@ const footer = {
 const footerText = {
   color: BRAND.colors.mutedForeground,
   fontSize: '13px',
+  lineHeight: '24px',
   margin: '0 0 8px',
 }
 
@@ -110,5 +114,6 @@ const footerLink = {
 const footerSmall = {
   color: BRAND.colors.mutedForeground,
   fontSize: '11px',
+  lineHeight: '24px',
   margin: 0,
 }

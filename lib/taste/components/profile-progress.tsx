@@ -20,18 +20,13 @@ const STATUS_CONFIG: Record<
   },
   researching: {
     label: 'Researching',
-    description: 'Scraping profiles, searching the web, building your dossier...',
-    progress: 40,
+    description: 'Scraping profiles and searching the web for your dossier...',
+    progress: 50,
   },
   formatting: {
     label: 'Building Profile',
     description: 'Extracting your headline, bio, projects, and more...',
-    progress: 80,
-  },
-  generating_skin: {
-    label: 'Generating Skin',
-    description: 'Creating your character...',
-    progress: 95,
+    progress: 90,
   },
 }
 
@@ -66,7 +61,7 @@ export const ProfileProgress = ({
       )}
 
       <p className="mt-6 text-center text-sm text-tag-dim">
-        This usually takes 1-2 minutes. You can leave this page and come back.
+        This usually takes 30-60 seconds. You can leave this page and come back.
       </p>
     </div>
   )

@@ -1,4 +1,4 @@
-import { Callout, H1, P } from './_components'
+import { Divider, H1, LabeledSection, P } from './_components'
 import { EmailLayout } from './_layout'
 
 interface ClaimRevokedProps {
@@ -17,16 +17,15 @@ export const ClaimRevoked = ({ name, notes, keptBuilderViaStripe }: ClaimRevoked
           ? ' Because you have an active direct Builder subscription, your TAG role stays on Builder.'
           : ' Your TAG role has been moved back to Ambassador.'}
       </P>
+
       {notes ? (
-        <Callout>
-          <strong>Note from the admin team:</strong>
-          <br />
-          {notes}
-        </Callout>
+        <>
+          <Divider />
+          <LabeledSection label="Note from the admin team">{notes}</LabeledSection>
+        </>
       ) : null}
-      <P muted>
-        Questions? Reply to this email and we&apos;ll get back to you.
-      </P>
+
+      <P muted>Questions? Reply to this email and we&apos;ll get back to you.</P>
     </EmailLayout>
   )
 }

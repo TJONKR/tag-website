@@ -4,7 +4,8 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:30
 
 export const BRAND = {
   name: 'TAG',
-  tagline: 'The Amsterdam Group',
+  tagline: 'To Achieve Greatness',
+  logoUrl: `${SITE_URL}/images/tag-logo-email.png`,
   // HSL values lifted from app/globals.css, flattened to hex for email clients
   // that don't support CSS custom properties.
   colors: {
