@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { H1, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -20,7 +20,7 @@ export const SubscriptionCancelled = ({ name, endsOn }: SubscriptionCancelledPro
         If you want to come back as a Builder later, it&apos;s one click from your
         profile.
       </P>
-      <PrimaryButton href={`${SITE_URL}/portal/profile`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile`}>
         Manage membership
       </PrimaryButton>
       <P muted>

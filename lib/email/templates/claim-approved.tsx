@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { Divider, H1, LabeledSection, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -21,7 +21,7 @@ export const ClaimApproved = ({ name }: ClaimApprovedProps) => {
         Full access to the TAG space, events, and Builder-only perks.
       </LabeledSection>
 
-      <PrimaryButton href={`${SITE_URL}/portal/profile`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile`}>
         Go to your profile
       </PrimaryButton>
     </EmailLayout>

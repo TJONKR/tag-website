@@ -12,7 +12,7 @@ import {
 } from '@react-email/components'
 import type { ReactNode } from 'react'
 
-import { BRAND, SITE_URL } from '../config'
+import { BRAND, EMAIL_PUBLIC_URL } from '../config'
 
 interface EmailLayoutProps {
   preview: string
@@ -38,7 +38,7 @@ export const EmailLayout = ({ preview, children }: EmailLayoutProps) => {
           <Section style={footer}>
             <Text style={footerText}>
               {BRAND.name} —{' '}
-              <Link href={SITE_URL} style={footerLink}>
+              <Link href={EMAIL_PUBLIC_URL} style={footerLink}>
                 tag.space
               </Link>
             </Text>

@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { H1, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -17,7 +17,7 @@ export const LootboxUnlocked = ({ name, eventTitle }: LootboxUnlockedProps) => {
         Thanks for showing up to <strong>{eventTitle}</strong>. You&apos;ve earned a
         lootbox with four TAG skin cards inside. Pick one and it becomes yours forever.
       </P>
-      <PrimaryButton href={`${SITE_URL}/portal/profile`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile`}>
         Open your lootbox
       </PrimaryButton>
       <P muted>

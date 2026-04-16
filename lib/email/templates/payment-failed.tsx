@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { Divider, H1, LabeledSection, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -24,7 +24,7 @@ export const PaymentFailed = ({ name, amountDue }: PaymentFailedProps) => {
         once it&apos;s fixed.
       </LabeledSection>
 
-      <PrimaryButton href={`${SITE_URL}/portal/profile`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile`}>
         Update payment method
       </PrimaryButton>
       <P muted>If you think this is a mistake, reply to this email.</P>

@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { H1, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -16,7 +16,7 @@ export const SkinFailed = ({ name }: SkinFailedProps) => {
         Something went wrong while generating your TAG skin. This is usually a
         temporary blip with the image pipeline — one retry is all it takes.
       </P>
-      <PrimaryButton href={`${SITE_URL}/portal/profile`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile`}>
         Retry generation
       </PrimaryButton>
       <P muted>

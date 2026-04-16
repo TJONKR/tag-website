@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { H1, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -18,7 +18,7 @@ export const SubscriptionActive = ({ name }: SubscriptionActiveProps) => {
         A billing receipt will follow from Stripe shortly. You can manage your
         subscription any time from your profile.
       </P>
-      <PrimaryButton href={`${SITE_URL}/portal/profile`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile`}>
         Go to your profile
       </PrimaryButton>
       <P muted>Shipping hard. — Team TAG</P>

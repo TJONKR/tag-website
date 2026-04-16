@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { H1, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -17,7 +17,7 @@ export const TasteComplete = ({ name }: TasteCompleteProps) => {
         visible to the rest of the community — and it&apos;s how other members can
         find out what you&apos;re working on.
       </P>
-      <PrimaryButton href={`${SITE_URL}/portal/taste`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/taste`}>
         View your profile
       </PrimaryButton>
       <P muted>

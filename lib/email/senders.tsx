@@ -1,3 +1,4 @@
+import { EMAIL_PUBLIC_URL } from './config'
 import { sendEmail, type SendEmailResult } from './send'
 import { getAdminRecipients, getUserEmail } from './recipients'
 import { ApplicationReceived } from './templates/application-received'
@@ -66,11 +67,10 @@ export const sendApplicationApproved = (args: {
   to: string
   name: string
 }): Promise<SendEmailResult> => {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
   return sendEmail({
     to: args.to,
     subject: "You're in — welcome to TAG",
-    react: <ApplicationApproved name={args.name} signupUrl={`${siteUrl}/signup`} />,
+    react: <ApplicationApproved name={args.name} signupUrl={`${EMAIL_PUBLIC_URL}/signup`} />,
     tag: 'application-approved',
   })
 }

@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { H1, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -16,7 +16,7 @@ export const ClaimNewAdmin = ({ userName, userEmail }: ClaimNewAdminProps) => {
         membership claim. Review it in the admin portal to approve, reject, or request
         more info.
       </P>
-      <PrimaryButton href={`${SITE_URL}/portal/admin/claims`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/admin/claims`}>
         Review claim
       </PrimaryButton>
     </EmailLayout>

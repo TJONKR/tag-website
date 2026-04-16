@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { Divider, H1, LabeledSection, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -35,7 +35,7 @@ export const ApplicationNewAdmin = ({
         </>
       ) : null}
 
-      <PrimaryButton href={`${SITE_URL}/portal/people?tab=applications`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/people?tab=applications`}>
         Review in portal
       </PrimaryButton>
     </EmailLayout>

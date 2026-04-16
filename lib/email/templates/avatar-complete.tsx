@@ -1,6 +1,6 @@
 import { Img } from '@react-email/components'
 
-import { BRAND, SITE_URL } from '../config'
+import { BRAND, EMAIL_PUBLIC_URL } from '../config'
 import { H1, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -33,7 +33,7 @@ export const AvatarComplete = ({ name, imageUrl }: AvatarCompleteProps) => {
           }}
         />
       ) : null}
-      <PrimaryButton href={`${SITE_URL}/portal/profile`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile`}>
         Review and confirm
       </PrimaryButton>
     </EmailLayout>

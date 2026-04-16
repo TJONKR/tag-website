@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { Divider, H1, LabeledSection, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -24,7 +24,7 @@ export const TasteFailed = ({ name, errorMessage }: TasteFailedProps) => {
         </>
       ) : null}
 
-      <PrimaryButton href={`${SITE_URL}/portal/taste`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/taste`}>
         Retry on the Taste page
       </PrimaryButton>
       <P muted>If it keeps failing, reply to this email and we&apos;ll debug together.</P>

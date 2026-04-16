@@ -1,4 +1,4 @@
-import { SITE_URL } from '../config'
+import { EMAIL_PUBLIC_URL } from '../config'
 import { Divider, H1, LabeledSection, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -35,7 +35,7 @@ export const WelcomeAmbassador = ({ name }: WelcomeAmbassadorProps) => {
         That&apos;s the whole point.
       </LabeledSection>
 
-      <PrimaryButton href={`${SITE_URL}/portal`}>Go to the portal</PrimaryButton>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal`}>Go to the portal</PrimaryButton>
 
       <P muted>Questions? Reply to this email — it goes straight to the team.</P>
     </EmailLayout>

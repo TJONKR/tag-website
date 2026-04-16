@@ -1,6 +1,6 @@
 import { Img } from '@react-email/components'
 
-import { BRAND, SITE_URL } from '../config'
+import { BRAND, EMAIL_PUBLIC_URL } from '../config'
 import { H1, P, PrimaryButton } from './_components'
 import { EmailLayout } from './_layout'
 
@@ -40,7 +40,7 @@ export const SkinComplete = ({ name, skinName, rarity, imageUrl }: SkinCompleteP
           }}
         />
       ) : null}
-      <PrimaryButton href={`${SITE_URL}/portal/profile`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile`}>
         See it on your profile
       </PrimaryButton>
     </EmailLayout>
