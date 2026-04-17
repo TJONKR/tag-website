@@ -21,26 +21,10 @@ interface ProfilePageClientProps {
 }
 
 export const ProfilePageClient = ({
-  userId,
+  userId: _userId,
   profile,
 }: ProfilePageClientProps) => {
   const { profile: builderProfile, mutate } = useBuilderProfile()
-
-  const handleTrigger = async () => {
-    try {
-      const res = await fetch('/api/taste/evaluate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
-      })
-
-      if (res.ok) {
-        mutate()
-      }
-    } catch {
-      // Error handled by SWR polling picking up status changes
-    }
-  }
 
   const handleVisibilityUpdate = async (
     field: VisibilityField,
@@ -61,18 +45,19 @@ export const ProfilePageClient = ({
     }
   }
 
-  // No profile yet or error — show prompt
+  // No profile yet or error — show prompt (no user-triggerable action;
+  // auto-generation runs once after onboarding completion).
   if (!builderProfile || builderProfile.status === 'error') {
     return (
       <div className="space-y-4">
-        <ProfilePrompt profile={profile} onTrigger={handleTrigger} />
+        <ProfilePrompt profile={profile} />
         {builderProfile?.status === 'error' && builderProfile.error && (
           <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4">
             <p className="text-sm text-red-400">
               Previous attempt failed: {builderProfile.error}
             </p>
             <p className="mt-1 text-xs text-tag-dim">
-              You can try running it again.
+              An admin can retry this for you — reach out in the space.
             </p>
           </div>
         )}

@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Sparkles, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { Sparkles, CheckCircle2, XCircle } from 'lucide-react'
 
-import { Button } from '@components/ui/button'
 import { cn } from '@lib/utils'
 
 interface ProfileData {
@@ -16,7 +14,6 @@ interface ProfileData {
 
 interface ProfilePromptProps {
   profile: ProfileData
-  onTrigger: () => void
 }
 
 const DATA_SOURCES = [
@@ -26,20 +23,13 @@ const DATA_SOURCES = [
   { key: 'website_url' as const, label: 'Website', required: false },
 ]
 
-export const ProfilePrompt = ({ profile, onTrigger }: ProfilePromptProps) => {
-  const [loading, setLoading] = useState(false)
-
+export const ProfilePrompt = ({ profile }: ProfilePromptProps) => {
   const hasName = !!profile.name
   const hasTwitter = !!profile.twitter_url
   const hasLinkedIn = !!profile.linkedin_url
-  const canTrigger = hasName && (hasTwitter || hasLinkedIn)
+  const canAutoRun = hasName && (hasTwitter || hasLinkedIn)
 
   const filledCount = DATA_SOURCES.filter((u) => !!profile[u.key]).length
-
-  const handleTrigger = async () => {
-    setLoading(true)
-    onTrigger()
-  }
 
   return (
     <div className="rounded-xl border border-tag-border bg-tag-card p-8">
@@ -49,18 +39,19 @@ export const ProfilePrompt = ({ profile, onTrigger }: ProfilePromptProps) => {
         </div>
         <div>
           <h2 className="font-syne text-xl font-bold text-tag-text">
-            Build Your Profile
+            Your Builder Profile
           </h2>
           <p className="text-sm text-tag-muted">
-            AI-powered profile enrichment from your digital presence
+            AI-enriched profile from your digital presence
           </p>
         </div>
       </div>
 
       <p className="mb-6 text-tag-muted">
-        We&apos;ll research your public digital presence — tweets, posts,
-        website, and projects — to build a rich builder profile. You stay in
-        control of what&apos;s shown publicly.
+        We research your public digital presence — tweets, posts, website, and
+        projects — to build a rich builder profile. It runs automatically once
+        you complete onboarding with at least a name and a Twitter or LinkedIn
+        URL.
       </p>
 
       <div className="mb-6 space-y-2">
@@ -70,10 +61,7 @@ export const ProfilePrompt = ({ profile, onTrigger }: ProfilePromptProps) => {
         {DATA_SOURCES.map((url) => {
           const filled = !!profile[url.key]
           return (
-            <div
-              key={url.key}
-              className="flex items-center gap-2 text-sm"
-            >
+            <div key={url.key} className="flex items-center gap-2 text-sm">
               {filled ? (
                 <CheckCircle2 className="size-4 text-green-500" />
               ) : (
@@ -84,11 +72,7 @@ export const ProfilePrompt = ({ profile, onTrigger }: ProfilePromptProps) => {
                   )}
                 />
               )}
-              <span
-                className={cn(
-                  filled ? 'text-tag-text' : 'text-tag-muted'
-                )}
-              >
+              <span className={cn(filled ? 'text-tag-text' : 'text-tag-muted')}>
                 {url.label}
               </span>
               {!filled && url.required && (
@@ -97,39 +81,27 @@ export const ProfilePrompt = ({ profile, onTrigger }: ProfilePromptProps) => {
                 </span>
               )}
               {!filled && !url.required && (
-                <span className="font-mono text-xs text-tag-dim">
-                  OPTIONAL
-                </span>
+                <span className="font-mono text-xs text-tag-dim">OPTIONAL</span>
               )}
             </div>
           )
         })}
       </div>
 
-      {!canTrigger && (
-        <p className="mb-4 text-sm text-tag-orange">
+      {!canAutoRun ? (
+        <p className="text-sm text-tag-orange">
           Add your name and at least a Twitter or LinkedIn URL in your{' '}
           <a href="/portal/profile" className="underline">
             profile
           </a>{' '}
-          to build your profile.
+          — your builder profile will be generated automatically.
+        </p>
+      ) : (
+        <p className="text-sm text-tag-muted">
+          Your builder profile hasn&apos;t been generated yet. If it doesn&apos;t
+          appear soon, reach out to an admin.
         </p>
       )}
-
-      <Button
-        onClick={handleTrigger}
-        disabled={!canTrigger || loading}
-        className="w-full bg-tag-orange font-mono text-sm uppercase tracking-wider text-white hover:bg-tag-orange/90 disabled:opacity-50"
-      >
-        {loading ? (
-          <>
-            <Loader2 className="mr-2 size-4 animate-spin" />
-            Starting...
-          </>
-        ) : (
-          'Build My Profile'
-        )}
-      </Button>
     </div>
   )
 }

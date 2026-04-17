@@ -2,6 +2,16 @@ import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
 
 import type { BuilderProfile } from './types'
 
+export async function hasBuilderProfile(userId: string): Promise<boolean> {
+  const supabase = createServiceRoleClient()
+  const { data } = await supabase
+    .from('builder_profiles')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle()
+  return Boolean(data)
+}
+
 export async function getBuilderProfile(
   userId: string
 ): Promise<BuilderProfile | null> {

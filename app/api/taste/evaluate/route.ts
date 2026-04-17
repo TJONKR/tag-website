@@ -16,6 +16,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 
+    // Manual reruns are admin-only. Auto-creation on first onboarding flows
+    // through /api/profile/onboarding instead, where it's guarded to run once
+    // per user without user-visible controls.
+    if (!user.is_super_admin) {
+      return NextResponse.json({ errors: [{ message: 'Forbidden' }] }, { status: 403 })
+    }
+
     const body = await req.json()
     const result = evaluateSchema.safeParse(body)
 
@@ -27,14 +34,6 @@ export async function POST(req: Request) {
     }
 
     const { userId } = result.data
-
-    // Ensure users can only evaluate their own profile
-    if (userId !== user.id) {
-      return NextResponse.json(
-        { errors: [{ message: 'Forbidden' }] },
-        { status: 403 }
-      )
-    }
 
     // Reject if evaluation is already in progress
     const existingProfile = await getBuilderProfile(userId)
