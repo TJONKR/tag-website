@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server'
+import { waitUntil } from '@vercel/functions'
 
 import { getOptionalUser } from '@lib/auth/queries'
 import { chooseSkin } from '@lib/lootbox/mutations'
 import { runGenerationPipeline } from '@lib/lootbox/pipeline/run'
 import { chooseSkinSchema } from '@lib/lootbox/schema'
+
+export const maxDuration = 300
 
 export async function POST(req: Request) {
   try {
@@ -21,15 +24,19 @@ export async function POST(req: Request) {
     const { lootboxId, styleId } = parsed.data
     const result = await chooseSkin(user.id, lootboxId, styleId)
 
-    // Fire-and-forget generation pipeline
-    runGenerationPipeline({
-      userId: user.id,
-      skinId: result.skinId,
-      styleId,
-      generationType: result.generationType,
-    }).catch((err) => {
-      console.error('[lootbox/choose] Pipeline error:', err)
-    })
+    // Keep the serverless function alive until the pipeline finishes
+    // (up to maxDuration), without blocking the response the client needs
+    // to start polling /api/lootbox/status.
+    waitUntil(
+      runGenerationPipeline({
+        userId: user.id,
+        skinId: result.skinId,
+        styleId,
+        generationType: result.generationType,
+      }).catch((err) => {
+        console.error('[lootbox/choose] Pipeline error:', err)
+      })
+    )
 
     return NextResponse.json({
       skinId: result.skinId,

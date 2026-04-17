@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server'
+import { waitUntil } from '@vercel/functions'
 
 import { getOptionalUser } from '@lib/auth/queries'
 import { retrySkinGeneration } from '@lib/lootbox/mutations'
 import { runGenerationPipeline } from '@lib/lootbox/pipeline/run'
 import { retrySkinSchema } from '@lib/lootbox/schema'
+
+export const maxDuration = 300
 
 export async function POST(req: Request) {
   try {
@@ -20,15 +23,18 @@ export async function POST(req: Request) {
 
     const result = await retrySkinGeneration(user.id, parsed.data.skinId)
 
-    // Fire-and-forget generation pipeline
-    runGenerationPipeline({
-      userId: user.id,
-      skinId: result.skinId,
-      styleId: result.styleId,
-      generationType: result.generationType,
-    }).catch((err) => {
-      console.error('[lootbox/retry] Pipeline error:', err)
-    })
+    // Keep the serverless function alive until the pipeline finishes
+    // (up to maxDuration), without blocking the response.
+    waitUntil(
+      runGenerationPipeline({
+        userId: user.id,
+        skinId: result.skinId,
+        styleId: result.styleId,
+        generationType: result.generationType,
+      }).catch((err) => {
+        console.error('[lootbox/retry] Pipeline error:', err)
+      })
+    )
 
     return NextResponse.json({ skinId: result.skinId })
   } catch (error) {
