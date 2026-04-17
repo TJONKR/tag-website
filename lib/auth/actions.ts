@@ -106,7 +106,7 @@ export async function signup(formData: FormData): Promise<SignupResult> {
       password,
       options: {
         data: { name, application_id: application.id },
-        emailRedirectTo: `${origin}/auth/confirm?next=/portal/onboarding`,
+        emailRedirectTo: `${origin}/auth/callback?next=/portal/onboarding`,
       },
     })
 
@@ -320,7 +320,7 @@ export async function requestPasswordReset(
   try {
     const supabase = await createServerSupabaseClient()
     const origin = await getOrigin()
-    const redirectTo = `${origin}/reset-password`
+    const redirectTo = `${origin}/auth/callback?next=/reset-password`
 
     await supabase.auth.resetPasswordForEmail(email, { redirectTo })
   } catch (error) {

@@ -17,7 +17,8 @@
     "test:e2e": "pnpm exec playwright test --project=e2e",
     "test:routes": "pnpm exec playwright test --project=routes",
     "add-builder": "tsx scripts/add-builder.ts",
-    "batch-scrape": "tsx scripts/batch-scrape.ts"
+    "batch-scrape": "tsx scripts/batch-scrape.ts",
+    "render-auth-emails": "TSX_TSCONFIG_PATH=tsconfig.scripts.json tsx scripts/render-auth-emails.tsx"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.16",
