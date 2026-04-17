@@ -17,6 +17,19 @@ export const SpaceAddress = () => {
             <p className="mt-1 font-mono text-sm text-tag-muted">
               Jacob Bontiusplaats 9, 1018 LL Amsterdam
             </p>
+            <a
+              href="https://aiam.amsterdam/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-tag-dim transition-colors hover:text-tag-text"
+            >
+              <span>TAG @</span>
+              <img
+                src="/images/aiam-logo.svg"
+                alt="AI AM"
+                className="h-4 w-auto opacity-80"
+              />
+            </a>
           </div>
         </div>
         <a
