@@ -23,6 +23,19 @@ export interface PublicProfile {
   website_url: string | null
   instagram_url: string | null
   created_at: string
+  equipped_skin_url: string | null
+  taste: PublicTaste | null
+}
+
+export interface PublicTaste {
+  headline: string | null
+  bio: string | null
+  tags: string[] | null
+  projects: { name: string; description: string; url?: string; role?: string }[] | null
+  interests: string[] | null
+  notable_work: string[] | null
+  influences: string[] | null
+  key_links: { url: string; title: string; type: string }[] | null
 }
 
 export interface LoginActionState {

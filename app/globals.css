@@ -124,6 +124,30 @@
 }
 
 /* ========================================
+   SKELETON SHIMMER
+   ======================================== */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.skeleton-bar {
+  height: 0.75rem;
+  border-radius: 0.25rem;
+  background: linear-gradient(
+    90deg,
+    rgba(240, 235, 227, 0.04),
+    rgba(240, 235, 227, 0.09),
+    rgba(240, 235, 227, 0.04)
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+/* ========================================
    SCANLINES
    ======================================== */
 .scanlines {

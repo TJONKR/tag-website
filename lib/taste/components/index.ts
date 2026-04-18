@@ -1,5 +1,7 @@
-export { ProfilePrompt } from './profile-prompt'
-export { ProfileProgress } from './profile-progress'
-export { ProfileCard } from './profile-card'
-export { ProfileVisibility } from './profile-visibility'
-export { ProfilePageClient } from './profile-page-client'
+export {
+  HeadlineDialog,
+  BioDialog,
+  StringListDialog,
+  ProjectsDialog,
+  KeyLinksDialog,
+} from './edit-dialogs'

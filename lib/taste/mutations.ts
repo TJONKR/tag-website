@@ -165,3 +165,32 @@ export async function updateVisibility(
 
   if (error) throw new Error(error.message)
 }
+
+interface TasteFieldsPatch {
+  headline?: string
+  bio?: string
+  tags?: string[]
+  projects?: { name: string; description: string; url?: string; role?: string }[]
+  interests?: string[]
+  notable_work?: string[]
+  influences?: string[]
+  key_links?: { url: string; title: string; type: string }[]
+}
+
+export async function updateTasteFields(userId: string, patch: TasteFieldsPatch) {
+  const supabase = createServiceRoleClient()
+
+  const cleaned: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(patch)) {
+    if (value === undefined) continue
+    cleaned[key] = value
+  }
+  if (Object.keys(cleaned).length === 0) return
+
+  const { error } = await supabase
+    .from('builder_profiles')
+    .update(cleaned)
+    .eq('user_id', userId)
+
+  if (error) throw new Error(error.message)
+}

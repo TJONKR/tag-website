@@ -17,11 +17,11 @@ export const TasteComplete = ({ name }: TasteCompleteProps) => {
         visible to the rest of the community — and it&apos;s how other members can
         find out what you&apos;re working on.
       </P>
-      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/taste`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile?tab=identity`}>
         View your profile
       </PrimaryButton>
       <P muted>
-        You can edit visibility per section from the Taste page.
+        You can edit visibility per section from the Identity tab.
       </P>
     </EmailLayout>
   )

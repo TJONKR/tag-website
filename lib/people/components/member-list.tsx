@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import Image from 'next/image'
-import { ExternalLink, Search, Loader2, Trash2 } from 'lucide-react'
+import { ExternalLink, Search, Loader2, RefreshCw, Trash2 } from 'lucide-react'
 
 import {
   AlertDialog,
@@ -42,6 +42,7 @@ interface MemberListProps {
   initialMembers: Member[]
   initialCounts: MemberCounts
   isOperator: boolean
+  isSuperAdmin: boolean
 }
 
 const roleColors: Record<UserRole, string> = {
@@ -68,7 +69,12 @@ const getInitials = (name: string | null) => {
 
 type FilterRole = UserRole | 'all'
 
-export const MemberList = ({ initialMembers, initialCounts, isOperator }: MemberListProps) => {
+export const MemberList = ({
+  initialMembers,
+  initialCounts,
+  isOperator,
+  isSuperAdmin,
+}: MemberListProps) => {
   const [members, setMembers] = useState(initialMembers)
   const [counts, setCounts] = useState(initialCounts)
   const [search, setSearch] = useState('')
@@ -77,6 +83,7 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
   const [enlargedAvatar, setEnlargedAvatar] = useState<Member | null>(null)
   const [roleLoading, setRoleLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [regenLoading, setRegenLoading] = useState(false)
 
   const filtered = useMemo(() => {
     return members.filter((m) => {
@@ -130,6 +137,37 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
       })
     } finally {
       setRoleLoading(false)
+    }
+  }
+
+  const handleRegenerate = async (memberId: string) => {
+    setRegenLoading(true)
+    try {
+      const res = await fetch('/api/taste/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: memberId }),
+      })
+
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        throw new Error(
+          json.errors?.[0]?.message ?? 'Failed to regenerate profile'
+        )
+      }
+
+      toast({
+        type: 'success',
+        description: 'Profile regeneration started.',
+      })
+    } catch (error) {
+      toast({
+        type: 'error',
+        description:
+          error instanceof Error ? error.message : 'Something went wrong.',
+      })
+    } finally {
+      setRegenLoading(false)
     }
   }
 
@@ -208,9 +246,15 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
             <div
               key={member.id}
               className={`group flex flex-col items-center rounded-lg border border-tag-border bg-tag-card p-4 transition-all duration-300 hover:border-tag-orange/30 hover:shadow-[0_0_24px_rgba(255,95,31,0.15)] ${
-                isOperator || profileHref ? 'cursor-pointer' : ''
+                isOperator || isSuperAdmin || profileHref ? 'cursor-pointer' : ''
               }`}
-              onClick={isOperator ? () => setSelected(member) : profileHref ? () => window.location.href = profileHref : undefined}
+              onClick={
+                isOperator || isSuperAdmin
+                  ? () => setSelected(member)
+                  : profileHref
+                    ? () => (window.location.href = profileHref)
+                    : undefined
+              }
             >
               <button
                 type="button"
@@ -275,8 +319,8 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
         </DialogContent>
       </Dialog>
 
-      {/* Detail dialog (operator only) */}
-      {isOperator && (
+      {/* Detail dialog (operator or super admin) */}
+      {(isOperator || isSuperAdmin) && (
         <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
           <DialogContent className="max-h-[80vh] overflow-y-auto border-tag-border bg-tag-bg text-tag-text">
             <DialogHeader>
@@ -307,29 +351,35 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
                 </div>
 
                 <div className="space-y-4">
-                  {/* Role change */}
-                  <div>
-                    <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
-                      Role
-                    </p>
-                    <div className="mt-1 flex items-center gap-2">
-                      <Select
-                        value={selected.role}
-                        onValueChange={(v) => handleRoleChange(selected.id, v as UserRole)}
-                        disabled={roleLoading}
-                      >
-                        <SelectTrigger className="w-40 border-tag-border bg-tag-card text-tag-text">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="border-tag-border bg-tag-bg">
-                          <SelectItem value="ambassador">Ambassador</SelectItem>
-                          <SelectItem value="builder">Builder</SelectItem>
-                          <SelectItem value="operator">Operator</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {roleLoading && <Loader2 className="size-4 animate-spin text-tag-dim" />}
+                  {/* Role change (operator only) */}
+                  {isOperator && (
+                    <div>
+                      <p className="font-mono text-xs uppercase tracking-[0.08em] text-tag-dim">
+                        Role
+                      </p>
+                      <div className="mt-1 flex items-center gap-2">
+                        <Select
+                          value={selected.role}
+                          onValueChange={(v) =>
+                            handleRoleChange(selected.id, v as UserRole)
+                          }
+                          disabled={roleLoading}
+                        >
+                          <SelectTrigger className="w-40 border-tag-border bg-tag-card text-tag-text">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="border-tag-border bg-tag-bg">
+                            <SelectItem value="ambassador">Ambassador</SelectItem>
+                            <SelectItem value="builder">Builder</SelectItem>
+                            <SelectItem value="operator">Operator</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {roleLoading && (
+                          <Loader2 className="size-4 animate-spin text-tag-dim" />
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {selected.building && (
                     <div>
@@ -356,7 +406,7 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
                   Joined {new Date(selected.created_at).toLocaleDateString()}
                 </p>
 
-                <div className="flex items-center gap-2 border-t border-tag-border pt-4">
+                <div className="flex flex-wrap items-center gap-2 border-t border-tag-border pt-4">
                   {selected.name && (
                     <Button
                       variant="outline"
@@ -370,6 +420,23 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
                       View profile
                     </Button>
                   )}
+                  {isSuperAdmin && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={regenLoading}
+                      className="gap-2 border-tag-border text-tag-text hover:border-tag-orange hover:text-tag-orange"
+                      onClick={() => handleRegenerate(selected.id)}
+                    >
+                      {regenLoading ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <RefreshCw className="size-4" />
+                      )}
+                      Regenerate profile
+                    </Button>
+                  )}
+                  {isOperator && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -410,6 +477,7 @@ export const MemberList = ({ initialMembers, initialCounts, isOperator }: Member
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
+                  )}
                 </div>
               </div>
             )}

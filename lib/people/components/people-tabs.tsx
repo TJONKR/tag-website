@@ -31,7 +31,14 @@ export const PeopleTabs = ({
   initialTab,
 }: PeopleTabsProps) => {
   if (!isOperator && !isSuperAdmin) {
-    return <MemberList initialMembers={members} initialCounts={memberCounts} isOperator={false} />
+    return (
+      <MemberList
+        initialMembers={members}
+        initialCounts={memberCounts}
+        isOperator={false}
+        isSuperAdmin={false}
+      />
+    )
   }
 
   const validTabs = ['members', 'applications', ...(isSuperAdmin ? ['claims'] : [])]
@@ -68,7 +75,12 @@ export const PeopleTabs = ({
       </div>
 
       <TabsContent value="members" className="mt-6">
-        <MemberList initialMembers={members} initialCounts={memberCounts} isOperator={isOperator} />
+        <MemberList
+          initialMembers={members}
+          initialCounts={memberCounts}
+          isOperator={isOperator}
+          isSuperAdmin={isSuperAdmin}
+        />
       </TabsContent>
 
       {isOperator && (

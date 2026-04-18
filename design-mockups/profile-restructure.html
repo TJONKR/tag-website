@@ -1,0 +1,1529 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TAG · Profile restructure options</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --tag-orange: #ff5f1f;
+        --tag-bg: #141210;
+        --tag-bg-deep: #0e0d0b;
+        --tag-card: #1a1816;
+        --tag-card-2: #201d1a;
+        --tag-text: #f0ebe3;
+        --tag-muted: #9b9589;
+        --tag-dim: #5e5850;
+        --tag-border: #2a2724;
+        --radius: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--tag-bg-deep);
+        color: var(--tag-text);
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        background-image: radial-gradient(
+          circle,
+          rgba(240, 235, 227, 0.07) 0.75px,
+          transparent 0.75px
+        );
+        background-size: 16px 16px;
+      }
+
+      /* ────── top bar ────── */
+      .top {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(20, 18, 16, 0.9);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--tag-border);
+      }
+      .top-inner {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 16px 32px;
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+      .brand {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: 20px;
+        letter-spacing: 0.02em;
+      }
+      .top-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--tag-muted);
+      }
+      .jumpnav {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .jumpnav a {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--tag-muted);
+        text-decoration: none;
+        padding: 8px 14px;
+        border: 1px solid var(--tag-border);
+        border-radius: 100px;
+        transition: all 0.15s ease;
+      }
+      .jumpnav a:hover {
+        color: var(--tag-orange);
+        border-color: var(--tag-orange);
+      }
+
+      /* ────── section (one option) ────── */
+      section.option {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 80px 32px;
+        border-bottom: 1px dashed var(--tag-border);
+      }
+      .opt-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 24px;
+        margin-bottom: 40px;
+      }
+      .opt-num {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: 64px;
+        line-height: 0.9;
+        color: var(--tag-orange);
+      }
+      .opt-title-wrap {
+        padding-top: 8px;
+      }
+      .opt-title {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 32px;
+        line-height: 1.1;
+      }
+      .opt-subtitle {
+        margin-top: 8px;
+        color: var(--tag-muted);
+        max-width: 720px;
+        line-height: 1.55;
+      }
+      .opt-tradeoffs {
+        display: flex;
+        gap: 32px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+      .opt-tradeoffs .pros,
+      .opt-tradeoffs .cons {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        line-height: 1.7;
+      }
+      .opt-tradeoffs .pros strong,
+      .opt-tradeoffs .cons strong {
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 6px;
+        font-size: 10px;
+      }
+      .opt-tradeoffs .pros strong {
+        color: #4ade80;
+      }
+      .opt-tradeoffs .cons strong {
+        color: #fb923c;
+      }
+
+      /* ────── mock portal frame ────── */
+      .portal {
+        border: 1px solid var(--tag-border);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--tag-bg);
+        box-shadow:
+          0 40px 80px -40px rgba(0, 0, 0, 0.7),
+          0 0 0 1px rgba(255, 95, 31, 0.04);
+      }
+      .portal + .portal {
+        margin-top: 24px;
+      }
+      .portal-nav {
+        display: flex;
+        align-items: center;
+        padding: 14px 24px;
+        border-bottom: 1px solid var(--tag-border);
+        background: var(--tag-bg);
+      }
+      .portal-nav .brand {
+        font-size: 16px;
+      }
+      .portal-nav-items {
+        margin-left: auto;
+        display: flex;
+        gap: 28px;
+        align-items: center;
+      }
+      .portal-nav-items a {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--tag-muted);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .portal-nav-items a.active {
+        color: var(--tag-orange);
+      }
+      .portal-nav-items .avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 100px;
+        background: linear-gradient(135deg, #ff5f1f, #b3421c);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--tag-bg);
+        border: 2px solid transparent;
+      }
+      .portal-nav-items .avatar.ring {
+        border-color: var(--tag-orange);
+      }
+      .portal-body {
+        padding: 32px 40px 48px;
+      }
+      .portal-label {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--tag-orange);
+        background: var(--tag-bg-deep);
+        padding: 4px 10px;
+        border: 1px solid var(--tag-border);
+        border-radius: 100px;
+      }
+      .portal-wrap {
+        position: relative;
+      }
+
+      /* ────── portal header ────── */
+      .ph {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 32px;
+      }
+      .ph h1 {
+        font-family: 'Syne', sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+      }
+      .ph p {
+        margin: 6px 0 0;
+        color: var(--tag-muted);
+        font-size: 14px;
+      }
+      .ph-link {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--tag-muted);
+        text-decoration: none;
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .ph-link:hover {
+        color: var(--tag-orange);
+      }
+
+      /* ────── shared card bits ────── */
+      .card {
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: var(--radius);
+        padding: 20px;
+      }
+      .card-lg {
+        padding: 28px;
+      }
+      .card-head {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--tag-dim);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .card-head .edit {
+        color: var(--tag-muted);
+        cursor: pointer;
+      }
+      .card-head .edit:hover {
+        color: var(--tag-text);
+      }
+
+      /* ────── stats strip ────── */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      .stat {
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+      }
+      .stat-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--tag-dim);
+      }
+      .stat-val {
+        margin-top: 6px;
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 26px;
+      }
+      .stat.good .stat-val {
+        color: #4ade80;
+      }
+      .stat.hot {
+        border-color: rgba(255, 95, 31, 0.35);
+        box-shadow: 0 0 20px rgba(255, 95, 31, 0.1);
+      }
+      .stat.hot .stat-val {
+        color: var(--tag-orange);
+      }
+
+      /* ────── hero identity card ────── */
+      .hero {
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .hero-img {
+        aspect-ratio: 3 / 4;
+        background:
+          radial-gradient(
+            circle at 30% 30%,
+            rgba(255, 95, 31, 0.4),
+            transparent 60%
+          ),
+          radial-gradient(
+            circle at 70% 80%,
+            rgba(180, 60, 20, 0.5),
+            transparent 60%
+          ),
+          linear-gradient(135deg, #3a1e12, #1a0d08);
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        padding: 20px;
+      }
+      .hero-img::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(
+            circle at 50% 30%,
+            rgba(240, 235, 227, 0.08),
+            transparent 40%
+          ),
+          url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.15'/></svg>");
+      }
+      .hero-img .skin-badge {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--tag-orange);
+        background: rgba(20, 18, 16, 0.7);
+        padding: 4px 8px;
+        border-radius: 100px;
+        border: 1px solid rgba(255, 95, 31, 0.3);
+      }
+      .hero-info {
+        padding: 18px 20px 20px;
+      }
+      .hero-info h2 {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        margin: 0;
+      }
+      .hero-info .headline {
+        margin-top: 4px;
+        color: var(--tag-muted);
+        font-size: 13px;
+      }
+      .tag-chips {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .tag-chip {
+        font-size: 12px;
+        color: var(--tag-orange);
+        background: rgba(255, 95, 31, 0.06);
+        border: 1px solid rgba(255, 95, 31, 0.2);
+        border-radius: 100px;
+        padding: 2px 10px;
+      }
+      .hero-meta {
+        margin-top: 14px;
+        display: grid;
+        gap: 6px;
+      }
+      .hero-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--tag-muted);
+      }
+      .dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 100px;
+        background: rgba(255, 95, 31, 0.1);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: var(--tag-orange);
+      }
+
+      /* ────── socials ────── */
+      .socials {
+        display: flex;
+        gap: 8px;
+        padding: 16px 20px;
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: var(--radius);
+      }
+      .socials a {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid var(--tag-border);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tag-muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.15s;
+      }
+      .socials a:hover {
+        color: var(--tag-orange);
+        border-color: var(--tag-orange);
+      }
+
+      /* ────── membership card ────── */
+      .membership {
+        background:
+          radial-gradient(
+            circle at 0% 0%,
+            rgba(255, 95, 31, 0.1),
+            transparent 60%
+          ),
+          var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: var(--radius);
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .membership-tier {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+      }
+      .membership-desc {
+        margin-top: 4px;
+        color: var(--tag-muted);
+        font-size: 13px;
+      }
+      .pill-btn {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 10px 16px;
+        border-radius: 100px;
+        border: 1px solid var(--tag-border);
+        background: transparent;
+        color: var(--tag-muted);
+        cursor: pointer;
+      }
+      .pill-btn.primary {
+        background: var(--tag-orange);
+        border-color: var(--tag-orange);
+        color: var(--tag-bg);
+      }
+
+      /* ────── events row ────── */
+      .event-row {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        gap: 14px;
+        padding: 14px 0;
+        border-top: 1px solid var(--tag-border);
+      }
+      .event-row:first-child {
+        border-top: none;
+      }
+      .event-date {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--tag-orange);
+      }
+      .event-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 15px;
+      }
+
+      /* ────── account list ────── */
+      .account-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0;
+        border-top: 1px solid var(--tag-border);
+      }
+      .account-item:first-child {
+        border-top: none;
+      }
+      .account-item .k {
+        font-size: 13px;
+        color: var(--tag-muted);
+      }
+      .account-item .v {
+        font-size: 14px;
+        color: var(--tag-text);
+      }
+
+      /* ────── visibility toggles ────── */
+      .vis-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .vis-row.on {
+        background: rgba(255, 95, 31, 0.06);
+        color: var(--tag-text);
+      }
+      .vis-row.off {
+        color: var(--tag-dim);
+      }
+      .vis-row .eye {
+        font-size: 13px;
+      }
+      .vis-row.on .eye {
+        color: var(--tag-orange);
+      }
+      .vis-row.off .eye {
+        color: var(--tag-dim);
+      }
+
+      /* ────── tabs ────── */
+      .tabs {
+        display: flex;
+        border-bottom: 1px solid var(--tag-border);
+        margin-bottom: 28px;
+      }
+      .tab {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--tag-muted);
+        padding: 14px 20px;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+      }
+      .tab.active {
+        color: var(--tag-orange);
+        border-bottom-color: var(--tag-orange);
+      }
+
+      /* ────── split layouts ────── */
+      .grid-a {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 24px;
+      }
+      .grid-edit {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 24px;
+      }
+      .grid-edit-wide {
+        display: grid;
+        grid-template-columns: 1fr 260px;
+        gap: 28px;
+      }
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+      .stack-lg {
+        display: grid;
+        gap: 24px;
+      }
+
+      /* ────── lootbox card ────── */
+      .lootbox {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 95, 31, 0.1),
+          var(--tag-card)
+        );
+        border: 1px solid rgba(255, 95, 31, 0.3);
+        border-radius: var(--radius);
+        padding: 24px;
+        text-align: center;
+      }
+      .lootbox-emoji {
+        font-size: 40px;
+      }
+      .lootbox-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        margin-top: 8px;
+      }
+      .lootbox-desc {
+        color: var(--tag-muted);
+        font-size: 13px;
+        margin-top: 4px;
+      }
+
+      /* ────── preview-mode (option C) mirror edit chrome ────── */
+      .mirror-section {
+        position: relative;
+        padding: 24px 28px;
+        border-radius: var(--radius);
+        border: 1px solid var(--tag-border);
+        background: var(--tag-card);
+      }
+      .mirror-section + .mirror-section {
+        margin-top: 18px;
+      }
+      .mirror-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .mirror-head h3 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--tag-muted);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .ai-pill {
+        background: rgba(255, 95, 31, 0.1);
+        color: var(--tag-orange);
+        font-size: 9px;
+        padding: 2px 8px;
+        border-radius: 100px;
+        letter-spacing: 0.1em;
+      }
+      .mirror-actions {
+        display: flex;
+        gap: 6px;
+      }
+      .mirror-actions .act {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--tag-muted);
+        padding: 4px 10px;
+        border-radius: 100px;
+        border: 1px solid var(--tag-border);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+      }
+      .mirror-actions .act.on {
+        color: var(--tag-orange);
+        border-color: rgba(255, 95, 31, 0.4);
+      }
+      .mirror-actions .act.locked {
+        color: var(--tag-dim);
+      }
+
+      .prose-text {
+        color: var(--tag-muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .prose-text p + p {
+        margin-top: 8px;
+      }
+
+      /* ────── footer ────── */
+      footer {
+        padding: 60px 32px 120px;
+        text-align: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--tag-dim);
+      }
+
+      /* small helpers */
+      .muted {
+        color: var(--tag-muted);
+      }
+      .dim {
+        color: var(--tag-dim);
+      }
+      .mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      .syne {
+        font-family: 'Syne', sans-serif;
+      }
+      .small {
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ─── sticky toolbar ─── -->
+    <div class="top">
+      <div class="top-inner">
+        <div class="brand">TAG</div>
+        <div class="top-title">Profile restructure · 3 options</div>
+        <div class="jumpnav">
+          <a href="#opt-a">A · Split</a>
+          <a href="#opt-b">B · Tabs</a>
+          <a href="#opt-c">C · Mirror</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         OPTION A · SPLIT BY PURPOSE (Dashboard + Profile)
+         ════════════════════════════════════════════════════════════ -->
+    <section class="option" id="opt-a">
+      <div class="opt-head">
+        <div class="opt-num">A</div>
+        <div class="opt-title-wrap">
+          <div class="opt-title">
+            Split by purpose — Dashboard + Profile
+          </div>
+          <div class="opt-subtitle">
+            Two portal pages with clearly different jobs. Dashboard is your
+            private "how am I doing" page (stats, gamification, membership).
+            Profile is the "what others see + controls" page. Public page
+            becomes one unified `/profile/[slug]` that honors visibility
+            toggles.
+          </div>
+          <div class="opt-tradeoffs">
+            <div class="pros">
+              <strong>Pros</strong>
+              · clearest mental model<br />
+              · taste data lives in the editor<br />
+              · public profile is finally complete<br />
+              · kills `/builders/[slug]` duplication
+            </div>
+            <div class="cons">
+              <strong>Cons</strong>
+              · two portal pages — avatar click picks one<br />
+              · biggest user-facing change<br />
+              · more routing
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── PAGE 1 of A: /portal/dashboard ─── -->
+      <div class="portal-wrap">
+        <span class="portal-label">/portal/dashboard</span>
+        <div class="portal">
+          <div class="portal-nav">
+            <div class="brand">TAG</div>
+            <div class="portal-nav-items">
+              <a>📅 Events</a>
+              <a>🗺 Space</a>
+              <a>👥 Community</a>
+              <a class="active">✦ Profile</a>
+              <span class="avatar ring">TN</span>
+            </div>
+          </div>
+          <div class="portal-body">
+            <div class="ph">
+              <div>
+                <h1>Dashboard</h1>
+                <p>Your TAG status — stats, rewards, membership.</p>
+              </div>
+            </div>
+
+            <div class="stack-lg">
+              <div class="stats">
+                <div class="stat">
+                  <div class="stat-label">Events</div>
+                  <div class="stat-val">12</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">Verified</div>
+                  <div class="stat-val">9</div>
+                </div>
+                <div class="stat good">
+                  <div class="stat-label">Rate</div>
+                  <div class="stat-val">75%</div>
+                </div>
+                <div class="stat hot">
+                  <div class="stat-label">Lootboxes</div>
+                  <div class="stat-val">2</div>
+                </div>
+              </div>
+
+              <div class="lootbox">
+                <div class="lootbox-emoji">🎁</div>
+                <div class="lootbox-title">2 lootboxes ready</div>
+                <div class="lootbox-desc">
+                  Open to unlock a new skin. Check-in at the next event for
+                  another.
+                </div>
+                <button class="pill-btn primary" style="margin-top: 14px">
+                  Open next box →
+                </button>
+              </div>
+
+              <div class="membership">
+                <div>
+                  <div class="membership-tier">Builder</div>
+                  <div class="membership-desc">
+                    Full access · Member since Jan 2026
+                  </div>
+                </div>
+                <button class="pill-btn primary">Upgrade to Operator</button>
+              </div>
+
+              <div class="card card-lg">
+                <div class="card-head">Event timeline</div>
+                <div class="event-row">
+                  <div class="event-date">APR 11 '26</div>
+                  <div class="event-title">Demo night · spring edition</div>
+                </div>
+                <div class="event-row">
+                  <div class="event-date">MAR 28 '26</div>
+                  <div class="event-title">Focus Friday · co-working</div>
+                </div>
+                <div class="event-row">
+                  <div class="event-date">MAR 14 '26</div>
+                  <div class="event-title">AI & agents meetup</div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-head">Account</div>
+                <div class="account-item">
+                  <span class="k">Name</span>
+                  <span class="v">Tijs Nieuwboer</span>
+                </div>
+                <div class="account-item">
+                  <span class="k">Email</span>
+                  <span class="v">tijsnieuwboer@gmail.com</span>
+                </div>
+                <div class="account-item">
+                  <span class="k">Session</span>
+                  <button class="pill-btn">Sign out</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── PAGE 2 of A: /portal/profile ─── -->
+      <div class="portal-wrap">
+        <span class="portal-label">/portal/profile</span>
+        <div class="portal">
+          <div class="portal-nav">
+            <div class="brand">TAG</div>
+            <div class="portal-nav-items">
+              <a>📅 Events</a>
+              <a>🗺 Space</a>
+              <a>👥 Community</a>
+              <a class="active">✦ Profile</a>
+              <span class="avatar">TN</span>
+            </div>
+          </div>
+          <div class="portal-body">
+            <div class="ph">
+              <div>
+                <h1>Profile</h1>
+                <p>What others see when they find you. Edit here — all in one place.</p>
+              </div>
+              <a class="ph-link" href="#">View public ↗</a>
+            </div>
+
+            <div class="grid-edit">
+              <!-- LEFT: live preview -->
+              <div class="stack-lg">
+                <div class="hero">
+                  <div class="hero-img">
+                    <span class="skin-badge">★ Skin equipped</span>
+                  </div>
+                  <div class="hero-info">
+                    <h2>Tijs Nieuwboer</h2>
+                    <div class="headline">
+                      Designer-engineer building AI-native tools for small
+                      teams
+                    </div>
+                    <div class="tag-chips">
+                      <span class="tag-chip">AI</span>
+                      <span class="tag-chip">Design</span>
+                      <span class="tag-chip">Next.js</span>
+                      <span class="tag-chip">Indie</span>
+                    </div>
+                    <div class="hero-meta">
+                      <div class="hero-meta-row">
+                        <span class="dot">★</span> Builder
+                      </div>
+                      <div class="hero-meta-row">
+                        <span class="dot">📅</span> Since Jan 2026
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="socials">
+                  <a>in</a><a>𝕏</a><a>gh</a><a>🌐</a><a>ig</a>
+                </div>
+
+                <div class="card">
+                  <div class="card-head">
+                    <span>Bio <span class="ai-pill">AI</span></span>
+                    <span class="edit">regenerate</span>
+                  </div>
+                  <div class="prose-text">
+                    <p>
+                      Tijs is a designer-engineer focused on AI-native tools.
+                      He runs Lerai and has shipped several side projects in
+                      the last year, from scoping tools to scheduling
+                      assistants.
+                    </p>
+                    <p>
+                      At TAG he spends most time in the Open Workspace and
+                      hosts the occasional focus Friday.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-head">
+                    <span>What I'm building</span>
+                    <span class="edit">edit</span>
+                  </div>
+                  <div class="prose-text">
+                    Lerai — an agent-powered scoping studio for agencies.
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-head">
+                    <span>Projects <span class="ai-pill">AI</span></span>
+                    <span class="edit">regenerate</span>
+                  </div>
+                  <div class="stack">
+                    <div>
+                      <strong style="font-size: 14px">Lerai</strong>
+                      <span
+                        class="mono small dim"
+                        style="margin-left: 8px"
+                        >founder</span
+                      >
+                      <div class="prose-text">
+                        Agent-powered scoping for agencies and consultancies.
+                      </div>
+                    </div>
+                    <div>
+                      <strong style="font-size: 14px">TAG portal</strong>
+                      <div class="prose-text">
+                        Member platform for TAG space in Amsterdam.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RIGHT: visibility + quick edits -->
+              <div class="stack-lg" style="position: sticky; top: 80px; align-self: start">
+                <div class="card">
+                  <div class="card-head">Public visibility</div>
+                  <div class="stack" style="gap: 2px">
+                    <div class="vis-row on">
+                      <span>Headline</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Bio</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row off">
+                      <span>Tags</span><span class="eye">⊘</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Projects</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row off">
+                      <span>Interests</span><span class="eye">⊘</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Notable work</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Links</span><span class="eye">👁</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-head">Quick edit</div>
+                  <div class="stack" style="gap: 10px">
+                    <div class="account-item" style="padding: 10px 0">
+                      <span class="k">Name</span
+                      ><span class="edit mono small">edit</span>
+                    </div>
+                    <div class="account-item" style="padding: 10px 0">
+                      <span class="k">Socials</span
+                      ><span class="edit mono small">edit</span>
+                    </div>
+                    <div class="account-item" style="padding: 10px 0">
+                      <span class="k">What I'm building</span
+                      ><span class="edit mono small">edit</span>
+                    </div>
+                    <div class="account-item" style="padding: 10px 0">
+                      <span class="k">Why TAG</span
+                      ><span class="edit mono small">edit</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         OPTION B · TABS (single page, zero routing change)
+         ════════════════════════════════════════════════════════════ -->
+    <section class="option" id="opt-b">
+      <div class="opt-head">
+        <div class="opt-num">B</div>
+        <div class="opt-title-wrap">
+          <div class="opt-title">One portal page with tabs</div>
+          <div class="opt-subtitle">
+            Zero nav changes. `/portal/profile` stays — it just grows tabs to
+            separate Overview (gamification), Identity (editor), Membership,
+            and Account. Public side still gets unified into
+            `/profile/[slug]`.
+          </div>
+          <div class="opt-tradeoffs">
+            <div class="pros">
+              <strong>Pros</strong>
+              · zero routing changes<br />
+              · single URL to remember<br />
+              · smooth migration · ships fast
+            </div>
+            <div class="cons">
+              <strong>Cons</strong>
+              · page still "does everything"<br />
+              · just hides complexity behind tabs<br />
+              · Overview tab stays heavy
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portal-wrap">
+        <span class="portal-label">/portal/profile · OVERVIEW tab</span>
+        <div class="portal">
+          <div class="portal-nav">
+            <div class="brand">TAG</div>
+            <div class="portal-nav-items">
+              <a>📅 Events</a>
+              <a>🗺 Space</a>
+              <a>👥 Community</a>
+              <span class="avatar ring">TN</span>
+            </div>
+          </div>
+          <div class="portal-body">
+            <div class="ph">
+              <div>
+                <h1>Profile</h1>
+                <p>Your account, identity, and membership in one place.</p>
+              </div>
+              <a class="ph-link" href="#">View public ↗</a>
+            </div>
+
+            <div class="tabs">
+              <div class="tab active">Overview</div>
+              <div class="tab">Identity</div>
+              <div class="tab">Membership</div>
+              <div class="tab">Account</div>
+            </div>
+
+            <div class="grid-a">
+              <div class="stack-lg">
+                <div class="hero">
+                  <div class="hero-img">
+                    <span class="skin-badge">★ Skin equipped</span>
+                  </div>
+                  <div class="hero-info">
+                    <h2>Tijs Nieuwboer</h2>
+                    <div class="headline">
+                      Designer-engineer building AI-native tools
+                    </div>
+                  </div>
+                </div>
+                <div class="lootbox">
+                  <div class="lootbox-emoji">🎁</div>
+                  <div class="lootbox-title">2 lootboxes ready</div>
+                </div>
+              </div>
+
+              <div class="stack-lg">
+                <div class="stats">
+                  <div class="stat">
+                    <div class="stat-label">Events</div>
+                    <div class="stat-val">12</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-label">Verified</div>
+                    <div class="stat-val">9</div>
+                  </div>
+                  <div class="stat good">
+                    <div class="stat-label">Rate</div>
+                    <div class="stat-val">75%</div>
+                  </div>
+                  <div class="stat hot">
+                    <div class="stat-label">Lootboxes</div>
+                    <div class="stat-val">2</div>
+                  </div>
+                </div>
+
+                <div class="card card-lg">
+                  <div class="card-head">Event timeline</div>
+                  <div class="event-row">
+                    <div class="event-date">APR 11 '26</div>
+                    <div class="event-title">
+                      Demo night · spring edition
+                    </div>
+                  </div>
+                  <div class="event-row">
+                    <div class="event-date">MAR 28 '26</div>
+                    <div class="event-title">Focus Friday · co-working</div>
+                  </div>
+                  <div class="event-row">
+                    <div class="event-date">MAR 14 '26</div>
+                    <div class="event-title">AI & agents meetup</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portal-wrap">
+        <span class="portal-label">/portal/profile · IDENTITY tab</span>
+        <div class="portal">
+          <div class="portal-nav">
+            <div class="brand">TAG</div>
+            <div class="portal-nav-items">
+              <a>📅 Events</a>
+              <a>🗺 Space</a>
+              <a>👥 Community</a>
+              <span class="avatar ring">TN</span>
+            </div>
+          </div>
+          <div class="portal-body">
+            <div class="ph">
+              <div>
+                <h1>Profile</h1>
+                <p>Your account, identity, and membership in one place.</p>
+              </div>
+              <a class="ph-link" href="#">View public ↗</a>
+            </div>
+
+            <div class="tabs">
+              <div class="tab">Overview</div>
+              <div class="tab active">Identity</div>
+              <div class="tab">Membership</div>
+              <div class="tab">Account</div>
+            </div>
+
+            <div class="grid-edit">
+              <div class="stack-lg">
+                <div class="hero">
+                  <div class="hero-img"></div>
+                  <div class="hero-info">
+                    <h2>Tijs Nieuwboer</h2>
+                    <div class="headline">
+                      Designer-engineer building AI-native tools for small
+                      teams
+                    </div>
+                    <div class="tag-chips">
+                      <span class="tag-chip">AI</span
+                      ><span class="tag-chip">Design</span
+                      ><span class="tag-chip">Next.js</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="socials"><a>in</a><a>𝕏</a><a>gh</a><a>🌐</a></div>
+                <div class="card">
+                  <div class="card-head">
+                    <span>Bio <span class="ai-pill">AI</span></span>
+                  </div>
+                  <div class="prose-text">
+                    Tijs is a designer-engineer focused on AI-native tools…
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-head">
+                    <span>What I'm building</span>
+                    <span class="edit">edit</span>
+                  </div>
+                  <div class="prose-text">
+                    Lerai — agent-powered scoping studio for agencies.
+                  </div>
+                </div>
+              </div>
+
+              <div class="stack-lg" style="position: sticky; top: 80px; align-self: start">
+                <div class="card">
+                  <div class="card-head">Public visibility</div>
+                  <div class="stack" style="gap: 2px">
+                    <div class="vis-row on">
+                      <span>Headline</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Bio</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row off">
+                      <span>Tags</span><span class="eye">⊘</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Projects</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Links</span><span class="eye">👁</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         OPTION C · MIRROR MODE (WYSIWYG profile editor)
+         ════════════════════════════════════════════════════════════ -->
+    <section class="option" id="opt-c">
+      <div class="opt-head">
+        <div class="opt-num">C</div>
+        <div class="opt-title-wrap">
+          <div class="opt-title">Mirror mode — private IS public + controls</div>
+          <div class="opt-subtitle">
+            The private profile page renders exactly what the public page
+            renders. Each section has an inline edit button and an eye toggle
+            for `show_*`. WYSIWYG — zero gap between "what I see" and "what
+            they see". Stats/gamification move to a separate
+            `/portal/dashboard`.
+          </div>
+          <div class="opt-tradeoffs">
+            <div class="pros">
+              <strong>Pros</strong>
+              · no mental translation — spatial controls<br />
+              · visibility becomes obvious, not hidden in a panel<br />
+              · private/public stay in sync by design
+            </div>
+            <div class="cons">
+              <strong>Cons</strong>
+              · biggest redesign lift<br />
+              · still needs `/portal/dashboard` split<br />
+              · some sections don't fit the pattern cleanly
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portal-wrap">
+        <span class="portal-label">/portal/profile</span>
+        <div class="portal">
+          <div class="portal-nav">
+            <div class="brand">TAG</div>
+            <div class="portal-nav-items">
+              <a>📅 Events</a>
+              <a>🗺 Space</a>
+              <a>👥 Community</a>
+              <a>◉ Dashboard</a>
+              <a class="active">✦ Profile</a>
+              <span class="avatar ring">TN</span>
+            </div>
+          </div>
+          <div class="portal-body" style="max-width: 720px; margin: 0 auto">
+            <div class="ph">
+              <div>
+                <h1>Profile</h1>
+                <p>
+                  This is exactly what others see. Toggle the eye to change
+                  what's public.
+                </p>
+              </div>
+              <a class="ph-link" href="#">Open public ↗</a>
+            </div>
+
+            <!-- header / identity -->
+            <div class="mirror-section">
+              <div style="display: flex; gap: 20px; align-items: center">
+                <div
+                  style="
+                    width: 96px;
+                    height: 96px;
+                    border-radius: 100px;
+                    background:
+                      radial-gradient(
+                        circle,
+                        rgba(255, 95, 31, 0.4),
+                        transparent 70%
+                      ),
+                      linear-gradient(135deg, #3a1e12, #1a0d08);
+                    flex-shrink: 0;
+                  "
+                ></div>
+                <div>
+                  <h2
+                    style="
+                      font-family: 'Syne', sans-serif;
+                      font-size: 28px;
+                      font-weight: 700;
+                      margin: 0;
+                    "
+                  >
+                    Tijs Nieuwboer
+                  </h2>
+                  <div
+                    style="display: flex; gap: 10px; margin-top: 6px; align-items: center"
+                  >
+                    <span class="tag-chip">Builder</span>
+                    <span class="mono small dim">Since Jan 2026</span>
+                  </div>
+                  <div class="socials" style="margin-top: 10px; padding: 0; border: none">
+                    <a>in</a><a>𝕏</a><a>gh</a><a>🌐</a>
+                  </div>
+                </div>
+                <div class="mirror-actions" style="margin-left: auto">
+                  <span class="act locked">always public</span>
+                  <span class="act">edit</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- headline (AI) -->
+            <div class="mirror-section">
+              <div class="mirror-head">
+                <h3>Headline <span class="ai-pill">AI</span></h3>
+                <div class="mirror-actions">
+                  <span class="act on">👁 public</span>
+                  <span class="act">edit</span>
+                </div>
+              </div>
+              <div
+                style="
+                  font-family: 'Syne', sans-serif;
+                  font-size: 20px;
+                  font-weight: 600;
+                "
+              >
+                Designer-engineer building AI-native tools for small teams
+              </div>
+            </div>
+
+            <!-- what I'm building -->
+            <div class="mirror-section">
+              <div class="mirror-head">
+                <h3>What I'm building</h3>
+                <div class="mirror-actions">
+                  <span class="act on">👁 public</span>
+                  <span class="act">edit</span>
+                </div>
+              </div>
+              <div class="prose-text">
+                Lerai — an agent-powered scoping studio for agencies and
+                consultancies. Also tinkering with TAG's portal.
+              </div>
+            </div>
+
+            <!-- bio (AI) -->
+            <div class="mirror-section">
+              <div class="mirror-head">
+                <h3>Bio <span class="ai-pill">AI</span></h3>
+                <div class="mirror-actions">
+                  <span class="act on">👁 public</span>
+                  <span class="act">regenerate</span>
+                </div>
+              </div>
+              <div class="prose-text">
+                <p>
+                  Tijs is a designer-engineer focused on AI-native tools. He
+                  runs Lerai and has shipped several side projects in the
+                  last year.
+                </p>
+                <p>
+                  At TAG he spends most time in the Open Workspace and hosts
+                  the occasional focus Friday.
+                </p>
+              </div>
+            </div>
+
+            <!-- tags (AI) - HIDDEN example -->
+            <div class="mirror-section" style="opacity: 0.55">
+              <div class="mirror-head">
+                <h3>
+                  Tags <span class="ai-pill">AI</span>
+                  <span class="mono small dim">· not shown publicly</span>
+                </h3>
+                <div class="mirror-actions">
+                  <span class="act">⊘ hidden</span>
+                  <span class="act">regenerate</span>
+                </div>
+              </div>
+              <div class="tag-chips">
+                <span class="tag-chip">AI</span>
+                <span class="tag-chip">Design</span>
+                <span class="tag-chip">Next.js</span>
+                <span class="tag-chip">Indie</span>
+              </div>
+            </div>
+
+            <!-- projects -->
+            <div class="mirror-section">
+              <div class="mirror-head">
+                <h3>Projects <span class="ai-pill">AI</span></h3>
+                <div class="mirror-actions">
+                  <span class="act on">👁 public</span>
+                  <span class="act">regenerate</span>
+                </div>
+              </div>
+              <div class="stack">
+                <div>
+                  <strong style="font-size: 15px">Lerai</strong>
+                  <span
+                    class="mono small dim"
+                    style="margin-left: 8px"
+                    >founder</span
+                  >
+                  <div class="prose-text">
+                    Agent-powered scoping for agencies and consultancies.
+                  </div>
+                </div>
+                <div>
+                  <strong style="font-size: 15px">TAG portal</strong>
+                  <div class="prose-text">
+                    Member platform for TAG space in Amsterdam.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- events -->
+            <div class="mirror-section">
+              <div class="mirror-head">
+                <h3>Events attended</h3>
+                <div class="mirror-actions">
+                  <span class="act locked">always public</span>
+                </div>
+              </div>
+              <div class="event-row" style="border-top: none; padding-top: 0">
+                <div class="event-date">APR 11 '26</div>
+                <div class="event-title">Demo night · spring edition</div>
+              </div>
+              <div class="event-row">
+                <div class="event-date">MAR 28 '26</div>
+                <div class="event-title">Focus Friday · co-working</div>
+              </div>
+              <div class="event-row">
+                <div class="event-date">MAR 14 '26</div>
+                <div class="event-title">AI & agents meetup</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>Static mockup · no interactivity · for structural comparison only</div>
+      <div style="margin-top: 8px; color: var(--tag-muted)">
+        Tokens: tag-orange #ff5f1f · bg #141210 · card #1a1816 · border #2a2724
+      </div>
+    </footer>
+  </body>
+</html>

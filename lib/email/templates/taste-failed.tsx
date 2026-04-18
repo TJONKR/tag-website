@@ -24,8 +24,8 @@ export const TasteFailed = ({ name, errorMessage }: TasteFailedProps) => {
         </>
       ) : null}
 
-      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/taste`}>
-        Retry on the Taste page
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/profile?tab=identity`}>
+        View your profile
       </PrimaryButton>
       <P muted>If it keeps failing, reply to this email and we&apos;ll debug together.</P>
     </EmailLayout>

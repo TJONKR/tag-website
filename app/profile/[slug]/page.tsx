@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
   ArrowLeft,
+  ExternalLink,
   Github,
   Globe,
   Instagram,
@@ -78,9 +79,13 @@ export async function generateMetadata({
 
   const name = profile.name ?? 'Member'
   const role = roleLabels[profile.role] ?? 'Member'
-  const description = profile.building
-    ? `${name} — ${role} at TAG. Building: ${profile.building}`
-    : `${name} — ${role} at TAG`
+  const headline = profile.taste?.headline
+  const description =
+    headline ??
+    (profile.building
+      ? `${name} — ${role} at TAG. Building: ${profile.building}`
+      : `${name} — ${role} at TAG`)
+  const ogImage = profile.equipped_skin_url ?? profile.avatar_url
 
   return {
     title: `${name} — TAG`,
@@ -88,8 +93,8 @@ export async function generateMetadata({
     openGraph: {
       title: `${name} — TAG`,
       description,
-      ...(profile.avatar_url && {
-        images: [{ url: profile.avatar_url, width: 400, height: 400 }],
+      ...(ogImage && {
+        images: [{ url: ogImage, width: 400, height: 400 }],
       }),
     },
     twitter: {
@@ -115,6 +120,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   })
 
   const activeSocials = socialLinks.filter((s) => profile[s.key])
+  const taste = profile.taste
+  const hasSkin = !!profile.equipped_skin_url
 
   return (
     <PageShell>
@@ -134,36 +141,54 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </Link>
 
           <article className="mt-12">
-            {/* Header: Avatar + Info */}
+            {/* Header: Avatar/skin + Info */}
             <header className="flex items-start gap-8 max-md:flex-col">
-              <div className="relative size-32 shrink-0 overflow-hidden rounded-full border border-tag-border bg-tag-card max-md:size-24">
-                {profile.avatar_url ? (
+              {hasSkin ? (
+                <div className="relative aspect-[3/4] w-40 shrink-0 overflow-hidden rounded-lg border border-tag-border bg-tag-card max-md:w-32">
                   <Image
-                    src={profile.avatar_url}
+                    src={profile.equipped_skin_url!}
                     alt={name}
                     fill
                     className="object-cover"
-                    sizes="128px"
+                    sizes="160px"
                     unoptimized
                   />
-                ) : (
-                  <div className="flex h-full items-center justify-center">
-                    <span className="font-syne text-3xl font-bold text-tag-dim">
-                      {name
-                        .split(' ')
-                        .map((w) => w[0])
-                        .join('')
-                        .slice(0, 2)
-                        .toUpperCase()}
-                    </span>
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="relative size-32 shrink-0 overflow-hidden rounded-full border border-tag-border bg-tag-card max-md:size-24">
+                  {profile.avatar_url ? (
+                    <Image
+                      src={profile.avatar_url}
+                      alt={name}
+                      fill
+                      className="object-cover"
+                      sizes="128px"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <span className="font-syne text-3xl font-bold text-tag-dim">
+                        {name
+                          .split(' ')
+                          .map((w) => w[0])
+                          .join('')
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex flex-col">
                 <h1 className="font-syne text-3xl font-bold text-tag-text">
                   {name}
                 </h1>
+                {taste?.headline && (
+                  <p className="mt-2 font-grotesk text-lg text-tag-orange">
+                    {taste.headline}
+                  </p>
+                )}
                 <div className="mt-2 flex items-center gap-3">
                   <span className="rounded bg-tag-orange/10 px-2 py-0.5 font-mono text-xs uppercase tracking-wider text-tag-orange">
                     {role}
@@ -173,7 +198,19 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   </span>
                 </div>
 
-                {/* Social links */}
+                {taste?.tags && taste.tags.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {taste.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-tag-orange/20 bg-tag-orange/5 px-2.5 py-0.5 text-sm text-tag-orange"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 {activeSocials.length > 0 && (
                   <div className="mt-4 flex items-center gap-2">
                     {activeSocials.map((social) => {
@@ -198,41 +235,146 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
             {/* Content sections */}
             <div className="mt-12 max-w-2xl space-y-10">
-              {/* What I'm building */}
+              {taste?.bio && (
+                <Section title="Bio">
+                  <div className="space-y-3">
+                    {taste.bio.split('\n\n').map((paragraph, i) => (
+                      <p
+                        key={i}
+                        className="font-grotesk leading-relaxed text-tag-text"
+                      >
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
               {profile.building && (
-                <section>
-                  <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.08em] text-tag-muted">
-                    What I&apos;m building
-                  </h2>
+                <Section title="What I'm building">
                   <p className="font-grotesk leading-relaxed text-tag-text">
                     {profile.building}
                   </p>
-                </section>
+                </Section>
               )}
 
-              {/* Why TAG */}
               {profile.why_tag && (
-                <section>
-                  <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.08em] text-tag-muted">
-                    Why TAG
-                  </h2>
+                <Section title="Why TAG">
                   <p className="font-grotesk leading-relaxed text-tag-text">
                     {profile.why_tag}
                   </p>
-                </section>
+                </Section>
               )}
 
-              {/* Events attended */}
+              {taste?.projects && taste.projects.length > 0 && (
+                <Section title="Projects">
+                  <div className="space-y-5">
+                    {taste.projects.map((project, i) => (
+                      <div key={i}>
+                        <div className="flex items-center gap-2">
+                          <span className="font-syne text-base font-medium text-tag-text">
+                            {project.name}
+                          </span>
+                          {project.role && (
+                            <span className="font-mono text-xs uppercase tracking-wider text-tag-dim">
+                              {project.role}
+                            </span>
+                          )}
+                          {project.url && (
+                            <a
+                              href={project.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-tag-orange hover:text-tag-orange/80"
+                            >
+                              <ExternalLink className="size-3.5" />
+                            </a>
+                          )}
+                        </div>
+                        <p className="mt-1 font-grotesk text-sm leading-relaxed text-tag-muted">
+                          {project.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
+              {taste?.notable_work && taste.notable_work.length > 0 && (
+                <Section title="Notable work">
+                  <ul className="space-y-2">
+                    {taste.notable_work.map((work, i) => (
+                      <li
+                        key={i}
+                        className="flex gap-2 font-grotesk text-sm text-tag-muted"
+                      >
+                        <span className="mt-1 text-tag-orange">•</span>
+                        <span>{work}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Section>
+              )}
+
+              {taste?.interests && taste.interests.length > 0 && (
+                <Section title="Interests">
+                  <div className="flex flex-wrap gap-2">
+                    {taste.interests.map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full border border-tag-border bg-tag-card px-3 py-1 font-grotesk text-sm text-tag-muted"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
+              {taste?.influences && taste.influences.length > 0 && (
+                <Section title="Influences">
+                  <div className="flex flex-wrap gap-2">
+                    {taste.influences.map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full border border-tag-border bg-tag-card px-3 py-1 font-grotesk text-sm text-tag-muted"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
+              {taste?.key_links && taste.key_links.length > 0 && (
+                <Section title="Links">
+                  <div>
+                    {taste.key_links.map((link, i) => (
+                      <a
+                        key={i}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 border-t border-t-tag-border py-2.5 font-grotesk text-sm text-tag-muted transition-colors first:border-t-0 hover:text-tag-orange"
+                      >
+                        <ExternalLink className="size-3.5 shrink-0" />
+                        <span className="truncate">{link.title}</span>
+                        <span className="ml-auto font-mono text-[10px] uppercase tracking-wider text-tag-dim">
+                          {link.type}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
               {events.length > 0 && (
-                <section>
-                  <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.08em] text-tag-muted">
-                    Events attended
-                  </h2>
+                <Section title="Events attended">
                   <div>
                     {events.map((event) => (
                       <div
                         key={event.id}
-                        className="flex flex-col gap-1 border-t border-t-tag-border py-3"
+                        className="flex flex-col gap-1 border-t border-t-tag-border py-3 first:border-t-0"
                       >
                         <div className="font-mono text-sm font-bold text-tag-orange">
                           {formatDateDisplay(event.date_iso)}
@@ -243,7 +385,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                       </div>
                     ))}
                   </div>
-                </section>
+                </Section>
               )}
             </div>
           </article>
@@ -252,3 +394,18 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     </PageShell>
   )
 }
+
+const Section = ({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) => (
+  <section>
+    <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.08em] text-tag-muted">
+      {title}
+    </h2>
+    {children}
+  </section>
+)

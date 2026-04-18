@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 
 import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
 
-import type { AuthUser, PublicProfile, UserRole } from './types'
+import type { AuthUser, PublicProfile, PublicTaste, UserRole } from './types'
 
 export async function getSession() {
   const supabase = await createServerSupabaseClient()
@@ -131,6 +131,11 @@ export async function getPublicProfile(slug: string): Promise<PublicProfile | nu
 
   if (error || !data) return null
 
+  const [taste, equippedSkinUrl] = await Promise.all([
+    getPublicTaste(data.id),
+    getEquippedSkinUrl(data.id),
+  ])
+
   return {
     id: data.id,
     name: data.name,
@@ -144,7 +149,57 @@ export async function getPublicProfile(slug: string): Promise<PublicProfile | nu
     website_url: data.website_url,
     instagram_url: data.instagram_url,
     created_at: data.created_at,
+    equipped_skin_url: equippedSkinUrl,
+    taste,
   }
+}
+
+async function getPublicTaste(userId: string): Promise<PublicTaste | null> {
+  const supabase = createServiceRoleClient()
+
+  const { data, error } = await supabase
+    .from('builder_profiles')
+    .select(
+      'headline, bio, tags, projects, interests, notable_work, influences, key_links, show_headline, show_bio, show_tags, show_projects, show_interests, show_notable_work, show_influences, show_key_links'
+    )
+    .eq('user_id', userId)
+    .eq('status', 'complete')
+    .maybeSingle()
+
+  if (error || !data) return null
+
+  return {
+    headline: data.show_headline ? data.headline : null,
+    bio: data.show_bio ? data.bio : null,
+    tags: data.show_tags ? data.tags : null,
+    projects: data.show_projects ? data.projects : null,
+    interests: data.show_interests ? data.interests : null,
+    notable_work: data.show_notable_work ? data.notable_work : null,
+    influences: data.show_influences ? data.influences : null,
+    key_links: data.show_key_links ? data.key_links : null,
+  }
+}
+
+async function getEquippedSkinUrl(userId: string): Promise<string | null> {
+  const supabase = createServiceRoleClient()
+
+  const { data } = await supabase
+    .from('user_skins')
+    .select('image_url')
+    .eq('user_id', userId)
+    .eq('equipped', true)
+    .maybeSingle()
+
+  if (data?.image_url) return data.image_url
+
+  // Fallback to legacy builder_profiles.skin_url
+  const { data: bp } = await supabase
+    .from('builder_profiles')
+    .select('skin_url')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  return bp?.skin_url ?? null
 }
 
 export async function getUser(): Promise<AuthUser> {

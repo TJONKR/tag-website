@@ -1,0 +1,1673 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TAG · Profile B (refined) mockup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --tag-orange: #ff5f1f;
+        --tag-bg: #141210;
+        --tag-bg-deep: #0e0d0b;
+        --tag-card: #1a1816;
+        --tag-card-2: #201d1a;
+        --tag-text: #f0ebe3;
+        --tag-muted: #9b9589;
+        --tag-dim: #5e5850;
+        --tag-border: #2a2724;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--tag-bg-deep);
+        color: var(--tag-text);
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        background-image: radial-gradient(
+          circle,
+          rgba(240, 235, 227, 0.07) 0.75px,
+          transparent 0.75px
+        );
+        background-size: 16px 16px;
+      }
+
+      /* ───────── top bar ───────── */
+      .top {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(20, 18, 16, 0.92);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--tag-border);
+      }
+      .top-inner {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .brand {
+        font-family: 'Syne', sans-serif;
+        font-weight: 800;
+        font-size: 18px;
+      }
+      .top-sub {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--tag-muted);
+      }
+      .state-switch {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .state-switch span {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--tag-dim);
+      }
+      .toggle {
+        display: inline-flex;
+        padding: 3px;
+        gap: 2px;
+        border: 1px solid var(--tag-border);
+        border-radius: 100px;
+        background: var(--tag-card);
+      }
+      .toggle button {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 6px 12px;
+        border-radius: 100px;
+        border: none;
+        background: transparent;
+        color: var(--tag-muted);
+        cursor: pointer;
+      }
+      .toggle button.on {
+        background: var(--tag-orange);
+        color: var(--tag-bg);
+      }
+
+      /* ───────── layout wrap ───────── */
+      .page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 40px 28px 120px;
+      }
+
+      /* ───────── portal frame ───────── */
+      .portal {
+        border: 1px solid var(--tag-border);
+        border-radius: 16px;
+        overflow: hidden;
+        background: var(--tag-bg);
+        box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.7);
+      }
+      .portal-nav {
+        display: flex;
+        align-items: center;
+        padding: 14px 24px;
+        border-bottom: 1px solid var(--tag-border);
+      }
+      .portal-nav-items {
+        margin-left: auto;
+        display: flex;
+        gap: 28px;
+        align-items: center;
+      }
+      .portal-nav-items a {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--tag-muted);
+        text-decoration: none;
+      }
+      .portal-nav-items a.active {
+        color: var(--tag-orange);
+      }
+      .portal-nav-items .nav-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 100px;
+        background: linear-gradient(135deg, #ff5f1f, #b3421c);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--tag-bg);
+        border: 2px solid var(--tag-orange);
+      }
+
+      .portal-body {
+        padding: 36px 44px 52px;
+      }
+
+      /* ───────── page header ───────── */
+      .ph {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 28px;
+      }
+      .ph h1 {
+        font-family: 'Syne', sans-serif;
+        font-size: 30px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      .ph p {
+        margin: 6px 0 0;
+        color: var(--tag-muted);
+        font-size: 14px;
+      }
+      .ph-link {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--tag-muted);
+        text-decoration: none;
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        padding: 8px 14px;
+        border: 1px solid var(--tag-border);
+        border-radius: 100px;
+        transition: 0.15s;
+      }
+      .ph-link:hover {
+        color: var(--tag-orange);
+        border-color: var(--tag-orange);
+      }
+
+      /* ───────── tabs ───────── */
+      .tabs {
+        display: flex;
+        border-bottom: 1px solid var(--tag-border);
+        margin-bottom: 36px;
+        gap: 4px;
+      }
+      .tab {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--tag-muted);
+        padding: 14px 22px;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        transition: 0.15s;
+      }
+      .tab:hover {
+        color: var(--tag-text);
+      }
+      .tab.active {
+        color: var(--tag-orange);
+        border-bottom-color: var(--tag-orange);
+      }
+
+      /* ───────── tab panels ───────── */
+      .panel {
+        display: none;
+      }
+      .panel.active {
+        display: block;
+      }
+
+      /* ═══════════════════════════════════════════════════
+         OVERVIEW TAB
+         ═══════════════════════════════════════════════════ */
+
+      .overview-grid {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 32px;
+      }
+
+      /* hero card */
+      .hero {
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: 12px;
+        overflow: hidden;
+        position: sticky;
+        top: 80px;
+        align-self: start;
+      }
+      .hero-img {
+        aspect-ratio: 3 / 4;
+        position: relative;
+        background:
+          radial-gradient(
+            circle at 30% 25%,
+            rgba(255, 95, 31, 0.5),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 75% 85%,
+            rgba(180, 60, 20, 0.55),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(240, 100, 40, 0.15),
+            transparent 70%
+          ),
+          linear-gradient(155deg, #3a1e12, #120806);
+        overflow: hidden;
+      }
+      .hero-img::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence baseFrequency='1.3' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.18'/></svg>");
+        mix-blend-mode: overlay;
+      }
+      .hero-img::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          transparent 40%,
+          rgba(20, 18, 16, 0.4) 100%
+        );
+      }
+      .hero-skin-label {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--tag-orange);
+        background: rgba(20, 18, 16, 0.8);
+        padding: 5px 10px;
+        border-radius: 100px;
+        border: 1px solid rgba(255, 95, 31, 0.35);
+        backdrop-filter: blur(4px);
+        z-index: 2;
+      }
+      .hero-info {
+        padding: 20px 22px 22px;
+      }
+      .hero-info h2 {
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      .hero-headline {
+        margin-top: 4px;
+        color: var(--tag-muted);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .tag-chips {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .tag-chip {
+        font-size: 12px;
+        color: var(--tag-orange);
+        background: rgba(255, 95, 31, 0.06);
+        border: 1px solid rgba(255, 95, 31, 0.2);
+        border-radius: 100px;
+        padding: 3px 10px;
+      }
+      .hero-meta {
+        margin-top: 16px;
+        display: grid;
+        gap: 8px;
+      }
+      .hero-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--tag-muted);
+      }
+      .meta-dot {
+        width: 22px;
+        height: 22px;
+        border-radius: 100px;
+        background: rgba(255, 95, 31, 0.1);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: var(--tag-orange);
+      }
+      .meta-dot.neutral {
+        background: rgba(240, 235, 227, 0.06);
+        color: var(--tag-muted);
+      }
+      .socials {
+        display: flex;
+        gap: 6px;
+        padding: 14px 22px;
+        border-top: 1px solid var(--tag-border);
+      }
+      .socials a {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid var(--tag-border);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--tag-muted);
+        text-decoration: none;
+        font-size: 13px;
+        transition: 0.15s;
+      }
+      .socials a:hover {
+        color: var(--tag-orange);
+        border-color: var(--tag-orange);
+      }
+
+      /* right column on overview */
+      .overview-right {
+        display: grid;
+        gap: 22px;
+      }
+
+      /* ── lootbox featured (LOUD when count > 0) ── */
+      .lootbox-feature {
+        position: relative;
+        background:
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 95, 31, 0.18),
+            transparent 60%
+          ),
+          linear-gradient(135deg, rgba(255, 95, 31, 0.08), var(--tag-card));
+        border: 1px solid rgba(255, 95, 31, 0.35);
+        border-radius: 12px;
+        padding: 28px 32px;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 24px;
+        align-items: center;
+        box-shadow: 0 0 40px -10px rgba(255, 95, 31, 0.15);
+      }
+      .lootbox-feature::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 100% 0%,
+          rgba(255, 95, 31, 0.08),
+          transparent 50%
+        );
+        pointer-events: none;
+      }
+      .lootbox-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--tag-orange);
+      }
+      .lootbox-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        margin-top: 6px;
+        letter-spacing: -0.01em;
+      }
+      .lootbox-desc {
+        margin-top: 6px;
+        font-size: 13px;
+        color: var(--tag-muted);
+        max-width: 420px;
+      }
+      .lootbox-icon {
+        font-size: 56px;
+        line-height: 1;
+        filter: drop-shadow(0 0 20px rgba(255, 95, 31, 0.3));
+      }
+      .lootbox-cta {
+        margin-top: 14px;
+      }
+
+      /* empty / calm lootbox block */
+      .lootbox-empty {
+        padding: 18px 20px;
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .lootbox-empty-icon {
+        font-size: 22px;
+        opacity: 0.5;
+      }
+      .lootbox-empty-text {
+        font-size: 13px;
+        color: var(--tag-muted);
+      }
+      .lootbox-empty-text strong {
+        color: var(--tag-text);
+      }
+
+      /* ── stats (quiet) ── */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+      .stat {
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: 10px;
+        padding: 16px 18px;
+      }
+      .stat-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--tag-dim);
+      }
+      .stat-val {
+        margin-top: 6px;
+        font-family: 'Syne', sans-serif;
+        font-weight: 700;
+        font-size: 26px;
+        color: var(--tag-text);
+      }
+      .stat.good .stat-val {
+        color: #4ade80;
+      }
+
+      /* ── membership row (woven in) ── */
+      .membership-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px;
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: 12px;
+        gap: 20px;
+      }
+      .membership-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .membership-pill {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        padding: 6px 12px;
+        border-radius: 100px;
+        border: 1px solid rgba(255, 95, 31, 0.3);
+        background: rgba(255, 95, 31, 0.08);
+        color: var(--tag-orange);
+      }
+      .membership-text {
+        font-size: 13px;
+        color: var(--tag-muted);
+      }
+      .membership-text strong {
+        color: var(--tag-text);
+      }
+
+      /* ── event timeline ── */
+      .card {
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: 12px;
+        padding: 22px 24px;
+      }
+      .card-head {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--tag-dim);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .event-row {
+        display: grid;
+        grid-template-columns: 94px 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 12px 0;
+        border-top: 1px solid var(--tag-border);
+      }
+      .event-row:first-child {
+        border-top: none;
+      }
+      .event-date {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--tag-orange);
+      }
+      .event-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 15px;
+      }
+      .event-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--tag-dim);
+      }
+      .event-badge.verified {
+        color: #4ade80;
+      }
+
+      /* ═══════════════════════════════════════════════════
+         IDENTITY TAB
+         ═══════════════════════════════════════════════════ */
+
+      .identity-grid {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 32px;
+      }
+
+      .id-intro {
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: 12px;
+        padding: 24px 28px;
+        margin-bottom: 20px;
+      }
+      .id-intro h3 {
+        font-family: 'Syne', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 6px;
+      }
+      .id-intro p {
+        margin: 0;
+        color: var(--tag-muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .id-intro .intro-actions {
+        margin-top: 14px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .id-stack {
+        display: grid;
+        gap: 18px;
+      }
+
+      .id-field {
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: 12px;
+        padding: 22px 24px;
+      }
+      .id-field-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .id-field-head h3 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--tag-dim);
+        margin: 0;
+      }
+      .id-field-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .eye-btn {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 5px 10px;
+        border-radius: 100px;
+        border: 1px solid var(--tag-border);
+        background: transparent;
+        color: var(--tag-dim);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .eye-btn.on {
+        color: var(--tag-orange);
+        border-color: rgba(255, 95, 31, 0.35);
+        background: rgba(255, 95, 31, 0.06);
+      }
+      .edit-btn {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 5px 10px;
+        border-radius: 100px;
+        border: 1px solid var(--tag-border);
+        background: transparent;
+        color: var(--tag-muted);
+        cursor: pointer;
+      }
+      .edit-btn:hover {
+        color: var(--tag-text);
+        border-color: var(--tag-muted);
+      }
+
+      .field-value {
+        color: var(--tag-text);
+        font-size: 15px;
+        line-height: 1.55;
+      }
+      .field-value.bio p + p {
+        margin-top: 10px;
+      }
+      .field-value.bio p {
+        margin: 0;
+        color: var(--tag-muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .field-value.headline {
+        font-family: 'Syne', sans-serif;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .field-value.empty {
+        color: var(--tag-dim);
+        font-style: italic;
+        font-size: 14px;
+      }
+
+      .projects-list {
+        display: grid;
+        gap: 14px;
+      }
+      .project-item strong {
+        font-size: 15px;
+        color: var(--tag-text);
+      }
+      .project-item .p-role {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--tag-dim);
+        margin-left: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .project-item p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        color: var(--tag-muted);
+        line-height: 1.5;
+      }
+
+      .keywords {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .keyword {
+        font-size: 13px;
+        background: var(--tag-bg);
+        border: 1px solid var(--tag-border);
+        border-radius: 100px;
+        padding: 4px 10px;
+        color: var(--tag-muted);
+      }
+
+      .links-list a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        color: var(--tag-muted);
+        font-size: 14px;
+        text-decoration: none;
+        border-top: 1px solid var(--tag-border);
+      }
+      .links-list a:first-child {
+        border-top: none;
+      }
+      .links-list a:hover {
+        color: var(--tag-orange);
+      }
+      .links-list .link-type {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--tag-dim);
+        margin-left: auto;
+        text-transform: uppercase;
+      }
+
+      /* identity right sidebar */
+      .id-sidebar {
+        display: grid;
+        gap: 16px;
+        position: sticky;
+        top: 80px;
+        align-self: start;
+      }
+      .vis-box {
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .vis-box h3 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--tag-dim);
+        margin: 0 0 4px;
+      }
+      .vis-box p {
+        margin: 0 0 14px;
+        font-size: 12px;
+        color: var(--tag-muted);
+        line-height: 1.5;
+      }
+      .vis-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .vis-row.on {
+        background: rgba(255, 95, 31, 0.06);
+        color: var(--tag-text);
+      }
+      .vis-row.off {
+        color: var(--tag-dim);
+      }
+      .vis-row .eye {
+        font-size: 13px;
+      }
+      .vis-row.on .eye {
+        color: var(--tag-orange);
+      }
+
+      /* first-run banner */
+      .first-run-banner {
+        display: none;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 95, 31, 0.12),
+          rgba(255, 95, 31, 0.04)
+        );
+        border: 1px solid rgba(255, 95, 31, 0.3);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      body[data-id-state='first-run'] .first-run-banner {
+        display: flex;
+      }
+      .first-run-banner .spin {
+        width: 24px;
+        height: 24px;
+        border-radius: 100px;
+        border: 2px solid rgba(255, 95, 31, 0.25);
+        border-top-color: var(--tag-orange);
+        animation: spin 1s linear infinite;
+        flex-shrink: 0;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .first-run-banner strong {
+        display: block;
+        font-family: 'Syne', sans-serif;
+        font-size: 15px;
+      }
+      .first-run-banner span {
+        font-size: 13px;
+        color: var(--tag-muted);
+      }
+
+      body[data-id-state='first-run'] .id-field.fillable .field-value,
+      body[data-id-state='first-run'] .id-field.fillable .projects-list,
+      body[data-id-state='first-run'] .id-field.fillable .keywords,
+      body[data-id-state='first-run'] .id-field.fillable .links-list {
+        display: none;
+      }
+      body[data-id-state='first-run'] .id-field.fillable .skeleton {
+        display: flex;
+      }
+      .skeleton {
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .skeleton .bar {
+        height: 12px;
+        border-radius: 4px;
+        background: linear-gradient(
+          90deg,
+          rgba(240, 235, 227, 0.04),
+          rgba(240, 235, 227, 0.08),
+          rgba(240, 235, 227, 0.04)
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+      }
+      .skeleton .bar.w90 {
+        width: 90%;
+      }
+      .skeleton .bar.w70 {
+        width: 70%;
+      }
+      .skeleton .bar.w50 {
+        width: 50%;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      body[data-id-state='first-run'] .id-field.fillable .id-field-actions,
+      body[data-id-state='first-run'] .id-field.fillable .vis-row {
+        opacity: 0.35;
+        pointer-events: none;
+      }
+
+      /* ═══════════════════════════════════════════════════
+         ACCOUNT TAB
+         ═══════════════════════════════════════════════════ */
+
+      .account-wrap {
+        max-width: 560px;
+      }
+      .account-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        background: var(--tag-card);
+        border: 1px solid var(--tag-border);
+        border-radius: 12px;
+        margin-bottom: 12px;
+      }
+      .account-row .k {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--tag-dim);
+      }
+      .account-row .v {
+        margin-top: 4px;
+        font-size: 15px;
+        color: var(--tag-text);
+      }
+      .account-row .v.muted {
+        color: var(--tag-muted);
+      }
+      .danger-zone {
+        margin-top: 28px;
+        padding: 20px 24px;
+        border: 1px dashed rgba(239, 68, 68, 0.3);
+        border-radius: 12px;
+      }
+      .danger-zone .k {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: rgba(239, 68, 68, 0.7);
+      }
+      .signout-btn {
+        margin-top: 10px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 10px 16px;
+        border-radius: 100px;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        background: transparent;
+        color: rgba(252, 165, 165, 1);
+        cursor: pointer;
+      }
+      .signout-btn:hover {
+        background: rgba(239, 68, 68, 0.1);
+      }
+
+      /* ───────── buttons ───────── */
+      .pill-btn {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        padding: 10px 18px;
+        border-radius: 100px;
+        border: 1px solid var(--tag-border);
+        background: transparent;
+        color: var(--tag-muted);
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .pill-btn.primary {
+        background: var(--tag-orange);
+        border-color: var(--tag-orange);
+        color: var(--tag-bg);
+        box-shadow: 0 6px 20px -6px rgba(255, 95, 31, 0.5);
+      }
+      .pill-btn.primary:hover {
+        transform: translateY(-1px);
+      }
+      .pill-btn.ghost {
+        background: transparent;
+      }
+
+      /* ───────── state notes ───────── */
+      .state-hint {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 28px 24px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--tag-dim);
+        letter-spacing: 0.05em;
+      }
+      .state-hint .orange {
+        color: var(--tag-orange);
+      }
+
+      footer {
+        padding: 60px 28px 120px;
+        text-align: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--tag-dim);
+      }
+    </style>
+  </head>
+  <body data-lb-state="has" data-id-state="normal">
+    <!-- ───── top bar with state toggles ───── -->
+    <div class="top">
+      <div class="top-inner">
+        <div class="brand">TAG</div>
+        <div class="top-sub">/portal/profile · mockup</div>
+        <div class="state-switch">
+          <span id="state-label">Lootboxes:</span>
+          <div class="toggle" id="lb-toggle">
+            <button data-lb="has" class="on">2 waiting</button>
+            <button data-lb="none">none</button>
+          </div>
+          <span style="margin-left: 14px">Identity state:</span>
+          <div class="toggle" id="id-toggle">
+            <button data-id="normal" class="on">normal</button>
+            <button data-id="first-run">first-run</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="state-hint" id="hint">
+      <span class="orange">●</span> Overview shows a loud lootbox block when
+      boxes are waiting. Toggle above to compare.
+    </div>
+
+    <div class="page">
+      <div class="portal">
+        <!-- portal nav -->
+        <div class="portal-nav">
+          <div class="brand" style="font-size: 16px">TAG</div>
+          <div class="portal-nav-items">
+            <a>📅 Events</a>
+            <a>🗺 Space</a>
+            <a>👥 Community</a>
+            <a class="active">✦ Profile</a>
+            <span class="nav-avatar">TN</span>
+          </div>
+        </div>
+
+        <div class="portal-body">
+          <!-- page header -->
+          <div class="ph">
+            <div>
+              <h1>Profile</h1>
+              <p>Your TAG identity, status, and account.</p>
+            </div>
+            <a class="ph-link" href="#">View public ↗</a>
+          </div>
+
+          <!-- tabs -->
+          <div class="tabs" id="tabs">
+            <button class="tab active" data-tab="overview">Overview</button>
+            <button class="tab" data-tab="identity">Identity</button>
+            <button class="tab" data-tab="account">Account</button>
+          </div>
+
+          <!-- ═══════ OVERVIEW TAB ═══════ -->
+          <div class="panel active" data-panel="overview">
+            <div class="overview-grid">
+              <!-- LEFT: hero identity card (sticky) -->
+              <div class="hero">
+                <div class="hero-img">
+                  <span class="hero-skin-label">★ Skin equipped</span>
+                </div>
+                <div class="hero-info">
+                  <h2>Tijs Nieuwboer</h2>
+                  <div class="hero-headline">
+                    Designer-engineer building AI-native tools for small teams
+                  </div>
+                  <div class="tag-chips">
+                    <span class="tag-chip">AI</span>
+                    <span class="tag-chip">Design</span>
+                    <span class="tag-chip">Next.js</span>
+                    <span class="tag-chip">Indie</span>
+                  </div>
+                  <div class="hero-meta">
+                    <div class="hero-meta-row">
+                      <span class="meta-dot">★</span>
+                      <span><strong style="color: var(--tag-text)">Builder</strong></span>
+                    </div>
+                    <div class="hero-meta-row">
+                      <span class="meta-dot neutral">◷</span>
+                      <span>Member since Jan 2026</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="socials">
+                  <a title="LinkedIn">in</a>
+                  <a title="X">𝕏</a>
+                  <a title="GitHub">gh</a>
+                  <a title="Website">🌐</a>
+                </div>
+              </div>
+
+              <!-- RIGHT: magazine column -->
+              <div class="overview-right">
+                <!-- Lootbox: LOUD when count > 0 -->
+                <div id="lb-has" class="lootbox-feature">
+                  <div>
+                    <div class="lootbox-label">
+                      ◉ Lootboxes · 2 waiting
+                    </div>
+                    <div class="lootbox-title">Open your next box</div>
+                    <div class="lootbox-desc">
+                      You've earned 2 boxes from check-ins. Each one unlocks
+                      a unique skin pulled from your reference photos.
+                    </div>
+                    <div class="lootbox-cta">
+                      <button class="pill-btn primary">Open next →</button>
+                    </div>
+                  </div>
+                  <div class="lootbox-icon">🎁</div>
+                </div>
+                <div id="lb-none" class="lootbox-empty" style="display: none">
+                  <div class="lootbox-empty-icon">◌</div>
+                  <div class="lootbox-empty-text">
+                    <strong>No lootboxes waiting.</strong> Check in at the
+                    next event to earn one.
+                  </div>
+                </div>
+
+                <!-- Stats: quiet -->
+                <div class="stats">
+                  <div class="stat">
+                    <div class="stat-label">Events</div>
+                    <div class="stat-val">12</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-label">Verified</div>
+                    <div class="stat-val">9</div>
+                  </div>
+                  <div class="stat good">
+                    <div class="stat-label">Rate</div>
+                    <div class="stat-val">75%</div>
+                  </div>
+                  <div class="stat">
+                    <div class="stat-label">Skins</div>
+                    <div class="stat-val">3</div>
+                  </div>
+                </div>
+
+                <!-- Membership: woven in as a single row -->
+                <div class="membership-row">
+                  <div class="membership-left">
+                    <span class="membership-pill">Builder</span>
+                    <span class="membership-text">
+                      Full access · <strong>Upgrade to Operator</strong> for
+                      host privileges
+                    </span>
+                  </div>
+                  <button class="pill-btn">Upgrade</button>
+                </div>
+
+                <!-- Events -->
+                <div class="card">
+                  <div class="card-head">
+                    <span>Event timeline</span>
+                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px;">
+                      12 attended
+                    </span>
+                  </div>
+                  <div class="event-row">
+                    <div class="event-date">APR 11 '26</div>
+                    <div class="event-title">Demo night · spring edition</div>
+                    <div class="event-badge verified">✓ verified</div>
+                  </div>
+                  <div class="event-row">
+                    <div class="event-date">MAR 28 '26</div>
+                    <div class="event-title">Focus Friday · co-working</div>
+                    <div class="event-badge verified">✓ verified</div>
+                  </div>
+                  <div class="event-row">
+                    <div class="event-date">MAR 14 '26</div>
+                    <div class="event-title">AI & agents meetup</div>
+                    <div class="event-badge verified">✓ verified</div>
+                  </div>
+                  <div class="event-row">
+                    <div class="event-date">FEB 22 '26</div>
+                    <div class="event-title">TAG office hours</div>
+                    <div class="event-badge">attended</div>
+                  </div>
+                  <div class="event-row">
+                    <div class="event-date">FEB 08 '26</div>
+                    <div class="event-title">Winter social · housewarming</div>
+                    <div class="event-badge verified">✓ verified</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════ IDENTITY TAB ═══════ -->
+          <div class="panel" data-panel="identity">
+            <!-- first-run banner (shown via data-attribute) -->
+            <div class="first-run-banner">
+              <div class="spin"></div>
+              <div>
+                <strong>Building your profile…</strong>
+                <span>
+                  We're researching your public presence to fill out your
+                  bio, tags and projects. This usually takes a minute.
+                </span>
+              </div>
+            </div>
+
+            <div class="identity-grid">
+              <!-- LEFT column: all editable fields -->
+              <div>
+                <div class="id-intro">
+                  <h3>This is what others see</h3>
+                  <p>
+                    Everything here appears on your public profile. Use the
+                    eye toggle to hide a section, or click edit to change
+                    the content.
+                  </p>
+                </div>
+
+                <div class="id-stack">
+                  <!-- Headline -->
+                  <div class="id-field fillable">
+                    <div class="id-field-head">
+                      <h3>Headline</h3>
+                      <div class="id-field-actions">
+                        <button class="eye-btn on">👁 Public</button>
+                        <button class="edit-btn">Edit</button>
+                      </div>
+                    </div>
+                    <div class="field-value headline">
+                      Designer-engineer building AI-native tools for small
+                      teams
+                    </div>
+                    <div class="skeleton">
+                      <div class="bar w90"></div>
+                      <div class="bar w50"></div>
+                    </div>
+                  </div>
+
+                  <!-- What I'm building -->
+                  <div class="id-field">
+                    <div class="id-field-head">
+                      <h3>What I'm building</h3>
+                      <div class="id-field-actions">
+                        <button class="eye-btn on">👁 Public</button>
+                        <button class="edit-btn">Edit</button>
+                      </div>
+                    </div>
+                    <div class="field-value">
+                      Lerai — an agent-powered scoping studio for agencies
+                      and consultancies. Also tinkering with TAG's member
+                      portal.
+                    </div>
+                  </div>
+
+                  <!-- Why TAG -->
+                  <div class="id-field">
+                    <div class="id-field-head">
+                      <h3>Why TAG</h3>
+                      <div class="id-field-actions">
+                        <button class="eye-btn on">👁 Public</button>
+                        <button class="edit-btn">Edit</button>
+                      </div>
+                    </div>
+                    <div class="field-value">
+                      To build around people who ship. The mix of
+                      independent builders and founders-in-residence is
+                      exactly the energy I was missing.
+                    </div>
+                  </div>
+
+                  <!-- Bio (was AI) -->
+                  <div class="id-field fillable">
+                    <div class="id-field-head">
+                      <h3>Bio</h3>
+                      <div class="id-field-actions">
+                        <button class="eye-btn on">👁 Public</button>
+                        <button class="edit-btn">Edit</button>
+                      </div>
+                    </div>
+                    <div class="field-value bio">
+                      <p>
+                        Tijs is a designer-engineer focused on AI-native
+                        tools. He runs Lerai and has shipped several side
+                        projects in the last year, from scoping assistants
+                        to scheduling tools.
+                      </p>
+                      <p>
+                        At TAG he spends most time in the Open Workspace
+                        and hosts the occasional focus Friday.
+                      </p>
+                    </div>
+                    <div class="skeleton">
+                      <div class="bar w90"></div>
+                      <div class="bar w90"></div>
+                      <div class="bar w70"></div>
+                      <div class="bar w90"></div>
+                      <div class="bar w50"></div>
+                    </div>
+                  </div>
+
+                  <!-- Tags -->
+                  <div class="id-field fillable">
+                    <div class="id-field-head">
+                      <h3>Tags</h3>
+                      <div class="id-field-actions">
+                        <button class="eye-btn">⊘ Hidden</button>
+                        <button class="edit-btn">Edit</button>
+                      </div>
+                    </div>
+                    <div class="field-value">
+                      <div class="tag-chips">
+                        <span class="tag-chip">AI</span>
+                        <span class="tag-chip">Design</span>
+                        <span class="tag-chip">Next.js</span>
+                        <span class="tag-chip">Indie</span>
+                        <span class="tag-chip">Agents</span>
+                      </div>
+                    </div>
+                    <div class="skeleton">
+                      <div class="bar w50"></div>
+                    </div>
+                  </div>
+
+                  <!-- Projects -->
+                  <div class="id-field fillable">
+                    <div class="id-field-head">
+                      <h3>Projects</h3>
+                      <div class="id-field-actions">
+                        <button class="eye-btn on">👁 Public</button>
+                        <button class="edit-btn">Edit</button>
+                      </div>
+                    </div>
+                    <div class="projects-list">
+                      <div class="project-item">
+                        <strong>Lerai</strong>
+                        <span class="p-role">founder</span>
+                        <p>
+                          Agent-powered scoping studio for agencies and
+                          consultancies.
+                        </p>
+                      </div>
+                      <div class="project-item">
+                        <strong>TAG portal</strong>
+                        <span class="p-role">contributor</span>
+                        <p>
+                          Member platform for TAG space in Amsterdam —
+                          events, space, community.
+                        </p>
+                      </div>
+                      <div class="project-item">
+                        <strong>Taste</strong>
+                        <span class="p-role">creator</span>
+                        <p>
+                          AI-enriched builder profile pipeline (previously
+                          a standalone page).
+                        </p>
+                      </div>
+                    </div>
+                    <div class="skeleton">
+                      <div class="bar w70"></div>
+                      <div class="bar w90"></div>
+                      <div class="bar w50"></div>
+                    </div>
+                  </div>
+
+                  <!-- Interests -->
+                  <div class="id-field fillable">
+                    <div class="id-field-head">
+                      <h3>Interests</h3>
+                      <div class="id-field-actions">
+                        <button class="eye-btn">⊘ Hidden</button>
+                        <button class="edit-btn">Edit</button>
+                      </div>
+                    </div>
+                    <div class="field-value">
+                      <div class="keywords">
+                        <span class="keyword">agents</span>
+                        <span class="keyword">type design</span>
+                        <span class="keyword">coffee</span>
+                        <span class="keyword">skateboarding</span>
+                        <span class="keyword">infra</span>
+                      </div>
+                    </div>
+                    <div class="skeleton">
+                      <div class="bar w70"></div>
+                    </div>
+                  </div>
+
+                  <!-- Notable work -->
+                  <div class="id-field fillable">
+                    <div class="id-field-head">
+                      <h3>Notable work</h3>
+                      <div class="id-field-actions">
+                        <button class="eye-btn on">👁 Public</button>
+                        <button class="edit-btn">Edit</button>
+                      </div>
+                    </div>
+                    <div class="field-value">
+                      <ul style="margin: 0; padding-left: 18px; color: var(--tag-muted); font-size: 14px; line-height: 1.8">
+                        <li>Shipped Lerai scoping studio v1</li>
+                        <li>Built TAG member portal (events + space + lootbox)</li>
+                        <li>Wrote the Syne-for-monospace experiment</li>
+                      </ul>
+                    </div>
+                    <div class="skeleton">
+                      <div class="bar w90"></div>
+                      <div class="bar w70"></div>
+                    </div>
+                  </div>
+
+                  <!-- Links -->
+                  <div class="id-field fillable">
+                    <div class="id-field-head">
+                      <h3>Links</h3>
+                      <div class="id-field-actions">
+                        <button class="eye-btn on">👁 Public</button>
+                        <button class="edit-btn">Edit</button>
+                      </div>
+                    </div>
+                    <div class="links-list">
+                      <a>
+                        <span>Lerai — scoping studio</span>
+                        <span class="link-type">work</span>
+                      </a>
+                      <a>
+                        <span>Personal site · tijs.space</span>
+                        <span class="link-type">home</span>
+                      </a>
+                      <a>
+                        <span>GitHub · @Tjonkr</span>
+                        <span class="link-type">code</span>
+                      </a>
+                    </div>
+                    <div class="skeleton">
+                      <div class="bar w70"></div>
+                      <div class="bar w90"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RIGHT column: visibility + socials -->
+              <div class="id-sidebar">
+                <div class="vis-box">
+                  <h3>Public visibility</h3>
+                  <p>
+                    Toggle what shows on your public profile at
+                    tag.space/profile/you.
+                  </p>
+                  <div style="display: grid; gap: 2px">
+                    <div class="vis-row on">
+                      <span>Headline</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>What I'm building</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Why TAG</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Bio</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row off">
+                      <span>Tags</span><span class="eye">⊘</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Projects</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row off">
+                      <span>Interests</span><span class="eye">⊘</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Notable work</span><span class="eye">👁</span>
+                    </div>
+                    <div class="vis-row on">
+                      <span>Links</span><span class="eye">👁</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="vis-box">
+                  <h3>Socials</h3>
+                  <p style="margin-bottom: 0">
+                    LinkedIn · X · GitHub · Website · Instagram
+                  </p>
+                  <div style="margin-top: 14px">
+                    <button class="pill-btn" style="width: 100%; justify-content: center">
+                      Edit socials
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ═══════ ACCOUNT TAB ═══════ -->
+          <div class="panel" data-panel="account">
+            <div class="account-wrap">
+              <div class="account-row">
+                <div>
+                  <div class="k">Display name</div>
+                  <div class="v">Tijs Nieuwboer</div>
+                </div>
+                <button class="edit-btn">Edit</button>
+              </div>
+
+              <div class="account-row">
+                <div>
+                  <div class="k">Email</div>
+                  <div class="v muted">tijsnieuwboer@gmail.com</div>
+                </div>
+                <span
+                  style="
+                    font-family: 'JetBrains Mono', monospace;
+                    font-size: 10px;
+                    color: var(--tag-dim);
+                    text-transform: uppercase;
+                    letter-spacing: 0.12em;
+                  "
+                  >readonly</span
+                >
+              </div>
+
+              <div class="account-row">
+                <div>
+                  <div class="k">Role</div>
+                  <div class="v">Builder</div>
+                </div>
+                <span
+                  style="
+                    font-family: 'JetBrains Mono', monospace;
+                    font-size: 10px;
+                    color: var(--tag-dim);
+                    text-transform: uppercase;
+                    letter-spacing: 0.12em;
+                  "
+                  >managed by admins</span
+                >
+              </div>
+
+              <div class="danger-zone">
+                <div class="k">Session</div>
+                <div
+                  style="
+                    margin-top: 4px;
+                    font-size: 13px;
+                    color: var(--tag-muted);
+                  "
+                >
+                  Sign out of this device.
+                </div>
+                <button class="signout-btn">Sign out</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Static mockup · Option B refined · no interactivity beyond tabs +
+      state toggles
+    </footer>
+
+    <script>
+      // ───── tab switching ─────
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('.panel');
+      const hint = document.getElementById('hint');
+      const hints = {
+        overview:
+          '<span class="orange">●</span> Overview shows a loud lootbox block when boxes are waiting. Toggle above to compare.',
+        identity:
+          '<span class="orange">●</span> Identity is the unified editor. No AI badges — the pipeline is invisible scaffolding. First-run state shows skeleton fields while generation runs.',
+        account: '<span class="orange">●</span> Account is small on purpose. Name, email, sign out.',
+      };
+      tabs.forEach((t) => {
+        t.addEventListener('click', () => {
+          const name = t.dataset.tab;
+          tabs.forEach((x) => x.classList.toggle('active', x === t));
+          panels.forEach((p) =>
+            p.classList.toggle('active', p.dataset.panel === name)
+          );
+          hint.innerHTML = hints[name];
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+
+      // ───── lootbox state ─────
+      const lbToggle = document.getElementById('lb-toggle');
+      lbToggle.querySelectorAll('button').forEach((b) => {
+        b.addEventListener('click', () => {
+          const state = b.dataset.lb;
+          document.body.dataset.lbState = state;
+          lbToggle
+            .querySelectorAll('button')
+            .forEach((x) => x.classList.toggle('on', x === b));
+          document.getElementById('lb-has').style.display =
+            state === 'has' ? 'grid' : 'none';
+          document.getElementById('lb-none').style.display =
+            state === 'none' ? 'flex' : 'none';
+        });
+      });
+
+      // ───── identity state ─────
+      const idToggle = document.getElementById('id-toggle');
+      idToggle.querySelectorAll('button').forEach((b) => {
+        b.addEventListener('click', () => {
+          const state = b.dataset.id;
+          document.body.dataset.idState = state;
+          idToggle
+            .querySelectorAll('button')
+            .forEach((x) => x.classList.toggle('on', x === b));
+          // auto-switch to identity tab when toggling first-run
+          if (state === 'first-run') {
+            document.querySelector('[data-tab="identity"]').click();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
