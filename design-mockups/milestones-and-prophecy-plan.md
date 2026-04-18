@@ -5,7 +5,7 @@ work progresses. Designed to be read cold — if you open a fresh session
 and need to continue, read this file top-to-bottom and you will have
 enough context.
 
-**Last updated:** 2026-04-18 (planning phase — no code started)
+**Last updated:** 2026-04-18 (phase 0 script shipped; awaiting tester feedback)
 **Related docs:**
 - `design-mockups/onboarding-milestones-brainstorm.md` — the "why"
 - `design-mockups/taste-pipeline-forward.md` — predecessor to prophecy
@@ -75,22 +75,29 @@ provisional answers — confirm or override.
 
 ## 3 · Work breakdown
 
-### Phase 0 · Prompt R&D ⬜
+### Phase 0 · Prompt R&D ◐ (script shipped, validation pending)
 
 **Goal:** prove we can generate good card content before doing any UI work.
 
-- [ ] Write a standalone script `scripts/prophecy-prompt-test.ts` that
-      takes a known profile (start with Tijs — existing `builder_profile`)
-      and generates a candidate deck of 12-15 cards.
-- [ ] Iterate on prompt until output is consistently:
-      - Personal (specific, not generic "you're a builder")
-      - Distinctive between cards (not 4 variants of the same thing)
-      - Good one-line title + 1-2 sentence narrative per card
-      - Sliceable into suits
-- [ ] Run on 3-5 other real profiles (pick volunteers from TAG) to
-      confirm it's not just good for Tijs.
-- [ ] **Exit criterion:** at least 3 of 5 test profiles produce a deck
-      where the tester would happily keep 3 cards without rewriting.
+- [x] Standalone script `scripts/prophecy-prompt-test.ts` takes a
+      `<email|name>` arg, loads `builder_profiles`, and prompts Claude
+      Sonnet 4.6 for a 14-card deck across 4 suits (field / method /
+      audience / arc). No DB writes.
+      Usage: `pnpm tsx scripts/prophecy-prompt-test.ts tijs@lerai.nl`
+- [x] First run on Tijs — quality is strong on first iteration.
+      Observations (2026-04-18):
+      - Cards are specific, grounded in the existing profile, distinct
+        per suit, varied in confidence.
+      - Bias toward stale source data (e.g. Beeckestijn lectures
+        surface in 2 cards) — this is inherited from the old
+        `builder_profile` and should resolve once the forward-looking
+        pipeline from `taste-pipeline-forward.md` lands.
+      - Model produced 15 cards (4+4+4+3) vs. requested 14. Acceptable.
+- [ ] Run on 3-5 other real profiles (volunteers from TAG) to confirm
+      it's not just good for Tijs.
+- [ ] **Exit criterion:** ≥3 of 5 test profiles produce a deck where
+      the tester would happily keep 3 cards without rewriting.
+- [ ] Once validated, lock in prompt as final for phase 1 integration.
 
 ### Phase 1 · Schema + pipeline plumbing ⬜
 
@@ -177,18 +184,25 @@ Fresh-session pointers:
 
 ## 6 · Next step right now
 
-**Start phase 0 — prompt R&D.** Write a throwaway script that generates
-a deck from Tijs's existing `builder_profile`. Iterate until the output
-is genuinely good. Nothing else starts until the prompt produces
-content worth drawing.
+**Validate phase 0 on more profiles.** The script exists and produces
+good content for Tijs. Before locking the prompt and moving to phase 1
+(schema + pipeline integration), run it on 3-5 more real TAG members
+and have each one read their deck.
 
-Concrete first move:
-```
-scripts/prophecy-prompt-test.ts
-```
-Reads a `user_id` from CLI, calls an LLM with the prophecy prompt and
-the user's profile data, prints the deck as JSON. No DB writes, no
-pipeline integration. Just prove the content.
+Concrete next moves:
+1. Pick 3-5 volunteers from TAG with a completed `builder_profile`.
+2. Run `pnpm tsx scripts/prophecy-prompt-test.ts <email>` for each.
+3. For each member, ask: "Would you keep 3 of these 14 cards without
+   rewriting?" Track yes/no.
+4. If ≥3 of 5 say yes → lock prompt, start phase 1.
+5. If <3 of 5 → iterate on the prompt in `buildPrompt()` inside the
+   script. Candidate improvements: tighten "grounded vs. bold vs.
+   wild" distribution, add more negative examples of what to avoid.
+
+Known prompt-quality debt that does NOT block phase 1:
+- The model inherits stale data from the old `builder_profile`. The
+  fix is the forward-looking pipeline work from
+  `taste-pipeline-forward.md`, which is a parallel track.
 
 ---
 
