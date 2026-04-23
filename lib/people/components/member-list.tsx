@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
-import Image from 'next/image'
 import { ExternalLink, Search, Loader2, RefreshCw, Trash2 } from 'lucide-react'
 
 import {
@@ -80,7 +79,6 @@ export const MemberList = ({
   const [search, setSearch] = useState('')
   const [filterRole, setFilterRole] = useState<FilterRole>('all')
   const [selected, setSelected] = useState<Member | null>(null)
-  const [enlargedAvatar, setEnlargedAvatar] = useState<Member | null>(null)
   const [roleLoading, setRoleLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [regenLoading, setRegenLoading] = useState(false)
@@ -256,23 +254,14 @@ export const MemberList = ({
                     : undefined
               }
             >
-              <button
-                type="button"
-                className="mb-3 shrink-0 focus:outline-none"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (member.avatar_url) setEnlargedAvatar(member)
-                }}
-              >
-                <Avatar className="size-20 cursor-pointer transition-opacity hover:opacity-80">
-                  {member.avatar_url && (
-                    <AvatarImage src={member.avatar_url} alt={member.name || 'Member'} />
-                  )}
-                  <AvatarFallback className="bg-tag-border text-lg font-medium text-tag-text">
-                    {getInitials(member.name)}
-                  </AvatarFallback>
-                </Avatar>
-              </button>
+              <Avatar className="mb-3 size-20 shrink-0">
+                {member.avatar_url && (
+                  <AvatarImage src={member.avatar_url} alt={member.name || 'Member'} />
+                )}
+                <AvatarFallback className="bg-tag-border text-lg font-medium text-tag-text">
+                  {getInitials(member.name)}
+                </AvatarFallback>
+              </Avatar>
               <span className="w-full truncate text-center font-grotesk text-sm font-medium text-tag-text">
                 {member.name || 'Unnamed'}
               </span>
@@ -298,28 +287,7 @@ export const MemberList = ({
         </div>
       )}
 
-      {/* Avatar enlarge dialog */}
-      <Dialog open={!!enlargedAvatar} onOpenChange={() => setEnlargedAvatar(null)}>
-        <DialogContent className="flex max-w-sm flex-col items-center border-tag-border bg-tag-bg p-6">
-          <DialogHeader>
-            <DialogTitle className="font-syne text-lg text-tag-text">
-              {enlargedAvatar?.name || 'Member'}
-            </DialogTitle>
-          </DialogHeader>
-          {enlargedAvatar?.avatar_url && (
-            <Image
-              src={enlargedAvatar.avatar_url}
-              alt={enlargedAvatar.name || 'Member'}
-              width={192}
-              height={192}
-              className="mt-2 rounded-full object-cover"
-              unoptimized
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Detail dialog (operator or super admin) */}
+{/* Detail dialog (operator or super admin) */}
       {(isOperator || isSuperAdmin) && (
         <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
           <DialogContent className="max-h-[80vh] overflow-y-auto border-tag-border bg-tag-bg text-tag-text">
