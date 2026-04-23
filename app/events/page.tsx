@@ -23,6 +23,17 @@ export default async function EventsPage() {
           >
             Tag In &rarr;
           </Link>
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <p className="font-mono text-xs uppercase tracking-[0.1em] text-tag-dim">
+              Got your own event?
+            </p>
+            <Link
+              href="/host-event"
+              className="border border-tag-border px-6 py-2.5 font-grotesk text-sm text-tag-text transition-colors hover:border-tag-orange hover:text-tag-orange"
+            >
+              Host an event at TAG &rarr;
+            </Link>
+          </div>
         </div>
       </div>
     </PageShell>

@@ -21,6 +21,10 @@ import { SkinFailed } from './templates/skin-failed'
 import { TasteComplete } from './templates/taste-complete'
 import { TasteFailed } from './templates/taste-failed'
 import { AvatarComplete } from './templates/avatar-complete'
+import { EventHostRequestReceived } from './templates/event-host-request-received'
+import { EventHostRequestNewAdmin } from './templates/event-host-request-new-admin'
+import { EventHostRequestApproved } from './templates/event-host-request-approved'
+import { EventHostRequestRejected } from './templates/event-host-request-rejected'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Applications
@@ -333,6 +337,101 @@ export const sendAvatarComplete = (args: {
     subject: 'Your TAG avatar is ready',
     react: <AvatarComplete name={args.name} imageUrl={args.imageUrl} />,
     tag: 'avatar-complete',
+  })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// External event-host requests
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const sendEventHostRequestReceived = (args: {
+  to: string
+  name: string
+  eventTitle: string
+}): Promise<SendEmailResult> =>
+  sendEmail({
+    to: args.to,
+    subject: "We've got your TAG event request",
+    react: <EventHostRequestReceived name={args.name} eventTitle={args.eventTitle} />,
+    tag: 'event-host-request-received',
+  })
+
+export const sendEventHostRequestNewAdmin = async (args: {
+  id: string
+  applicantName: string
+  applicantEmail: string
+  eventTitle: string
+  eventType: string
+  description: string
+  expectedAttendees: number | null
+  proposedDate: string | null
+  proposedDateFlexible: boolean
+  organization: string | null
+  websiteUrl: string | null
+  socialUrl: string | null
+}): Promise<SendEmailResult> => {
+  const admins = await getAdminRecipients()
+  if (admins.length === 0) return { ok: false, skipped: true }
+
+  return sendEmail({
+    to: admins,
+    replyTo: args.applicantEmail,
+    subject: `New event request: ${args.eventTitle}`,
+    react: (
+      <EventHostRequestNewAdmin
+        id={args.id}
+        applicantName={args.applicantName}
+        applicantEmail={args.applicantEmail}
+        eventTitle={args.eventTitle}
+        eventType={args.eventType}
+        description={args.description}
+        expectedAttendees={args.expectedAttendees}
+        proposedDate={args.proposedDate}
+        proposedDateFlexible={args.proposedDateFlexible}
+        organization={args.organization}
+        websiteUrl={args.websiteUrl}
+        socialUrl={args.socialUrl}
+      />
+    ),
+    tag: 'event-host-request-new-admin',
+  })
+}
+
+export const sendEventHostRequestApproved = (args: {
+  to: string
+  name: string
+  eventTitle: string
+  adminNotes?: string | null
+}): Promise<SendEmailResult> =>
+  sendEmail({
+    to: args.to,
+    subject: 'Your TAG event request is approved',
+    react: (
+      <EventHostRequestApproved
+        name={args.name}
+        eventTitle={args.eventTitle}
+        adminNotes={args.adminNotes}
+      />
+    ),
+    tag: 'event-host-request-approved',
+  })
+
+export const sendEventHostRequestRejected = (args: {
+  to: string
+  name: string
+  eventTitle: string
+  adminNotes?: string | null
+}): Promise<SendEmailResult> =>
+  sendEmail({
+    to: args.to,
+    subject: 'An update on your TAG event request',
+    react: (
+      <EventHostRequestRejected
+        name={args.name}
+        eventTitle={args.eventTitle}
+        adminNotes={args.adminNotes}
+      />
+    ),
+    tag: 'event-host-request-rejected',
   })
 
 // Re-exported so callers that need to resolve a user's email from an id
