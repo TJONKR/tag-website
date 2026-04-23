@@ -6,8 +6,12 @@ import type { Member, MemberCounts } from '../types'
 import type { Application, ApplicationCounts } from '@lib/applications/types'
 import type { AiAmClaimWithUser } from '@lib/membership/types'
 import { MemberList } from './member-list'
-import { ApplicationList, InviteDialog } from '@lib/applications/components'
+import { ApplicationList } from '@lib/applications/components'
 import { ClaimList } from '@lib/membership/components'
+import {
+  PORTAL_TABS_LIST_CLASSES,
+  PORTAL_TABS_TRIGGER_CLASSES,
+} from '@lib/portal/components/portal-tabs-style'
 
 interface PeopleTabsProps {
   members: Member[]
@@ -46,35 +50,23 @@ export const PeopleTabs = ({
 
   return (
     <Tabs defaultValue={defaultTab}>
-      <div className="flex items-center justify-between">
-        <TabsList className="border-tag-border bg-tag-card">
-          <TabsTrigger
-            value="members"
-            className="data-[state=active]:bg-tag-orange data-[state=active]:text-tag-bg-deep"
-          >
-            Members ({memberCounts.total})
+      <TabsList className={PORTAL_TABS_LIST_CLASSES}>
+        <TabsTrigger value="members" className={PORTAL_TABS_TRIGGER_CLASSES}>
+          Members ({memberCounts.total})
+        </TabsTrigger>
+        {isOperator && (
+          <TabsTrigger value="applications" className={PORTAL_TABS_TRIGGER_CLASSES}>
+            Applications ({applicationCounts.pending} pending)
           </TabsTrigger>
-          {isOperator && (
-            <TabsTrigger
-              value="applications"
-              className="data-[state=active]:bg-tag-orange data-[state=active]:text-tag-bg-deep"
-            >
-              Applications ({applicationCounts.pending} pending)
-            </TabsTrigger>
-          )}
-          {isSuperAdmin && (
-            <TabsTrigger
-              value="claims"
-              className="data-[state=active]:bg-tag-orange data-[state=active]:text-tag-bg-deep"
-            >
-              Claims ({claims.length} pending)
-            </TabsTrigger>
-          )}
-        </TabsList>
-        {isOperator && <InviteDialog />}
-      </div>
+        )}
+        {isSuperAdmin && (
+          <TabsTrigger value="claims" className={PORTAL_TABS_TRIGGER_CLASSES}>
+            Claims ({claims.length} pending)
+          </TabsTrigger>
+        )}
+      </TabsList>
 
-      <TabsContent value="members" className="mt-6">
+      <TabsContent value="members" className="mt-0">
         <MemberList
           initialMembers={members}
           initialCounts={memberCounts}
@@ -84,7 +76,7 @@ export const PeopleTabs = ({
       </TabsContent>
 
       {isOperator && (
-        <TabsContent value="applications" className="mt-6">
+        <TabsContent value="applications" className="mt-0">
           <ApplicationList
             initialApplications={applications}
             initialCounts={applicationCounts}
@@ -93,7 +85,7 @@ export const PeopleTabs = ({
       )}
 
       {isSuperAdmin && (
-        <TabsContent value="claims" className="mt-6">
+        <TabsContent value="claims" className="mt-0">
           <ClaimList initialClaims={claims} />
         </TabsContent>
       )}

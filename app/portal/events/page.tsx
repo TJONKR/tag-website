@@ -6,6 +6,7 @@ import {
   getEventAttendanceSummary,
 } from '@lib/events/queries'
 import { PortalEventList } from '@lib/events/components/portal-event-list'
+import { EventAdminActions } from '@lib/events/components/event-admin-actions'
 
 export default async function EventsPage() {
   const user = await getUser()
@@ -27,7 +28,11 @@ export default async function EventsPage() {
   return (
     <>
       <FadeIn>
-        <PortalHeader title="Events" description="Upcoming events, workshops and meetups at TAG." />
+        <PortalHeader
+          title="Events"
+          description="Upcoming events, workshops and meetups at TAG."
+          actions={isAdmin ? <EventAdminActions /> : undefined}
+        />
       </FadeIn>
       <FadeIn delay={75}>
         <PortalEventList

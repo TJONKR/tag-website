@@ -4,6 +4,7 @@ import { getApplications, getApplicationCounts } from '@lib/applications/queries
 import { getAiAmClaimsByStatus } from '@lib/membership/queries'
 import { FadeIn, PortalHeader } from '@lib/portal/components'
 import { PeopleTabs } from '@lib/people/components'
+import { InviteDialog } from '@lib/applications/components'
 
 interface CommunityPageProps {
   searchParams: Promise<{ tab?: string }>
@@ -33,6 +34,7 @@ export default async function CommunityPage({ searchParams }: CommunityPageProps
               ? 'Manage members and review applications.'
               : 'See who is part of the community.'
           }
+          actions={isOperator ? <InviteDialog /> : undefined}
         />
       </FadeIn>
       <FadeIn delay={75}>

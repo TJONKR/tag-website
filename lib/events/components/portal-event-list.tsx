@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CalendarX, ExternalLink, Pencil, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react'
+import { CalendarX, ExternalLink, Pencil, Sparkles, Trash2 } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { toast } from '@components/toast'
@@ -15,6 +15,11 @@ import {
   DialogDescription,
   DialogTrigger,
 } from '@components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs'
+import {
+  PORTAL_TABS_LIST_CLASSES,
+  PORTAL_TABS_TRIGGER_CLASSES,
+} from '@lib/portal/components/portal-tabs-style'
 
 import { formatDateDisplay } from '@lib/events/types'
 import type { TagEvent } from '@lib/events/types'
@@ -225,92 +230,66 @@ export const PortalEventList = ({
   isAdmin,
   attendanceSummaries,
 }: PortalEventListProps) => {
-  const router = useRouter()
-  const [showPast, setShowPast] = useState(upcoming.length === 0)
-  const [syncing, setSyncing] = useState(false)
-
-  const handleLumaSync = async () => {
-    setSyncing(true)
-    try {
-      const res = await fetch('/api/luma/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'all' }),
-      })
-      if (!res.ok) throw new Error()
-      const data = await res.json()
-      toast({
-        type: 'success',
-        description: `Synced ${data.eventsSynced ?? 0} events, ${data.guestsSynced ?? 0} guests`,
-      })
-      router.refresh()
-    } catch {
-      toast({ type: 'error', description: 'Luma sync failed' })
-    }
-    setSyncing(false)
-  }
+  const defaultTab = upcoming.length === 0 && past.length > 0 ? 'past' : 'upcoming'
 
   return (
     <>
-      <div className="rounded-lg border border-tag-border bg-tag-card">
-        {/* Upcoming */}
-        <div className="flex items-center justify-between px-4 py-3">
-          <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
-            Upcoming
-          </span>
-          {isAdmin && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleLumaSync}
-                disabled={syncing}
-                className="flex items-center gap-1.5 rounded-md border border-tag-border px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-muted transition-colors hover:border-tag-orange/30 hover:text-tag-orange disabled:opacity-50"
-              >
-                <RefreshCw className={cn('size-3', syncing && 'animate-spin')} />
-                {syncing ? 'Syncing...' : 'Sync Luma'}
-              </button>
-              <EventFormDialog
-                isAdmin={isAdmin}
-                trigger={
-                  <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
-                    <Plus className="size-3" />
-                    Add Event
-                  </button>
-                }
-              />
-            </div>
-          )}
-        </div>
-        {upcoming.length > 0 ? (
-          upcoming.map((event) => (
-            <PortalEventRow key={event.id} event={event} isAdmin={isAdmin} attendanceSummary={attendanceSummaries?.[event.id]} />
-          ))
-        ) : (
-          <div className="flex flex-col items-center px-4 py-12 text-center">
-            <CalendarX className="size-8 text-tag-dim" />
-            <p className="mt-3 font-syne text-lg font-bold text-tag-text">Nothing announced yet</p>
-            <p className="mt-1 text-sm text-tag-muted">
-              New events are in the works. Check back soon or browse past events below.
-            </p>
-          </div>
-        )}
+      <Tabs defaultValue={defaultTab} className="w-full">
+        <TabsList className={PORTAL_TABS_LIST_CLASSES}>
+          <TabsTrigger value="upcoming" className={PORTAL_TABS_TRIGGER_CLASSES}>
+            Upcoming ({upcoming.length})
+          </TabsTrigger>
+          <TabsTrigger value="past" className={PORTAL_TABS_TRIGGER_CLASSES}>
+            Past ({past.length})
+          </TabsTrigger>
+        </TabsList>
 
-        {/* Past */}
-        <div className="flex items-center justify-between border-t border-tag-border px-4 py-3">
-          <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
-            Past Events
-          </span>
-          <button
-            onClick={() => setShowPast((prev) => !prev)}
-            className="font-mono text-xs uppercase tracking-[0.15em] text-tag-muted transition-colors hover:text-tag-orange"
-          >
-            {showPast ? 'Hide' : 'Show'} &rarr;
-          </button>
-        </div>
-        {showPast &&
-          past.map((event) => (
-            <PortalEventRow key={event.id} event={event} muted isAdmin={isAdmin} attendanceSummary={attendanceSummaries?.[event.id]} />
-          ))}
-      </div>
+        <TabsContent value="upcoming" className="mt-0">
+          <div className="rounded-lg border border-tag-border bg-tag-card">
+            {upcoming.length > 0 ? (
+              upcoming.map((event) => (
+                <PortalEventRow
+                  key={event.id}
+                  event={event}
+                  isAdmin={isAdmin}
+                  attendanceSummary={attendanceSummaries?.[event.id]}
+                />
+              ))
+            ) : (
+              <div className="flex flex-col items-center px-4 py-12 text-center">
+                <CalendarX className="size-8 text-tag-dim" />
+                <p className="mt-3 font-syne text-lg font-bold text-tag-text">
+                  Nothing announced yet
+                </p>
+                <p className="mt-1 text-sm text-tag-muted">
+                  New events are in the works. Check back soon or browse past events.
+                </p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="past" className="mt-0">
+          <div className="rounded-lg border border-tag-border bg-tag-card">
+            {past.length > 0 ? (
+              past.map((event) => (
+                <PortalEventRow
+                  key={event.id}
+                  event={event}
+                  muted
+                  isAdmin={isAdmin}
+                  attendanceSummary={attendanceSummaries?.[event.id]}
+                />
+              ))
+            ) : (
+              <div className="flex flex-col items-center px-4 py-12 text-center">
+                <CalendarX className="size-8 text-tag-dim" />
+                <p className="mt-3 font-syne text-lg font-bold text-tag-text">No past events yet</p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Host your own event CTA */}
       <Dialog>

@@ -59,8 +59,10 @@ import {
   SelectValue,
 } from '@components/ui/select'
 
+import { Tabs, TabsList, TabsTrigger } from '@components/ui/tabs'
 import { ConfirmDialog } from '@components/confirm-dialog'
 import { FloorPlanMap } from './floor-plan-map'
+import { PORTAL_TABS_LIST_CLASSES, PORTAL_TABS_TRIGGER_CLASSES } from './portal-tabs-style'
 import type { ContactItem, Facility, Guideline, OpeningHours } from '@lib/portal/types'
 
 const tabs = [
@@ -1197,22 +1199,15 @@ export const SpaceTabs = ({
   return (
     <>
       {/* Tabs */}
-      <div className="mb-6 flex gap-1 overflow-x-auto rounded-lg border border-tag-border bg-tag-card p-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              'shrink-0 flex-1 rounded-md px-3 py-2 font-mono text-xs uppercase tracking-[0.1em] transition-colors',
-              activeTab === tab.key
-                ? 'bg-tag-orange/10 text-tag-orange'
-                : 'text-tag-muted hover:text-tag-text'
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as Tab)} className="w-full">
+        <TabsList className={PORTAL_TABS_LIST_CLASSES}>
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.key} value={tab.key} className={PORTAL_TABS_TRIGGER_CLASSES}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
       {/* Floor Plan */}
       {activeTab === 'floor-plan' && <FloorPlanMap />}

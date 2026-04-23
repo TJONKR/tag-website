@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@components/ui/tabs'
-import { cn } from '@lib/utils'
+import { PORTAL_TABS_LIST_CLASSES, PORTAL_TABS_TRIGGER_CLASSES } from './portal-tabs-style'
 
 const TAB_KEYS = ['overview', 'identity', 'account'] as const
 type TabKey = (typeof TAB_KEYS)[number]
@@ -47,16 +47,12 @@ export const ProfileTabs = ({ overview, identity, account }: ProfileTabsProps) =
 
   return (
     <Tabs value={active} onValueChange={handleChange} className="w-full">
-      <TabsList className="mb-8 h-auto w-full justify-start gap-1 rounded-none border-b border-tag-border bg-transparent p-0">
+      <TabsList className={PORTAL_TABS_LIST_CLASSES}>
         {TABS.map((tab) => (
           <TabsTrigger
             key={tab.key}
             value={tab.key}
-            className={cn(
-              '-mb-px rounded-none border-b-2 border-transparent bg-transparent px-5 py-3 font-mono text-xs uppercase tracking-[0.14em] text-tag-muted shadow-none transition-colors',
-              'hover:text-tag-text',
-              'data-[state=active]:border-tag-orange data-[state=active]:bg-transparent data-[state=active]:text-tag-orange data-[state=active]:shadow-none'
-            )}
+            className={PORTAL_TABS_TRIGGER_CLASSES}
           >
             {tab.label}
           </TabsTrigger>

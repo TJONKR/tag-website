@@ -17,6 +17,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from '@components/ui/avatar'
 import { Badge } from '@components/ui/badge'
 import { Button } from '@components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@components/ui/tabs'
 import {
   Dialog,
   DialogContent,
@@ -198,24 +199,30 @@ export const MemberList = ({
 
   return (
     <div>
-      {/* Counts summary */}
-      <div className="mb-6 flex gap-4">
-        {(['ambassador', 'builder', 'operator'] as const).map((role) => (
-          <button
-            key={role}
-            onClick={() => setFilterRole(filterRole === role ? 'all' : role)}
-            className={`rounded-lg border px-4 py-2 font-mono text-xs transition-colors ${
-              filterRole === role
-                ? 'border-tag-orange bg-tag-orange/10 text-tag-orange'
-                : 'border-tag-border bg-tag-card text-tag-muted hover:border-tag-orange/30'
-            }`}
-          >
-            {roleLabels[role]} ({counts[role]})
-          </button>
-        ))}
-        <div className="ml-auto font-mono text-sm text-tag-dim leading-loose">
-          {counts.total} total
-        </div>
+      {/* Role filter */}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <Tabs
+          value={filterRole}
+          onValueChange={(v) => setFilterRole(v as FilterRole)}
+        >
+          <TabsList className="border-tag-border bg-tag-card">
+            <TabsTrigger
+              value="all"
+              className="data-[state=active]:bg-tag-orange data-[state=active]:text-tag-bg-deep"
+            >
+              All ({counts.total})
+            </TabsTrigger>
+            {(['ambassador', 'builder', 'operator'] as const).map((role) => (
+              <TabsTrigger
+                key={role}
+                value={role}
+                className="data-[state=active]:bg-tag-orange data-[state=active]:text-tag-bg-deep"
+              >
+                {roleLabels[role]} ({counts[role]})
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Search */}
