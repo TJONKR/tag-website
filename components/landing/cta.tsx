@@ -24,10 +24,10 @@ export const Cta = () => {
 
       {/* Content */}
       <div className="reveal relative z-[2]">
-        <div className="font-syne text-[clamp(80px,12vw,140px)] leading-[0.9] text-tag-text">
+        <div className="select-none font-syne text-[clamp(80px,12vw,140px)] leading-[0.9] text-tag-text">
           TAG IN.
         </div>
-        <p className="mt-4 max-w-[600px] font-grotesk text-lg leading-relaxed text-tag-muted">
+        <p className="mt-4 max-w-[600px] select-none font-grotesk text-lg leading-relaxed text-tag-muted">
           Europe has the talent. What we&apos;re missing is the irrational belief that we deserve to
           win. This is where that belief starts.
         </p>
