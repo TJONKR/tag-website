@@ -155,18 +155,18 @@ export const ProfileIdentityTab = ({
           </div>
         </FadeIn>
 
-        {/* First-run / in-progress banner */}
+        {/* First-run / in-progress takeover */}
         {isInProgress && (
           <FadeIn delay={50}>
-            <div className="flex items-center gap-4 rounded-lg border border-tag-orange/30 bg-gradient-to-br from-tag-orange/10 to-tag-orange/[0.02] p-5">
-              <Loader2 className="size-6 shrink-0 animate-spin text-tag-orange" />
+            <div className="flex flex-col items-center gap-4 rounded-lg border border-tag-orange/30 bg-gradient-to-br from-tag-orange/10 to-tag-orange/[0.02] px-6 py-12 text-center">
+              <Loader2 className="size-8 shrink-0 animate-spin text-tag-orange" />
               <div>
-                <p className="font-syne text-sm font-bold text-tag-text">
+                <p className="font-syne text-base font-bold text-tag-text">
                   Building your profile…
                 </p>
-                <p className="mt-1 text-xs text-tag-muted">
-                  We&apos;re researching your public presence to fill out bio,
-                  tags and projects. Usually takes a minute.
+                <p className="mt-2 max-w-md text-sm text-tag-muted">
+                  We&apos;re researching your public presence to fill out your bio, tags and
+                  projects. Usually takes a minute — check back in a bit.
                 </p>
               </div>
             </div>
@@ -187,36 +187,30 @@ export const ProfileIdentityTab = ({
           </FadeIn>
         )}
 
-        {/* Socials */}
-        <FadeIn delay={100}>
-          <SocialLinks
-            profile={{
-              linkedin_url: onboardingProfile.linkedin_url,
-              twitter_url: onboardingProfile.twitter_url,
-              github_url: onboardingProfile.github_url,
-              website_url: onboardingProfile.website_url,
-              instagram_url: onboardingProfile.instagram_url,
-            }}
-          />
-        </FadeIn>
-
-        {/* Building + Why TAG (user-editable) */}
-        <FadeIn delay={150}>
-          <EditProfileForm
-            profile={{
-              building: onboardingProfile.building,
-              why_tag: onboardingProfile.why_tag,
-            }}
-          />
-        </FadeIn>
-
-        {/* Skeletons during first-run — preview of what's coming */}
-        {isInProgress && (
+        {!isInProgress && (
           <>
-            <SkeletonCard title="Headline" lines={['90%', '50%']} />
-            <SkeletonCard title="Bio" lines={['95%', '95%', '70%', '95%', '50%']} />
-            <SkeletonCard title="Tags" lines={['60%']} />
-            <SkeletonCard title="Projects" lines={['70%', '95%', '50%']} />
+            {/* Socials */}
+            <FadeIn delay={100}>
+              <SocialLinks
+                profile={{
+                  linkedin_url: onboardingProfile.linkedin_url,
+                  twitter_url: onboardingProfile.twitter_url,
+                  github_url: onboardingProfile.github_url,
+                  website_url: onboardingProfile.website_url,
+                  instagram_url: onboardingProfile.instagram_url,
+                }}
+              />
+            </FadeIn>
+
+            {/* Building + Why TAG (user-editable) */}
+            <FadeIn delay={150}>
+              <EditProfileForm
+                profile={{
+                  building: onboardingProfile.building,
+                  why_tag: onboardingProfile.why_tag,
+                }}
+              />
+            </FadeIn>
           </>
         )}
 
