@@ -1,6 +1,7 @@
 import { FadeIn } from '@lib/portal/components'
 import { EditNameForm } from '@lib/auth/components/edit-name-form'
 import { SignOutForm } from '@lib/auth/components/sign-out-form'
+import { ResetOnboardingButton } from '@lib/auth/components/reset-onboarding-button'
 
 import type { AuthUser, UserRole } from '@lib/auth/types'
 
@@ -38,7 +39,21 @@ export const ProfileAccountTab = ({ user }: ProfileAccountTabProps) => {
         </div>
       </FadeIn>
 
-      <FadeIn delay={75}>
+      {user.is_super_admin && (
+        <FadeIn delay={75}>
+          <div className="rounded-lg border border-dashed border-tag-orange/30 p-5">
+            <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-orange/70">
+              Super admin
+            </span>
+            <p className="mt-1 text-sm text-tag-muted">Tools for testing the onboarding flow.</p>
+            <div className="mt-3">
+              <ResetOnboardingButton />
+            </div>
+          </div>
+        </FadeIn>
+      )}
+
+      <FadeIn delay={user.is_super_admin ? 150 : 75}>
         <div className="rounded-lg border border-dashed border-destructive/30 p-5">
           <span className="font-mono text-xs uppercase tracking-[0.15em] text-destructive/70">
             Session
