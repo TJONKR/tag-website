@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import type { UserPhoto } from '@lib/photos/types'
@@ -32,6 +32,16 @@ export const OnboardingForm = ({
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const ensureFired = useRef(false)
+
+  // Kick off the taste pipeline as soon as onboarding starts so the
+  // prophecy step has a complete builder profile by the time the user
+  // gets there. Idempotent on the server.
+  useEffect(() => {
+    if (ensureFired.current) return
+    ensureFired.current = true
+    fetch('/api/taste/ensure', { method: 'POST' }).catch(() => {})
+  }, [])
 
   const step = useMemo(() => {
     const raw = Number(searchParams.get('step'))
