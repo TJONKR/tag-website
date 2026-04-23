@@ -235,6 +235,47 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
             {/* Content sections */}
             <div className="mt-12 max-w-2xl space-y-10">
+              {taste?.prophecy && taste.prophecy.length === 3 && (
+                <Section title="Prophecy">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    {taste.prophecy.map((card) => (
+                      <div
+                        key={card.id}
+                        className="overflow-hidden rounded-lg border border-tag-orange/30 bg-gradient-to-br from-tag-orange/10 via-tag-orange/[0.03] to-transparent"
+                      >
+                        {card.image_url && (
+                          <div className="aspect-square w-full overflow-hidden bg-black">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={card.image_url}
+                              alt=""
+                              className="size-full object-cover"
+                              style={{ imageRendering: 'pixelated' }}
+                            />
+                          </div>
+                        )}
+                        <div className="p-4">
+                          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-tag-orange">
+                            Round {card.round} ·{' '}
+                            {card.round === 1
+                              ? 'Surface'
+                              : card.round === 2
+                                ? 'Undercurrent'
+                                : 'Horizon'}
+                          </span>
+                          <h4 className="mt-2 font-syne text-base font-bold leading-tight text-tag-text">
+                            {card.title}
+                          </h4>
+                          <p className="mt-2 font-grotesk text-[12px] leading-relaxed text-tag-muted">
+                            {card.narrative}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
               {taste?.bio && (
                 <Section title="Bio">
                   <div className="space-y-3">

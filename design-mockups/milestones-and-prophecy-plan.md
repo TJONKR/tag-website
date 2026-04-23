@@ -5,7 +5,7 @@ work progresses. Designed to be read cold — if you open a fresh session
 and need to continue, read this file top-to-bottom and you will have
 enough context.
 
-**Last updated:** 2026-04-18 (phase 0 script shipped; awaiting tester feedback)
+**Last updated:** 2026-04-23 (phase 7 rework: adaptive 3-round draw + pixel-art imagery)
 **Related docs:**
 - `design-mockups/onboarding-milestones-brainstorm.md` — the "why"
 - `design-mockups/taste-pipeline-forward.md` — predecessor to prophecy
@@ -93,60 +93,84 @@ provisional answers — confirm or override.
         `builder_profile` and should resolve once the forward-looking
         pipeline from `taste-pipeline-forward.md` lands.
       - Model produced 15 cards (4+4+4+3) vs. requested 14. Acceptable.
-- [ ] Run on 3-5 other real profiles (volunteers from TAG) to confirm
-      it's not just good for Tijs.
-- [ ] **Exit criterion:** ≥3 of 5 test profiles produce a deck where
-      the tester would happily keep 3 cards without rewriting.
+- [x] ~~Run on 3-5 other real profiles (volunteers from TAG)~~.
+      **Cut 2026-04-18:** only 1 complete `builder_profile` exists in
+      prod (Tijs). Other 3 signups have no pipeline run yet. Instead of
+      blocking on volunteer recruitment, we iterate on Tijs' profile as
+      the single test case.
+- [ ] **New exit criterion:** 3 consecutive runs on Tijs' profile
+      produce decks where he would happily keep 3 cards without
+      rewriting, AND no single pair of cards feels like a dupe.
+      Runs logged in `design-mockups/prophecy-runs/`.
+- [ ] Tune prompt for per-suit distinctness (run 02 showed Keyboard
+      Undertaker and Ambient Stack Builder overlap inside THE FIELD).
+- [ ] Once a new member gets a complete builder_profile, re-run as a
+      cheap sanity check before locking.
 - [ ] Once validated, lock in prompt as final for phase 1 integration.
 
-### Phase 1 · Schema + pipeline plumbing ⬜
+### Phase 1 · Schema + pipeline plumbing ✅
 
-- [ ] Migration: add to `builder_profiles`:
-      ```
-      prophecy_deck      jsonb      -- {suits: {field:[...], method:[...], ...}}
-      prophecy_chosen    jsonb      -- array of 3 picked card IDs with narratives
-      prophecy_drawn_at  timestamptz
-      show_prophecy      boolean default true
-      ```
-- [ ] Update `lib/taste/pipeline/` to call the card-generation prompt
-      and save the deck.
-- [ ] Keep existing `headline` and `bio` for backward compat — they
-      still surface when prophecy hasn't been drawn yet.
+- [x] Migration `20260418120000_add_prophecy_to_builder_profiles.sql`
+      adds `prophecy_deck jsonb`, `prophecy_chosen jsonb`,
+      `prophecy_drawn_at timestamptz`, `show_prophecy boolean default true`.
+      Applied to prod (TAG Supabase).
+- [x] `lib/taste/pipeline/prophecy.ts` generates decks via Sonnet 4.6.
+- [x] `lib/taste/pipeline/run.ts` now runs prophecy as a phase 3 after
+      profile save. A prophecy failure is non-fatal — the member still
+      gets a complete bio/tags.
+- [x] `scripts/prophecy-backfill.ts` for one-off generation on
+      already-complete profiles. Tijs backfilled on 2026-04-18.
+- [x] Added `POST /api/taste/prophecy/draw` — self (with 60-day gate)
+      or super admin.
+- [x] Added `POST /api/taste/prophecy/pick` — accepts 3 card IDs,
+      resolves against deck server-side to prevent spoofing, writes
+      `prophecy_chosen` and `prophecy_drawn_at`.
 
-### Phase 2 · Prophecy reveal UI ⬜
+### Phase 2 · Prophecy reveal UI ✅
 
-- [ ] New component: `lib/taste/components/prophecy-reveal.tsx`
-      - Full-screen modal/takeover
-      - Face-down cards → tap/click to flip
-      - "Pick 3" selector with running count
-      - Confirm button → saves choice
-- [ ] Card component with suit-specific styling
-- [ ] Animation pass (flip, shake-into-position, final reveal)
-- [ ] Show on Identity tab when `prophecy_deck` exists and
-      `prophecy_chosen` is null.
+- [x] `lib/taste/components/prophecy-reveal.tsx` — full-screen
+      takeover, face-down cards per suit, flip-on-click via CSS 3D
+      backface, "pick 3" running counter, Seal the prophecy CTA.
+- [x] Suit-themed colors + glyphs (field=orange ◈, method=amber ◇,
+      audience=emerald ◉, arc=violet ☉).
+- [x] Mounted on Identity tab: draw CTA shows when
+      `prophecy_deck && !prophecy_chosen`; chosen cards render as a
+      FieldCard with visibility toggle once picked.
+- [ ] Animation pass beyond flip (shake-into-position, final reveal) —
+      defer; feel out need during dogfood.
 
-### Phase 3 · Public prophecy statement ⬜
+### Phase 3 · Public prophecy statement ✅
 
-- [ ] Update `/profile/[slug]` to render the 3 chosen cards as a
-      visual block (probably under the headline, above bio).
-- [ ] Add `show_prophecy` visibility toggle to Identity tab.
-- [ ] Update `PublicProfile` type in `lib/auth/types.ts`.
+- [x] `PublicTaste` type extended with `prophecy: ProphecyCard[] | null`.
+- [x] `getPublicTaste()` respects `show_prophecy` flag, reads
+      `prophecy_chosen`.
+- [x] `/profile/[slug]` renders chosen cards as a 3-up grid above the
+      Bio section.
+- [x] Visibility toggle added to Identity tab (`show_prophecy` in
+      `VISIBILITY_OPTIONS`).
 
-### Phase 4 · Milestone tracking UI ⬜
+### Phase 4 · Milestone tracking UI ✅
 
-- [ ] Compute current tier from profile state (query helper).
-- [ ] Show tier progress indicator somewhere — Overview tab? Small
-      portal header badge? Needs design.
-- [ ] Each tier reveal gets its own component; at transition show a
-      subtle celebration (toast + confetti-lite animation).
+- [x] `lib/milestones/tiers.ts` — `computeTier()` derives tier (Arrived
+      → Sparked → Prophecy → Embodied → Present) from onboarding
+      profile, builder profile, photo count, checked-in count. Returns
+      label, tagline, next-step hint, progress index.
+- [x] `lib/milestones/components/tier-badge.tsx` — tier card with
+      progress bar and per-tier color.
+- [x] Mounted on Overview tab left column below socials.
+- [ ] Per-tier transition celebration (toast + confetti) — defer to
+      phase 6 (future polish). Silent tier changes for now.
 
-### Phase 5 · Redraw mechanic ⬜
+### Phase 5 · Redraw mechanic ✅
 
-- [ ] Redraw button on Identity tab (enabled after `prophecy_drawn_at`
-      is >60 days ago).
-- [ ] Redraw path reuses the same pipeline + reveal modal.
-- [ ] Decide: does the old prophecy archive somewhere? (Retrospective
-      feature — "you drew X in January, Y today").
+- [x] Redraw button on Identity tab prophecy card; clicks
+      `/api/taste/prophecy/draw`. Backend gates: 60 days for members,
+      super admin bypasses.
+- [x] Reveal modal auto-opens after successful redraw.
+- [x] Helper `formatDrawnAt()` shows "X days/months ago" under chosen
+      cards.
+- [ ] Prophecy archive / retrospective view — deferred (plan said
+      phase 5 stretch goal).
 
 ### Phase 6 · Admin tooling ⬜
 
@@ -184,29 +208,127 @@ Fresh-session pointers:
 
 ## 6 · Next step right now
 
-**Validate phase 0 on more profiles.** The script exists and produces
-good content for Tijs. Before locking the prompt and moving to phase 1
-(schema + pipeline integration), run it on 3-5 more real TAG members
-and have each one read their deck.
+**Dogfood the full flow on Tijs' profile, then polish.** The code
+for phases 1-5 is shipped end-to-end, Tijs' deck is backfilled
+(2026-04-18). Open `/portal/profile` → Identity tab → click "Draw
+the cards" → pick 3 → confirm → verify chosen cards render on
+Identity, Overview tier badge updates, `/profile/tijs-nieuwboer`
+public page shows them.
+
+Things likely to need iteration after dogfood:
+- Reveal modal density / card readability on mobile.
+- Whether the "Redraw" button belongs here or should be more hidden.
+- Tier badge placement (currently left column under socials) — might
+  want to be more hero-level.
+- The "flip all" shortcut — might make the flip ritual feel pointless;
+  consider removing.
+
+**Iterate the prompt against Tijs' profile** (original phase 0 work
+continues in parallel):
 
 Concrete next moves:
-1. Pick 3-5 volunteers from TAG with a completed `builder_profile`.
-2. Run `pnpm tsx scripts/prophecy-prompt-test.ts <email>` for each.
-3. For each member, ask: "Would you keep 3 of these 14 cards without
-   rewriting?" Track yes/no.
-4. If ≥3 of 5 say yes → lock prompt, start phase 1.
-5. If <3 of 5 → iterate on the prompt in `buildPrompt()` inside the
-   script. Candidate improvements: tighten "grounded vs. bold vs.
-   wild" distribution, add more negative examples of what to avoid.
+1. Pick one dimension of the prompt to change (start with **per-suit
+   distinctness** — run 02 had two cards in THE FIELD that were
+   essentially the same voice-first prediction in different words).
+2. Edit `buildPrompt()` in `scripts/prophecy-prompt-test.ts`.
+3. Run `pnpm tsx scripts/prophecy-prompt-test.ts tijs@lerai.nl`.
+4. Save the deck as `design-mockups/prophecy-runs/<date>-tijs-run-NN.md`
+   with observations + which 3 cards Tijs would keep.
+5. Repeat until 3 consecutive runs hit the new exit criterion
+   (section 3, phase 0). Then lock the prompt.
 
 Known prompt-quality debt that does NOT block phase 1:
-- The model inherits stale data from the old `builder_profile`. The
-  fix is the forward-looking pipeline work from
-  `taste-pipeline-forward.md`, which is a parallel track.
+- The model inherits stale data from the old `builder_profile` (e.g.
+  Beeckestijn still leaks through in run 02). The fix is the
+  forward-looking pipeline work from `taste-pipeline-forward.md`,
+  which is a parallel track.
+- When a second member gets a `builder_profile`, do one cheap
+  sanity-check run on them before locking — catches if we've
+  overfit to Tijs.
 
 ---
 
-## 7 · How to use this doc in future sessions
+## 7 · Phase 7 rework — adaptive rounds + pixel art ◐
+
+**Decision 2026-04-23:** the "draw the whole deck, pick 3" ritual is too
+flat and the cards come out too literal ("you'll do more marathons"). We
+want a funnel: concrete → underlying drive → mythic vision. Shape the
+draw as three adaptive rounds, each shaped by the prior pick, each
+culminating in a card with a pixel-art gaming image.
+
+### Locked-in changes
+- **3 rounds × 4 cards.** End with exactly 3 chosen cards (one per round).
+- **Drop the 4-suit model.** Suits were dead weight under the adaptive
+  scheme. Replace with round semantics:
+  - Round 1 · **Surface** — observable patterns in current work.
+  - Round 2 · **Undercurrent** — what's actually driving those patterns.
+  - Round 3 · **Horizon** — the impossible/mythic version of where this
+    leads. Explicitly abstract.
+- **Each round is generated on demand**, conditioned on prior picks.
+  Round 1 uses the full profile; round 2 gets round-1 pick; round 3 gets
+  rounds 1-2 picks.
+- **Pixel-art gaming images per card.** `fal-ai/flux/schnell` (~1-2s,
+  ~$0.003/image). Style prompt baked in: 16-bit SNES-era fantasy RPG
+  card illustration, dark mystical background, tag-orange palette. 12
+  images per full run ≈ $0.04.
+- **Full-screen modal (real Dialog).** Not a panel takeover — so we can
+  open it from Overview tier-badge too, not just Identity tab.
+- **Magic loading between rounds.** Latency of the generate step is the
+  ritual — don't hide it, theatre it. Shuffle/deck animation + copy
+  that gives it meaning ("the deck reshuffles around your choice…").
+
+### Schema change
+Drop `prophecy_deck` (single-shot 14-card JSON, now obsolete).
+Add:
+- `prophecy_rounds jsonb` — `[{ cards: Card[], picked_id: string|null }, …]`
+  Live state of the draw. `cards` each have `{id, round, title,
+  narrative, image_url}`. Exactly 3 entries when sealed.
+Keep: `prophecy_chosen`, `prophecy_drawn_at`, `show_prophecy`.
+
+New Supabase storage bucket: `prophecy-images` (public read).
+
+### API surface
+- `POST /api/taste/prophecy/draw` — gated by 60-day redraw window. Resets
+  `prophecy_rounds` + generates round 1 (text + 4 images in parallel).
+- `POST /api/taste/prophecy/advance` — body `{ pickedCardId }`. Validates
+  against the unsealed round, writes the pick, generates next round or
+  finalises `prophecy_chosen` + `prophecy_drawn_at` on round 3.
+- Retire `/api/taste/prophecy/pick` (replaced by /advance).
+
+### Pipeline changes
+- `runProfilePipeline` stops auto-generating a prophecy deck at signup.
+  The first draw only happens when the member taps "draw the cards" on
+  Identity tab. (The old approach pre-generated 14 cards that most
+  members never looked at.)
+- `lib/taste/pipeline/prophecy.ts` becomes `generateRound(profile,
+  priorPicks, roundIndex)` → 4 text cards.
+- `lib/taste/pipeline/prophecy-image.ts` new — `generateCardImage(card)`
+  → pixel PNG, uploaded to `prophecy-images/{userId}/{cardId}.png`,
+  returns public URL. All 4 images fired in parallel per round.
+
+### Tests
+- `tests/routes/prophecy-draw.test.ts` — start new draw, 60-day gating.
+- `tests/routes/prophecy-advance.test.ts` (new) — pick through 3
+  rounds, reject invalid card id, reject picking already-sealed round,
+  finalisation writes `prophecy_chosen`.
+
+### Work breakdown
+- [x] Plan locked (this section).
+- [ ] Migration `20260423130000_prophecy_adaptive_rounds.sql`.
+- [ ] Types + schema: replace `ProphecyDeck`/suits with
+      `ProphecyRound`/`ProphecyCard` (+ image_url, round).
+- [ ] Backend `prophecy.ts` + `prophecy-image.ts`.
+- [ ] API routes `draw` + `advance`.
+- [ ] Rewrite `ProphecyReveal` as Dialog modal with round stepper +
+      magic loading.
+- [ ] Update Identity tab + public profile to new card shape.
+- [ ] Tests, typecheck, lint.
+- [ ] Retire `scripts/prophecy-backfill.ts` / update to new shape.
+- [ ] Dogfood on Tijs' profile (drop old deck, redraw).
+
+---
+
+## 8 · How to use this doc in future sessions
 
 1. Read this file top-to-bottom.
 2. Find the first unchecked box in section 3.
