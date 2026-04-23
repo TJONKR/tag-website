@@ -160,7 +160,7 @@ async function getPublicTaste(userId: string): Promise<PublicTaste | null> {
   const { data, error } = await supabase
     .from('builder_profiles')
     .select(
-      'headline, bio, tags, projects, interests, notable_work, influences, key_links, show_headline, show_bio, show_tags, show_projects, show_interests, show_notable_work, show_influences, show_key_links'
+      'headline, bio, tags, projects, interests, notable_work, influences, key_links, prophecy_chosen, show_headline, show_bio, show_tags, show_projects, show_interests, show_notable_work, show_influences, show_key_links, show_prophecy'
     )
     .eq('user_id', userId)
     .eq('status', 'complete')
@@ -177,6 +177,7 @@ async function getPublicTaste(userId: string): Promise<PublicTaste | null> {
     notable_work: data.show_notable_work ? data.notable_work : null,
     influences: data.show_influences ? data.influences : null,
     key_links: data.show_key_links ? data.key_links : null,
+    prophecy: data.show_prophecy ? data.prophecy_chosen : null,
   }
 }
 

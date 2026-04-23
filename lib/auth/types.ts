@@ -36,6 +36,15 @@ export interface PublicTaste {
   notable_work: string[] | null
   influences: string[] | null
   key_links: { url: string; title: string; type: string }[] | null
+  prophecy:
+    | {
+        id: string
+        round: 1 | 2 | 3
+        title: string
+        narrative: string
+        image_url: string | null
+      }[]
+    | null
 }
 
 export interface LoginActionState {

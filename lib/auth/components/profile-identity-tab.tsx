@@ -14,10 +14,11 @@ import {
   HeadlineDialog,
   KeyLinksDialog,
   ProjectsDialog,
+  ProphecyReveal,
   StringListDialog,
 } from '@lib/taste/components'
 
-import type { BuilderProfile, VisibilityField } from '@lib/taste/types'
+import type { BuilderProfile, ProphecyCard, VisibilityField } from '@lib/taste/types'
 import type { OnboardingProfile } from '@lib/onboarding/types'
 
 type EditTarget =
@@ -47,10 +48,50 @@ export const ProfileIdentityTab = ({
 
   const [updating, setUpdating] = useState<VisibilityField | null>(null)
   const [editing, setEditing] = useState<EditTarget>(null)
+  const [revealOpen, setRevealOpen] = useState(false)
+  const [drawing, setDrawing] = useState(false)
   const closeEditor = () => setEditing(null)
   const onSaved = () => {
     mutate()
     setEditing(null)
+  }
+
+  const unsealedInProgress = Boolean(
+    builderProfile?.prophecy_rounds &&
+      builderProfile.prophecy_rounds.length > 0 &&
+      !builderProfile.prophecy_chosen
+  )
+  const prophecyChosen: ProphecyCard[] | null =
+    builderProfile?.prophecy_chosen ?? null
+
+  const handleRevealComplete = (_: ProphecyCard[]) => {
+    setRevealOpen(false)
+    mutate()
+  }
+
+  const handleDraw = async () => {
+    setDrawing(true)
+    try {
+      const res = await fetch('/api/taste/prophecy/draw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        toast({
+          type: 'error',
+          description: json.errors?.[0]?.message ?? 'Could not start the draw.',
+        })
+        return
+      }
+      await mutate()
+      setRevealOpen(true)
+    } catch {
+      toast({ type: 'error', description: 'Could not start the draw.' })
+    } finally {
+      setDrawing(false)
+    }
   }
 
   const handleToggle = async (field: VisibilityField, nextValue: boolean) => {
@@ -177,6 +218,113 @@ export const ProfileIdentityTab = ({
             <SkeletonCard title="Tags" lines={['60%']} />
             <SkeletonCard title="Projects" lines={['70%', '95%', '50%']} />
           </>
+        )}
+
+        {/* Prophecy — start CTA (no draw yet) or resume CTA (mid-draw) */}
+        {isComplete && !prophecyChosen && (
+          <FadeIn delay={175}>
+            <button
+              type="button"
+              onClick={unsealedInProgress ? () => setRevealOpen(true) : handleDraw}
+              disabled={drawing}
+              className="group flex w-full flex-col items-start gap-2 rounded-lg border border-tag-orange/40 bg-gradient-to-br from-tag-orange/15 via-tag-orange/5 to-transparent p-5 text-left transition-colors hover:border-tag-orange/70 disabled:opacity-60"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-tag-orange">
+                {unsealedInProgress ? 'prophecy in progress' : 'the prophecy awaits'}
+              </span>
+              <span className="font-syne text-lg font-bold text-tag-text">
+                {unsealedInProgress
+                  ? 'Three rounds. One you already opened.'
+                  : 'Three rounds. Three picks. One emerging vision.'}
+              </span>
+              <span className="text-sm text-tag-muted">
+                Draw the cards that surface a pattern in your work, the
+                undercurrent beneath it, and the impossible shape it bends
+                toward.
+              </span>
+              <span className="mt-2 inline-flex items-center gap-2 rounded-full border border-tag-orange/50 bg-tag-orange/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.15em] text-tag-orange group-hover:bg-tag-orange/20">
+                {drawing ? (
+                  <>
+                    <Loader2 className="size-3 animate-spin" />
+                    Drawing round 1…
+                  </>
+                ) : unsealedInProgress ? (
+                  <>Resume the draw →</>
+                ) : (
+                  <>Draw the cards →</>
+                )}
+              </span>
+            </button>
+          </FadeIn>
+        )}
+
+        {/* Chosen prophecy — shown after all 3 rounds sealed */}
+        {isComplete && prophecyChosen && prophecyChosen.length === 3 && (
+          <FieldCard
+            title="Prophecy"
+            show={builderProfile?.show_prophecy ?? true}
+            onToggle={(v) => handleToggle('show_prophecy', v)}
+            isUpdating={updating === 'show_prophecy'}
+          >
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {prophecyChosen.map((card) => (
+                <div
+                  key={card.id}
+                  className="overflow-hidden rounded-md border border-tag-border bg-tag-bg"
+                >
+                  {card.image_url && (
+                    <div className="aspect-square w-full overflow-hidden bg-black">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={card.image_url}
+                        alt=""
+                        className="size-full object-cover"
+                        style={{ imageRendering: 'pixelated' }}
+                      />
+                    </div>
+                  )}
+                  <div className="p-3">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-tag-orange">
+                      Round {card.round} ·{' '}
+                      {card.round === 1
+                        ? 'Surface'
+                        : card.round === 2
+                          ? 'Undercurrent'
+                          : 'Horizon'}
+                    </span>
+                    <p className="mt-1 font-syne text-sm font-semibold text-tag-text">
+                      {card.title}
+                    </p>
+                    <p className="mt-1 text-[11px] leading-relaxed text-tag-muted">
+                      {card.narrative}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex items-center justify-between gap-2 border-t border-t-tag-border pt-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-tag-dim">
+                {builderProfile?.prophecy_drawn_at
+                  ? `Drawn ${formatDrawnAt(builderProfile.prophecy_drawn_at)}`
+                  : 'Prophecy sealed'}
+              </span>
+              <button
+                type="button"
+                onClick={handleDraw}
+                disabled={drawing}
+                className="flex items-center gap-1.5 rounded-full border border-tag-border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-tag-muted transition-colors hover:border-tag-orange/35 hover:text-tag-orange disabled:opacity-50"
+              >
+                {drawing ? (
+                  <>
+                    <Loader2 className="size-3 animate-spin" />
+                    Drawing…
+                  </>
+                ) : (
+                  'Redraw'
+                )}
+              </button>
+            </div>
+          </FieldCard>
         )}
 
         {/* AI sections — visibility only in v1 */}
@@ -481,12 +629,30 @@ export const ProfileIdentityTab = ({
         onSaved={onSaved}
         initialValue={builderProfile?.key_links ?? null}
       />
+
+      <ProphecyReveal
+        open={revealOpen}
+        onOpenChange={setRevealOpen}
+        initialRounds={builderProfile?.prophecy_rounds ?? null}
+        onFinalized={handleRevealComplete}
+      />
     </div>
   )
 }
 
+function formatDrawnAt(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime()
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  if (days <= 0) return 'today'
+  if (days === 1) return 'yesterday'
+  if (days < 30) return `${days} days ago`
+  const months = Math.floor(days / 30)
+  return `${months} month${months === 1 ? '' : 's'} ago`
+}
+
 const VISIBILITY_OPTIONS: { field: VisibilityField; label: string }[] = [
   { field: 'show_headline', label: 'Headline' },
+  { field: 'show_prophecy', label: 'Prophecy' },
   { field: 'show_bio', label: 'Bio' },
   { field: 'show_tags', label: 'Tags' },
   { field: 'show_projects', label: 'Projects' },

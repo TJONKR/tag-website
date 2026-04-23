@@ -14,6 +14,8 @@ import { PhotosModal } from '@lib/photos/components'
 import { ProfileEventTimeline } from '@lib/events/components'
 import { AvatarUpload } from '@lib/auth/components/avatar-upload'
 import { SocialLinks } from '@lib/auth/components/social-links'
+import { TierBadge } from '@lib/milestones/components'
+import { computeTier } from '@lib/milestones/tiers'
 
 import type { AuthUser, UserRole } from '@lib/auth/types'
 import type { MembershipStatus } from '@lib/membership/types'
@@ -85,6 +87,13 @@ export const ProfileOverviewTab = ({
 
   const equippedSkinUrl = equippedSkin?.image_url ?? builderProfile?.skin_url
   const hasSkin = !!equippedSkinUrl
+
+  const tier = computeTier({
+    onboardingProfile,
+    builderProfile,
+    photoCount: userPhotos.length,
+    checkedInCount,
+  })
 
   const participationRate =
     attendedEvents.length > 0
@@ -178,6 +187,10 @@ export const ProfileOverviewTab = ({
               instagram_url: onboardingProfile.instagram_url,
             }}
           />
+        </FadeIn>
+
+        <FadeIn delay={200}>
+          <TierBadge tier={tier} />
         </FadeIn>
 
         {/* Lootbox progress (onboarding-completion checklist) */}
