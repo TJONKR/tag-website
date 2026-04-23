@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback } from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useState } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@components/ui/tabs'
 import { cn } from '@lib/utils'
@@ -26,21 +26,23 @@ interface ProfileTabsProps {
 }
 
 export const ProfileTabs = ({ overview, identity, account }: ProfileTabsProps) => {
-  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const raw = searchParams.get('tab')
-  const active: TabKey = isTabKey(raw) ? raw : 'overview'
+  const [active, setActive] = useState<TabKey>(isTabKey(raw) ? raw : 'overview')
 
   const handleChange = useCallback(
     (next: string) => {
+      if (!isTabKey(next)) return
+      setActive(next)
       const params = new URLSearchParams(searchParams.toString())
       if (next === 'overview') params.delete('tab')
       else params.set('tab', next)
       const qs = params.toString()
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+      const url = qs ? `${pathname}?${qs}` : pathname
+      window.history.replaceState(null, '', url)
     },
-    [pathname, router, searchParams]
+    [pathname, searchParams]
   )
 
   return (
