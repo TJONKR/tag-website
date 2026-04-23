@@ -65,4 +65,18 @@ test.describe('Space photos routes', () => {
       expect(body.errors[0].message).toBe('Unauthorized')
     })
   })
+
+  test.describe('GET /api/space-photos/download', () => {
+    test('returns a zip or 404 depending on bucket state', async ({ request }) => {
+      const response = await request.get('/api/space-photos/download')
+
+      // 200 with zip attachment when there are photos, 404 when the
+      // bucket is empty. Both are valid responses for the test env.
+      expect([200, 404]).toContain(response.status())
+      if (response.status() === 200) {
+        expect(response.headers()['content-type']).toContain('application/zip')
+        expect(response.headers()['content-disposition']).toContain('attachment')
+      }
+    })
+  })
 })
