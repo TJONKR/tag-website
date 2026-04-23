@@ -1,7 +1,12 @@
+'use client'
+
+import { useState } from 'react'
+
 import { cn } from '@lib/utils'
 
 import { formatDateDisplay } from '@lib/events/types'
 import type { TagEvent } from '@lib/events/types'
+import { EventDetailsSheet } from './event-details-sheet'
 
 interface EventRowProps {
   event: TagEvent
@@ -9,28 +14,38 @@ interface EventRowProps {
 }
 
 export const EventRow = ({ event, muted = false }: EventRowProps) => {
+  const [open, setOpen] = useState(false)
+
   return (
-    <div
-      className={cn(
-        'group relative flex flex-col gap-2 border-t border-t-tag-border py-4',
-        muted && 'opacity-50'
-      )}
-    >
+    <>
       <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setOpen(true)
+          }
+        }}
         className={cn(
-          'font-mono text-xl font-bold',
-          muted ? 'text-tag-dim' : 'text-tag-orange'
+          'group relative flex cursor-pointer flex-col gap-2 border-t border-t-tag-border py-4',
+          muted && 'opacity-50'
         )}
       >
-        {formatDateDisplay(event.date_iso)}
+        <div
+          className={cn(
+            'font-mono text-xl font-bold',
+            muted ? 'text-tag-dim' : 'text-tag-orange'
+          )}
+        >
+          {formatDateDisplay(event.date_iso)}
+        </div>
+        <span className="font-syne text-base text-tag-text">{event.title}</span>
+        <div className="font-mono text-[11px] uppercase text-tag-muted">{event.type}</div>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-full origin-bottom scale-y-0 border-b-2 border-tag-orange transition-transform duration-300 group-hover:h-full group-hover:scale-y-100" />
       </div>
-      <span className="font-syne text-base text-tag-text">
-        {event.title}
-      </span>
-      <div className="font-mono text-[11px] uppercase text-tag-muted">
-        {event.type}
-      </div>
-      <div className="pointer-events-none absolute bottom-0 left-0 w-full origin-bottom scale-y-0 border-b-2 border-tag-orange transition-transform duration-300 group-hover:h-full group-hover:scale-y-100" />
-    </div>
+      <EventDetailsSheet event={event} open={open} onOpenChange={setOpen} />
+    </>
   )
 }
