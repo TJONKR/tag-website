@@ -23,6 +23,11 @@ import {
 
 import { formatDateDisplay } from '@lib/events/types'
 import type { TagEvent } from '@lib/events/types'
+import { EventApplicationList } from '@lib/event-applications/components'
+import type {
+  EventHostApplication,
+  EventApplicationCounts,
+} from '@lib/event-applications/types'
 import { EventFormDialog } from './event-form-dialog'
 import { AttendanceDialog } from './attendance-dialog'
 import { EventDetailsSheet } from './event-details-sheet'
@@ -32,6 +37,8 @@ interface PortalEventListProps {
   past: TagEvent[]
   isAdmin: boolean
   attendanceSummaries?: Record<string, { total: number; checkedIn: number }>
+  hostRequests?: EventHostApplication[]
+  hostRequestCounts?: EventApplicationCounts
 }
 
 const PortalEventRow = ({
@@ -260,8 +267,11 @@ export const PortalEventList = ({
   past,
   isAdmin,
   attendanceSummaries,
+  hostRequests,
+  hostRequestCounts,
 }: PortalEventListProps) => {
   const defaultTab = upcoming.length === 0 && past.length > 0 ? 'past' : 'upcoming'
+  const showRequests = isAdmin && hostRequests && hostRequestCounts
 
   return (
     <>
@@ -273,6 +283,11 @@ export const PortalEventList = ({
           <TabsTrigger value="past" className={PORTAL_TABS_TRIGGER_CLASSES}>
             Past ({past.length})
           </TabsTrigger>
+          {showRequests && (
+            <TabsTrigger value="requests" className={PORTAL_TABS_TRIGGER_CLASSES}>
+              Requests ({hostRequestCounts.pending})
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="upcoming" className="mt-0">
@@ -320,6 +335,16 @@ export const PortalEventList = ({
             )}
           </div>
         </TabsContent>
+
+        {showRequests && (
+          <TabsContent value="requests" className="mt-0">
+            <EventApplicationList
+              initialApplications={hostRequests}
+              initialCounts={hostRequestCounts}
+              initialSelectedId={null}
+            />
+          </TabsContent>
+        )}
       </Tabs>
 
       {/* Host your own event CTA */}

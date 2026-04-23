@@ -7,6 +7,14 @@ import {
 } from '@lib/events/queries'
 import { PortalEventList } from '@lib/events/components/portal-event-list'
 import { EventAdminActions } from '@lib/events/components/event-admin-actions'
+import {
+  getEventHostApplications,
+  getEventHostApplicationCounts,
+} from '@lib/event-applications/queries'
+import type {
+  EventHostApplication,
+  EventApplicationCounts,
+} from '@lib/event-applications/types'
 
 export default async function EventsPage() {
   const user = await getUser()
@@ -25,6 +33,15 @@ export default async function EventsPage() {
     attendanceSummaries = Object.fromEntries(summaries)
   }
 
+  let hostRequests: EventHostApplication[] | undefined
+  let hostRequestCounts: EventApplicationCounts | undefined
+  if (isAdmin) {
+    ;[hostRequests, hostRequestCounts] = await Promise.all([
+      getEventHostApplications(),
+      getEventHostApplicationCounts(),
+    ])
+  }
+
   return (
     <>
       <FadeIn>
@@ -40,6 +57,8 @@ export default async function EventsPage() {
           past={past}
           isAdmin={isAdmin}
           attendanceSummaries={attendanceSummaries}
+          hostRequests={hostRequests}
+          hostRequestCounts={hostRequestCounts}
         />
       </FadeIn>
     </>
