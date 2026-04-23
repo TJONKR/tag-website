@@ -5,7 +5,7 @@ _Bron: `docs/Daan Amsterdam 27.md`_
 ## 🔥 Belangrijk: Community & Events
 - [x] **Ideeënbox** — plek waar members ideeën kunnen droppen _(zie `docs/plans/ideeënbox.md`)_
 - [x] **Aanvraagformulier** voor externe hosts _(zie `docs/plans/event-host-aanvraagformulier.md`)_
-- [ ] **Foto's van de ruimte** uploadbaar maken, zodat hosts ze kunnen gebruiken in hun Luma event _(Tijs doet zelf)_
+- [x] **Foto's van de ruimte** uploadbaar maken — operators uploaden via `/portal/space` tab "Photos"; gallery rendert op `/host-event`
 
 ## Onboarding (quick wins)
 - [x] Fix: eerste geüploade foto wordt altijd automatisch getransformeerd → nu random foto uit upload-pool
