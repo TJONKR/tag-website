@@ -74,7 +74,7 @@ const deskClusters: DeskCluster[] = [
   makeDeskCluster('E', 'Flex', 'flex', 15, 11, 5, 6, 6),
 
   // Bottom-left — small flex above Lerai
-  makeDeskCluster('F', 'Flex', 'flex', 1, 15, 5, 4, 2),
+  makeDeskCluster('F', 'Flex', 'flex', 1, 15, 5, 4, 4),
 
   // Bottom row
   makeDeskCluster('G', 'Lerai', 'company', 1, 21, 5, 4, 4, 'Lerai'),
@@ -92,34 +92,34 @@ const TOTAL_H = 26
 
 const clusterStyles = {
   flex: {
-    zone: 'border-tag-text/15',
-    zoneHover: 'border-tag-text/30 bg-tag-text/[0.03]',
-    label: 'text-tag-muted/50',
-    labelHover: 'text-tag-muted',
-    desk: 'border-tag-text/20 bg-tag-text/[0.06] text-tag-muted',
-    deskHover: 'border-tag-text/40 bg-tag-text/[0.14] text-tag-text shadow-[0_0_12px_rgba(240,235,227,0.06)]',
+    zone: 'border-tag-text/30',
+    zoneHover: 'border-tag-text/60 bg-tag-text/[0.08]',
+    label: 'text-tag-muted',
+    labelHover: 'text-tag-text',
+    desk: 'border-tag-text/40 bg-tag-text/[0.12] text-tag-text/85',
+    deskHover: 'border-tag-text/80 bg-tag-text/[0.25] text-tag-text shadow-[0_0_20px_rgba(240,235,227,0.15)]',
   },
   company: {
-    zone: 'border-tag-orange/15',
-    zoneHover: 'border-tag-orange/30 bg-tag-orange/[0.03]',
-    label: 'text-tag-orange/40',
-    labelHover: 'text-tag-orange/70',
-    desk: 'border-tag-orange/25 bg-tag-orange/[0.06] text-tag-orange/70',
-    deskHover: 'border-tag-orange/50 bg-tag-orange/[0.14] text-tag-orange shadow-[0_0_12px_rgba(255,95,31,0.1)]',
+    zone: 'border-tag-orange/30',
+    zoneHover: 'border-tag-orange/60 bg-tag-orange/[0.08]',
+    label: 'text-tag-orange/75',
+    labelHover: 'text-tag-orange',
+    desk: 'border-tag-orange/50 bg-tag-orange/[0.12] text-tag-orange',
+    deskHover: 'border-tag-orange bg-tag-orange/[0.25] text-tag-orange shadow-[0_0_20px_rgba(255,95,31,0.25)]',
   },
 }
 
 const staticStyles = {
   meeting: {
-    base: 'border-blue-400/20 bg-blue-400/[0.05]',
-    hover: 'border-blue-400/40 bg-blue-400/[0.12] shadow-[0_0_20px_rgba(96,165,250,0.08)]',
-    label: 'text-blue-400/60',
+    base: 'border-blue-400/40 bg-blue-400/[0.10]',
+    hover: 'border-blue-400/70 bg-blue-400/[0.22] shadow-[0_0_28px_rgba(96,165,250,0.2)]',
+    label: 'text-blue-400',
     labelHover: 'text-blue-400',
   },
   amenity: {
-    base: 'border-tag-dim/20 bg-tag-dim/[0.04]',
-    hover: 'border-tag-dim/35 bg-tag-dim/[0.10]',
-    label: 'text-tag-muted',
+    base: 'border-tag-dim/35 bg-tag-dim/[0.08]',
+    hover: 'border-tag-dim/60 bg-tag-dim/[0.18]',
+    label: 'text-tag-text/80',
     labelHover: 'text-tag-text',
   },
 }
