@@ -100,7 +100,8 @@ export const ProphecyStep = ({
             <div>
               <p className="font-syne text-lg text-tag-text">Reading about you...</p>
               <p className="mt-2 text-sm text-tag-muted">
-                We're studying the signals from your socials. This usually takes a minute or two.
+                We&apos;re studying the signals from your socials. This usually takes a minute or
+                two.
               </p>
             </div>
           </div>
@@ -112,8 +113,8 @@ export const ProphecyStep = ({
               !
             </div>
             <p className="text-sm text-tag-muted">
-              We couldn't prepare your Prophecy right now. You can continue and try again later
-              from your profile.
+              We couldn&apos;t prepare your Prophecy right now. You can continue and try again
+              later from your profile.
             </p>
           </div>
         )}

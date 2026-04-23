@@ -69,7 +69,7 @@ export const TourStep = ({
               <Check className="size-5" />
             </div>
             <div>
-              <p className="font-syne text-base font-bold text-tag-text">Yes, I'd love one</p>
+              <p className="font-syne text-base font-bold text-tag-text">Yes, I&apos;d love one</p>
               <p className="mt-1 text-sm text-tag-muted">
                 Pick a time on the next screen.
               </p>
