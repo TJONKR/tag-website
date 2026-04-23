@@ -63,10 +63,13 @@ import { Tabs, TabsList, TabsTrigger } from '@components/ui/tabs'
 import { ConfirmDialog } from '@components/confirm-dialog'
 import { FloorPlanMap } from './floor-plan-map'
 import { PORTAL_TABS_LIST_CLASSES, PORTAL_TABS_TRIGGER_CLASSES } from './portal-tabs-style'
+import { SpacePhotosTab } from '@lib/space-photos/components'
+import type { SpacePhotoWithUrl } from '@lib/space-photos/types'
 import type { ContactItem, Facility, Guideline, OpeningHours } from '@lib/portal/types'
 
 const tabs = [
   { key: 'floor-plan', label: 'Floor Plan' },
+  { key: 'photos', label: 'Photos' },
   { key: 'facilities', label: 'Facilities' },
   { key: 'hours', label: 'Opening Hours' },
   { key: 'guidelines', label: 'Guidelines' },
@@ -1084,6 +1087,7 @@ interface SpaceTabsProps {
   openingHours: OpeningHours[]
   guidelines: Guideline[]
   contactItems: ContactItem[]
+  spacePhotos: SpacePhotoWithUrl[]
   isAdmin: boolean
 }
 
@@ -1092,6 +1096,7 @@ export const SpaceTabs = ({
   openingHours: initialHours,
   guidelines: initialGuidelines,
   contactItems: initialContacts,
+  spacePhotos,
   isAdmin,
 }: SpaceTabsProps) => {
   const [activeTab, setActiveTab] = useState<Tab>('floor-plan')
@@ -1211,6 +1216,16 @@ export const SpaceTabs = ({
 
       {/* Floor Plan */}
       {activeTab === 'floor-plan' && <FloorPlanMap />}
+
+      {/* Photos */}
+      {activeTab === 'photos' &&
+        (isAdmin ? (
+          <SpacePhotosTab initialPhotos={spacePhotos} />
+        ) : (
+          <p className="py-12 text-center font-mono text-sm text-tag-dim">
+            Photos of the space are managed by operators.
+          </p>
+        ))}
 
       {/* Facilities */}
       {activeTab === 'facilities' && (
