@@ -57,8 +57,8 @@ export const InviteDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-2 bg-tag-orange px-6 py-2.5 font-grotesk font-medium text-tag-bg-deep transition-colors hover:bg-[#e8551b]">
-          <Send className="size-4" />
+        <button className="flex items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
+          <Send className="size-3" />
           Direct Invite
         </button>
       </DialogTrigger>
