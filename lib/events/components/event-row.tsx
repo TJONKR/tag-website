@@ -27,6 +27,11 @@ export const EventRow = ({ event, muted = false }: EventRowProps) => {
       <span className="font-syne text-base text-tag-text">
         {event.title}
       </span>
+      {event.is_externally_managed && event.external_host && (
+        <span className="font-mono text-[11px] text-tag-muted">
+          Hosted by {event.external_host}
+        </span>
+      )}
       <div className="font-mono text-[11px] uppercase text-tag-muted">
         {event.type}
       </div>

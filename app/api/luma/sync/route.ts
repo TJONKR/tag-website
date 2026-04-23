@@ -24,6 +24,7 @@ export async function POST(req: Request) {
           .from('events')
           .select('id, luma_event_id')
           .not('luma_event_id', 'is', null)
+          .eq('is_externally_managed', false)
 
         let totalGuests = 0
         for (const event of lumaEvents ?? []) {

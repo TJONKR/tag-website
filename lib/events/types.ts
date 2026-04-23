@@ -13,6 +13,8 @@ export interface TagEvent {
   start_at: string | null
   end_at: string | null
   cover_url: string | null
+  is_externally_managed: boolean
+  external_host: string | null
 }
 
 export interface EventAttendee {

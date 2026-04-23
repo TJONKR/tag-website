@@ -3,7 +3,7 @@ import { createServerSupabaseClient } from '@lib/db'
 import type { TagEvent, EventAttendee } from './types'
 
 const EVENT_COLUMNS =
-  'id, title, type, description, date_iso, location, created_by, luma_event_id, luma_url, start_at, end_at, cover_url'
+  'id, title, type, description, date_iso, location, created_by, luma_event_id, luma_url, start_at, end_at, cover_url, is_externally_managed, external_host'
 
 export async function getUpcomingEvents(): Promise<TagEvent[]> {
   const supabase = await createServerSupabaseClient()
