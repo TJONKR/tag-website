@@ -90,16 +90,27 @@ const PortalEventRow = ({
           {formatDateDisplay(event.date_iso)}
         </div>
         <span className="font-syne text-base text-tag-text">{event.title}</span>
+        {event.is_externally_managed && event.external_host && (
+          <span className="font-mono text-xs text-tag-muted">
+            Hosted by {event.external_host}
+          </span>
+        )}
         <div className="flex items-center gap-2">
           {muted && attendanceSummary && attendanceSummary.total > 0 && (
             <span className="font-mono text-sm text-tag-muted">
               {attendanceSummary.checkedIn}/{attendanceSummary.total} checked in
             </span>
           )}
-          {event.luma_event_id && (
-            <span className="rounded bg-tag-orange/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-tag-orange">
-              Luma
+          {event.is_externally_managed ? (
+            <span className="rounded bg-tag-dim/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-tag-muted">
+              External
             </span>
+          ) : (
+            event.luma_event_id && (
+              <span className="rounded bg-tag-orange/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-tag-orange">
+                Luma
+              </span>
+            )
           )}
           <span className="font-mono text-xs uppercase tracking-wider text-tag-dim">
             {event.type}
@@ -117,39 +128,43 @@ const PortalEventRow = ({
                   <ExternalLink className="size-3.5" />
                 </a>
               )}
-              {muted && (
+              {!event.is_externally_managed && muted && (
                 <AttendanceDialog
                   eventId={event.id}
                   eventTitle={event.title}
                   isLumaLinked={!!event.luma_event_id}
                 />
               )}
-              <EventFormDialog
-                event={event}
-                isAdmin={isAdmin}
-                trigger={
-                  <button
-                    className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
-                    aria-label="Edit event"
-                  >
-                    <Pencil className="size-3.5" />
-                  </button>
-                }
-              />
-              <ConfirmDialog
-                trigger={
-                  <button
-                    disabled={deleting}
-                    className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-destructive"
-                    aria-label="Delete event"
-                  >
-                    <Trash2 className="size-3.5" />
-                  </button>
-                }
-                title="Delete event?"
-                description="This action cannot be undone."
-                onConfirm={handleDelete}
-              />
+              {!event.is_externally_managed && (
+                <>
+                  <EventFormDialog
+                    event={event}
+                    isAdmin={isAdmin}
+                    trigger={
+                      <button
+                        className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
+                        aria-label="Edit event"
+                      >
+                        <Pencil className="size-3.5" />
+                      </button>
+                    }
+                  />
+                  <ConfirmDialog
+                    trigger={
+                      <button
+                        disabled={deleting}
+                        className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-destructive"
+                        aria-label="Delete event"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    }
+                    title="Delete event?"
+                    description="This action cannot be undone."
+                    onConfirm={handleDelete}
+                  />
+                </>
+              )}
             </div>
           )}
         </div>
