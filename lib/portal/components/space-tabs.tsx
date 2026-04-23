@@ -65,14 +65,17 @@ import { FloorPlanMap } from './floor-plan-map'
 import { PORTAL_TABS_LIST_CLASSES, PORTAL_TABS_TRIGGER_CLASSES } from './portal-tabs-style'
 import { SpacePhotosTab } from '@lib/space-photos/components'
 import type { SpacePhotoWithUrl } from '@lib/space-photos/types'
+import { IdeaList } from '@lib/ideas/components'
+import type { Idea } from '@lib/ideas/types'
 import type { ContactItem, Facility, Guideline, OpeningHours } from '@lib/portal/types'
 
 const tabs = [
   { key: 'floor-plan', label: 'Floor Plan' },
-  { key: 'photos', label: 'Photos' },
   { key: 'facilities', label: 'Facilities' },
   { key: 'hours', label: 'Opening Hours' },
   { key: 'guidelines', label: 'Guidelines' },
+  { key: 'photos', label: 'Photos' },
+  { key: 'ideas', label: 'Ideas' },
   { key: 'contact', label: 'Contact' },
 ] as const
 
@@ -1088,7 +1091,9 @@ interface SpaceTabsProps {
   guidelines: Guideline[]
   contactItems: ContactItem[]
   spacePhotos: SpacePhotoWithUrl[]
+  ideas: Idea[]
   isAdmin: boolean
+  currentUserId: string | null
 }
 
 export const SpaceTabs = ({
@@ -1097,7 +1102,9 @@ export const SpaceTabs = ({
   guidelines: initialGuidelines,
   contactItems: initialContacts,
   spacePhotos,
+  ideas,
   isAdmin,
+  currentUserId,
 }: SpaceTabsProps) => {
   const [activeTab, setActiveTab] = useState<Tab>('floor-plan')
   const [facilities, setFacilities] = useState(initialFacilities)
@@ -1218,15 +1225,13 @@ export const SpaceTabs = ({
       {activeTab === 'floor-plan' && <FloorPlanMap />}
 
       {/* Photos */}
-      {activeTab === 'photos' &&
-        (isAdmin ? (
-          <SpacePhotosTab initialPhotos={spacePhotos} />
-        ) : (
-          <p className="py-12 text-center font-mono text-sm text-tag-dim">
-            Photos of the space are managed by operators.
-          </p>
-        ))}
-
+      {activeTab === 'photos' && (
+        <SpacePhotosTab
+          initialPhotos={spacePhotos}
+          currentUserId={currentUserId}
+          isAdmin={isAdmin}
+        />
+      )}
       {/* Facilities */}
       {activeTab === 'facilities' && (
         <div className="grid gap-4">
@@ -1390,6 +1395,9 @@ export const SpaceTabs = ({
           </DndContext>
         </div>
       )}
+
+      {/* Ideas */}
+      {activeTab === 'ideas' && <IdeaList initialIdeas={ideas} />}
 
       {/* Contact */}
       {activeTab === 'contact' && (

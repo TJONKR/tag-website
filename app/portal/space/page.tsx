@@ -3,16 +3,19 @@ import { getUser } from '@lib/auth/queries'
 import { getContactItems, getFacilities, getGuidelines, getOpeningHours } from '@lib/portal/queries'
 import { SpaceTabs } from '@lib/portal/components/space-tabs'
 import { getSpacePhotos } from '@lib/space-photos/queries'
+import { getIdeasByUser } from '@lib/ideas/queries'
 
 export default async function SpacePage() {
   const user = await getUser()
-  const [facilities, guidelines, openingHours, contactItems, spacePhotos] = await Promise.all([
-    getFacilities(),
-    getGuidelines(),
-    getOpeningHours(),
-    getContactItems(),
-    getSpacePhotos(),
-  ])
+  const [facilities, guidelines, openingHours, contactItems, spacePhotos, ideas] =
+    await Promise.all([
+      getFacilities(),
+      getGuidelines(),
+      getOpeningHours(),
+      getContactItems(),
+      getSpacePhotos(),
+      getIdeasByUser(user.id),
+    ])
 
   return (
     <>
@@ -29,7 +32,9 @@ export default async function SpacePage() {
           guidelines={guidelines}
           contactItems={contactItems}
           spacePhotos={spacePhotos}
+          ideas={ideas}
           isAdmin={user.role === 'operator'}
+          currentUserId={user.id}
         />
       </FadeIn>
     </>
