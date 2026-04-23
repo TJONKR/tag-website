@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, Map, Sparkles, User, Users } from 'lucide-react'
+import { Calendar, Lightbulb, Map, Sparkles, User, Users } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@components/ui/avatar'
 import { cn } from '@lib/utils'
@@ -12,6 +12,7 @@ import type { UserRole } from '@lib/auth/types'
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   calendar: Calendar,
+  lightbulb: Lightbulb,
   map: Map,
   sparkles: Sparkles,
   user: User,
