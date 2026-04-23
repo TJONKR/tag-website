@@ -15,7 +15,7 @@ const sanitizeExt = (name: string) => {
 export const uploadSpacePhoto = async (
   file: File,
   createdBy: string,
-  caption?: string | null
+  opts?: { caption?: string | null; takenAt?: string | null }
 ): Promise<SpacePhoto> => {
   const service = createServiceRoleClient()
 
@@ -47,7 +47,8 @@ export const uploadSpacePhoto = async (
     .from('space_photos')
     .insert({
       storage_path: storagePath,
-      caption: caption ?? null,
+      caption: opts?.caption ?? null,
+      taken_at: opts?.takenAt ?? null,
       sort_order: nextOrder,
       created_by: createdBy,
     })
@@ -61,6 +62,33 @@ export const uploadSpacePhoto = async (
   }
 
   return data as SpacePhoto
+}
+
+export const tagUserInPhoto = async (
+  photoId: string,
+  userId: string,
+  taggedBy: string
+) => {
+  const service = createServiceRoleClient()
+  const { error } = await service
+    .from('space_photo_tags')
+    .insert({ photo_id: photoId, user_id: userId, tagged_by: taggedBy })
+
+  // Unique violation means already tagged — treat as idempotent success.
+  if (error && !error.message.toLowerCase().includes('duplicate')) {
+    throw new Error(error.message)
+  }
+}
+
+export const untagUserFromPhoto = async (photoId: string, userId: string) => {
+  const service = createServiceRoleClient()
+  const { error } = await service
+    .from('space_photo_tags')
+    .delete()
+    .eq('photo_id', photoId)
+    .eq('user_id', userId)
+
+  if (error) throw new Error(error.message)
 }
 
 export const updateSpacePhoto = async (

@@ -1,55 +1,121 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
-import { ImagePlus, Loader2, Pencil, Trash2 } from 'lucide-react'
+import useSWR from 'swr'
+import { ImagePlus, Loader2 } from 'lucide-react'
 
-import { Button } from '@components/ui/button'
-import { Input } from '@components/ui/input'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@components/ui/dialog'
-import { ConfirmDialog } from '@components/confirm-dialog'
 import { toast } from '@components/toast'
+import { fetcher } from '@lib/utils'
+import type { Member } from '@lib/people/types'
 
 import { useSpacePhotos } from '../hooks'
 import type { SpacePhotoWithUrl } from '../types'
+import { SpacePhotoViewer } from './space-photo-viewer'
 
 interface SpacePhotosTabProps {
   initialPhotos: SpacePhotoWithUrl[]
+  currentUserId: string | null
+  isAdmin: boolean
 }
 
-export const SpacePhotosTab = ({ initialPhotos }: SpacePhotosTabProps) => {
+type Filter = 'all' | 'me'
+
+const AvatarStack = ({ tags }: { tags: SpacePhotoWithUrl['tags'] }) => {
+  if (tags.length === 0) return null
+  const visible = tags.slice(0, 4)
+  const extra = Math.max(0, tags.length - visible.length)
+  return (
+    <div className="flex items-center">
+      {visible.map((tag, i) => {
+        const initials = (tag.name ?? '?')
+          .split(' ')
+          .map((s) => s[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2)
+        return (
+          <span
+            key={tag.id}
+            className="relative -ml-2 inline-flex size-7 items-center justify-center overflow-hidden rounded-full border-2 border-tag-bg bg-tag-card text-[10px] font-medium text-tag-text first:ml-0"
+            style={{ zIndex: visible.length - i }}
+            title={tag.name ?? 'Member'}
+          >
+            {tag.avatar_url ? (
+              <Image
+                src={tag.avatar_url}
+                alt={tag.name ?? 'Member'}
+                fill
+                className="object-cover"
+                unoptimized
+              />
+            ) : (
+              <span>{initials}</span>
+            )}
+          </span>
+        )
+      })}
+      {extra > 0 && (
+        <span className="relative -ml-2 inline-flex size-7 items-center justify-center rounded-full border-2 border-tag-bg bg-tag-orange/80 text-[10px] font-medium text-white">
+          +{extra}
+        </span>
+      )}
+    </div>
+  )
+}
+
+export const SpacePhotosTab = ({
+  initialPhotos,
+  currentUserId,
+  isAdmin,
+}: SpacePhotosTabProps) => {
   const { photos, mutate } = useSpacePhotos(initialPhotos)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
-  const [editing, setEditing] = useState<SpacePhotoWithUrl | null>(null)
-  const [caption, setCaption] = useState('')
-  const [savingCaption, setSavingCaption] = useState(false)
+  const [filter, setFilter] = useState<Filter>('all')
+  const [viewingId, setViewingId] = useState<string | null>(null)
+  const viewing = useMemo(
+    () => (viewingId ? (photos.find((p) => p.id === viewingId) ?? null) : null),
+    [photos, viewingId]
+  )
+
+  const { data: members } = useSWR<Member[]>(
+    currentUserId ? '/api/people' : null,
+    fetcher
+  )
+
+  const filtered = useMemo(() => {
+    if (filter === 'me' && currentUserId) {
+      return photos.filter((p) => p.tags.some((t) => t.user_id === currentUserId))
+    }
+    return photos
+  }, [photos, filter, currentUserId])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
+    const files = Array.from(e.target.files ?? [])
+    if (files.length === 0) return
     setUploading(true)
     try {
       const formData = new FormData()
-      formData.append('file', file)
-
-      const res = await fetch('/api/space-photos', {
-        method: 'POST',
-        body: formData,
-      })
-
+      for (const f of files) formData.append('files', f)
+      const res = await fetch('/api/space-photos', { method: 'POST', body: formData })
       if (!res.ok) {
         const json = await res.json().catch(() => ({}))
         throw new Error(json.errors?.[0]?.message ?? 'Upload failed')
       }
-
-      toast({ type: 'success', description: 'Photo uploaded.' })
+      const result = (await res.json()) as {
+        uploaded: string[]
+        failed: { name: string; reason: string }[]
+      }
+      if (result.uploaded.length > 0) {
+        toast({
+          type: 'success',
+          description: `${result.uploaded.length} photo${result.uploaded.length === 1 ? '' : 's'} uploaded.`,
+        })
+      }
+      for (const f of result.failed) {
+        toast({ type: 'error', description: `${f.name}: ${f.reason}` })
+      }
       await mutate()
     } catch (err) {
       toast({
@@ -62,168 +128,98 @@ export const SpacePhotosTab = ({ initialPhotos }: SpacePhotosTabProps) => {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    try {
-      const res = await fetch(`/api/space-photos/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const json = await res.json().catch(() => ({}))
-        throw new Error(json.errors?.[0]?.message ?? 'Delete failed')
-      }
-      toast({ type: 'success', description: 'Photo deleted.' })
-      await mutate()
-    } catch (err) {
-      toast({
-        type: 'error',
-        description: err instanceof Error ? err.message : 'Delete failed',
-      })
-    }
-  }
-
-  const openCaptionEditor = (photo: SpacePhotoWithUrl) => {
-    setEditing(photo)
-    setCaption(photo.caption ?? '')
-  }
-
-  const saveCaption = async () => {
-    if (!editing) return
-    setSavingCaption(true)
-    try {
-      const res = await fetch(`/api/space-photos/${editing.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ caption: caption || null }),
-      })
-      if (!res.ok) {
-        const json = await res.json().catch(() => ({}))
-        throw new Error(json.errors?.[0]?.message ?? 'Save failed')
-      }
-      toast({ type: 'success', description: 'Caption saved.' })
-      await mutate()
-      setEditing(null)
-    } catch (err) {
-      toast({
-        type: 'error',
-        description: err instanceof Error ? err.message : 'Save failed',
-      })
-    } finally {
-      setSavingCaption(false)
-    }
-  }
-
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <p className="font-mono text-xs text-tag-dim">
-          {photos.length} photo{photos.length === 1 ? '' : 's'} shown on /host-event
-        </p>
-        <label className="flex cursor-pointer items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
-          {uploading ? (
-            <Loader2 className="size-3 animate-spin" />
-          ) : (
-            <ImagePlus className="size-3" />
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="inline-flex overflow-hidden rounded-md border border-tag-border bg-tag-card">
+          <button
+            type="button"
+            onClick={() => setFilter('all')}
+            className={`px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition-colors ${
+              filter === 'all'
+                ? 'bg-tag-orange text-tag-bg-deep'
+                : 'text-tag-muted hover:text-tag-text'
+            }`}
+          >
+            All ({photos.length})
+          </button>
+          {currentUserId && (
+            <button
+              type="button"
+              onClick={() => setFilter('me')}
+              className={`border-l border-tag-border px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition-colors ${
+                filter === 'me'
+                  ? 'bg-tag-orange text-tag-bg-deep'
+                  : 'text-tag-muted hover:text-tag-text'
+              }`}
+            >
+              Tagged me
+            </button>
           )}
-          {uploading ? 'Uploading…' : 'Upload photo'}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={handleFileChange}
-            disabled={uploading}
-            className="hidden"
-          />
-        </label>
+        </div>
+
+        {isAdmin && (
+          <label className="flex cursor-pointer items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
+            {uploading ? (
+              <Loader2 className="size-3 animate-spin" />
+            ) : (
+              <ImagePlus className="size-3" />
+            )}
+            {uploading ? 'Uploading…' : 'Upload'}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="hidden"
+            />
+          </label>
+        )}
       </div>
 
-      {photos.length === 0 ? (
+      {filtered.length === 0 ? (
         <p className="py-12 text-center font-mono text-sm text-tag-dim">
-          No photos yet. Upload JPEG, PNG, or WebP up to 5 MB.
+          {filter === 'me' ? 'No photos with you tagged yet.' : 'No photos yet.'}
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          {photos.map((photo) => (
-            <div
+        <div className="grid grid-cols-3 gap-0.5 sm:grid-cols-4 md:grid-cols-5">
+          {filtered.map((photo) => (
+            <button
+              type="button"
               key={photo.id}
-              className="group relative overflow-hidden rounded-lg border border-tag-border bg-tag-card"
+              onClick={() => setViewingId(photo.id)}
+              className="group relative aspect-square overflow-hidden bg-tag-card"
             >
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={photo.url}
-                  alt={photo.caption ?? 'TAG space'}
-                  fill
-                  sizes="(min-width: 768px) 33vw, 50vw"
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
-              <div className="flex items-start justify-between gap-2 p-3">
-                <p className="min-w-0 flex-1 truncate font-mono text-xs text-tag-muted">
-                  {photo.caption ?? <span className="text-tag-dim">No caption</span>}
-                </p>
-                <div className="flex shrink-0 gap-1">
-                  <button
-                    type="button"
-                    onClick={() => openCaptionEditor(photo)}
-                    className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-bg hover:text-tag-text"
-                    aria-label="Edit caption"
-                  >
-                    <Pencil className="size-3.5" />
-                  </button>
-                  <ConfirmDialog
-                    trigger={
-                      <button
-                        type="button"
-                        className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-bg hover:text-destructive"
-                        aria-label="Delete photo"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </button>
-                    }
-                    title="Delete this photo?"
-                    description="This action cannot be undone."
-                    onConfirm={() => handleDelete(photo.id)}
-                  />
+              <Image
+                src={photo.url}
+                alt=""
+                fill
+                sizes="(min-width: 768px) 20vw, 33vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                unoptimized
+              />
+              {photo.tags.length > 0 && (
+                <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  <div className="w-full p-2">
+                    <AvatarStack tags={photo.tags} />
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
+            </button>
           ))}
         </div>
       )}
 
-      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
-        <DialogContent className="border-tag-border bg-tag-bg text-tag-text sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-syne">Edit caption</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Optional caption"
-              maxLength={200}
-              className="border-tag-border bg-tag-card"
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setEditing(null)}
-                className="border-tag-border"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={saveCaption}
-                disabled={savingCaption}
-                className="gap-2 bg-tag-orange text-tag-bg hover:bg-tag-orange/90"
-              >
-                {savingCaption && <Loader2 className="size-4 animate-spin" />}
-                Save
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <SpacePhotoViewer
+        photo={viewing}
+        onOpenChange={(open) => !open && setViewingId(null)}
+        onPhotoMutated={mutate}
+        currentUserId={currentUserId}
+        isAdmin={isAdmin}
+        members={members ?? []}
+      />
     </div>
   )
 }
