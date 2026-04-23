@@ -1,264 +1,124 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { useCallback, useMemo } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-import { Input } from '@components/ui/input'
-import { Textarea } from '@components/ui/textarea'
-import { Label } from '@components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@components/ui/select'
-import { toast } from '@components/toast'
+import type { UserPhoto } from '@lib/photos/types'
 
-import type { OnboardingProfile } from '../types'
+import { AvatarStep } from './steps/avatar-step'
+import { PhotosStep } from './steps/photos-step'
+import { TourStep } from './steps/tour-step'
+import { ProphecyStep } from './steps/prophecy-step'
+import { ManifestoStep } from './steps/manifesto-step'
 
 interface OnboardingFormProps {
-  profile: OnboardingProfile
+  name: string | null
+  avatarUrl: string | null
+  initialPhotos: UserPhoto[]
+  photoUrls: Record<string, string>
+  isPreview: boolean
 }
 
-const REFERRAL_OPTIONS = ['Twitter/X', 'LinkedIn', 'Friend', 'Event', 'Other']
+const TOTAL_STEPS = 5
+const STEPPER_TOTAL = 4
 
-const labelClass = 'font-mono text-xs uppercase tracking-[0.08em] text-tag-muted'
-const inputClass =
-  'border-tag-border bg-tag-card text-tag-text placeholder:text-tag-dim focus-visible:ring-tag-orange'
-
-export const OnboardingForm = ({ profile }: OnboardingFormProps) => {
+export const OnboardingForm = ({
+  name,
+  avatarUrl,
+  initialPhotos,
+  photoUrls,
+  isPreview,
+}: OnboardingFormProps) => {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
-    setErrors({})
+  const step = useMemo(() => {
+    const raw = Number(searchParams.get('step'))
+    if (Number.isFinite(raw) && raw >= 1 && raw <= TOTAL_STEPS) return raw
+    return 1
+  }, [searchParams])
 
-    const formData = new FormData(e.currentTarget)
-    const data = {
-      name: formData.get('name') as string,
-      building: formData.get('building') as string,
-      whyTag: formData.get('whyTag') as string,
-      referral: (formData.get('referral') as string) || undefined,
-      linkedinUrl: (formData.get('linkedinUrl') as string) || '',
-      twitterUrl: (formData.get('twitterUrl') as string) || '',
-      githubUrl: (formData.get('githubUrl') as string) || '',
-      websiteUrl: (formData.get('websiteUrl') as string) || '',
-      instagramUrl: (formData.get('instagramUrl') as string) || '',
-    }
+  const goToStep = useCallback(
+    (next: number) => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (next <= 1) params.delete('step')
+      else params.set('step', String(next))
+      const qs = params.toString()
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+    },
+    [pathname, router, searchParams]
+  )
 
-    try {
-      const res = await fetch('/api/profile/onboarding', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
+  const handleNext = useCallback(() => goToStep(step + 1), [goToStep, step])
+  const handleBack = useCallback(
+    () => (step > 1 ? goToStep(step - 1) : undefined),
+    [goToStep, step]
+  )
 
-      const json = await res.json()
-
-      if (!res.ok) {
-        if (json.errors) {
-          const fieldErrors: Record<string, string> = {}
-          for (const err of json.errors) {
-            if (err.path?.[0]) {
-              fieldErrors[err.path[0]] = err.message
-            }
-          }
-          setErrors(fieldErrors)
-        } else {
-          toast({ type: 'error', description: json.errors?.[0]?.message || 'Something went wrong.' })
-        }
-        return
-      }
-
-      toast({ type: 'success', description: 'Welcome to TAG!' })
+  const handleComplete = useCallback(async () => {
+    if (isPreview) {
       router.push('/portal/events')
-    } catch {
-      toast({ type: 'error', description: 'Something went wrong. Try again.' })
-    } finally {
-      setLoading(false)
+      return
     }
+    const res = await fetch('/api/profile/onboarding/finish', { method: 'POST' })
+    if (!res.ok) {
+      const json = await res.json().catch(() => null)
+      throw new Error(json?.errors?.[0]?.message || 'Failed to finish onboarding')
+    }
+    router.push('/portal/events')
+  }, [isPreview, router])
+
+  if (step === 1) {
+    return (
+      <AvatarStep
+        name={name}
+        avatarUrl={avatarUrl}
+        stepNumber={1}
+        totalSteps={STEPPER_TOTAL}
+        onNext={handleNext}
+        onStepClick={goToStep}
+      />
+    )
   }
 
-  return (
-    <form onSubmit={handleSubmit} className="max-w-[600px] space-y-8">
-      {/* Identity */}
-      <div className="space-y-6">
-        <h2 className="font-syne text-lg font-bold text-tag-text">About You</h2>
+  if (step === 2) {
+    return (
+      <PhotosStep
+        initialPhotos={initialPhotos}
+        photoUrls={photoUrls}
+        stepNumber={2}
+        totalSteps={STEPPER_TOTAL}
+        onBack={handleBack}
+        onNext={handleNext}
+        onStepClick={goToStep}
+      />
+    )
+  }
 
-        <div className="space-y-2">
-          <Label htmlFor="name" className={labelClass}>
-            Name
-          </Label>
-          <Input
-            id="name"
-            name="name"
-            required
-            defaultValue={profile.name ?? ''}
-            placeholder="Your name"
-            className={inputClass}
-          />
-          {errors.name && (
-            <p className="font-mono text-xs text-red-400">{errors.name}</p>
-          )}
-        </div>
+  if (step === 3) {
+    return (
+      <TourStep
+        stepNumber={3}
+        totalSteps={STEPPER_TOTAL}
+        onBack={handleBack}
+        onNext={handleNext}
+        onStepClick={goToStep}
+      />
+    )
+  }
 
-        <div className="space-y-2">
-          <Label htmlFor="building" className={labelClass}>
-            What are you building?
-          </Label>
-          <Textarea
-            id="building"
-            name="building"
-            required
-            rows={4}
-            defaultValue={profile.building ?? ''}
-            placeholder="Side projects, startups, experiments..."
-            className={inputClass}
-          />
-          {errors.building && (
-            <p className="font-mono text-xs text-red-400">{errors.building}</p>
-          )}
-        </div>
+  if (step === 4) {
+    return (
+      <ProphecyStep
+        stepNumber={4}
+        totalSteps={STEPPER_TOTAL}
+        onBack={handleBack}
+        onNext={handleNext}
+        onStepClick={goToStep}
+      />
+    )
+  }
 
-        <div className="space-y-2">
-          <Label htmlFor="whyTag" className={labelClass}>
-            Why TAG?
-          </Label>
-          <Textarea
-            id="whyTag"
-            name="whyTag"
-            required
-            rows={3}
-            defaultValue={profile.why_tag ?? ''}
-            placeholder="What drew you here?"
-            className={inputClass}
-          />
-          {errors.whyTag && (
-            <p className="font-mono text-xs text-red-400">{errors.whyTag}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="referral" className={labelClass}>
-            How did you hear about us?
-          </Label>
-          <Select name="referral" defaultValue={profile.referral ?? undefined}>
-            <SelectTrigger className={inputClass}>
-              <SelectValue placeholder="Select one (optional)" />
-            </SelectTrigger>
-            <SelectContent className="border-tag-border bg-tag-card">
-              {REFERRAL_OPTIONS.map((option) => (
-                <SelectItem
-                  key={option}
-                  value={option}
-                  className="text-tag-text focus:bg-tag-border focus:text-tag-text"
-                >
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Socials */}
-      <div className="space-y-6">
-        <h2 className="font-syne text-lg font-bold text-tag-text">Socials</h2>
-        <p className="font-grotesk text-sm text-tag-muted">
-          Add your socials so other builders can find you. All optional.
-        </p>
-
-        <div className="space-y-2">
-          <Label htmlFor="linkedinUrl" className={labelClass}>
-            LinkedIn
-          </Label>
-          <Input
-            id="linkedinUrl"
-            name="linkedinUrl"
-            type="url"
-            defaultValue={profile.linkedin_url ?? ''}
-            placeholder="https://linkedin.com/in/you"
-            className={inputClass}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="twitterUrl" className={labelClass}>
-            Twitter / X
-          </Label>
-          <Input
-            id="twitterUrl"
-            name="twitterUrl"
-            type="url"
-            defaultValue={profile.twitter_url ?? ''}
-            placeholder="https://x.com/you"
-            className={inputClass}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="githubUrl" className={labelClass}>
-            GitHub
-          </Label>
-          <Input
-            id="githubUrl"
-            name="githubUrl"
-            type="url"
-            defaultValue={profile.github_url ?? ''}
-            placeholder="https://github.com/you"
-            className={inputClass}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="websiteUrl" className={labelClass}>
-            Website
-          </Label>
-          <Input
-            id="websiteUrl"
-            name="websiteUrl"
-            type="url"
-            defaultValue={profile.website_url ?? ''}
-            placeholder="https://yoursite.com"
-            className={inputClass}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="instagramUrl" className={labelClass}>
-            Instagram
-          </Label>
-          <Input
-            id="instagramUrl"
-            name="instagramUrl"
-            type="url"
-            defaultValue={profile.instagram_url ?? ''}
-            placeholder="https://instagram.com/you"
-            className={inputClass}
-          />
-        </div>
-      </div>
-
-      {/* Submit */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="flex items-center gap-2 bg-tag-orange px-8 py-3 font-grotesk font-medium text-tag-bg-deep transition-colors hover:bg-[#e8551b] disabled:opacity-50"
-      >
-        {loading ? (
-          <>
-            <Loader2 className="size-4 animate-spin" />
-            Saving...
-          </>
-        ) : (
-          'Complete Setup \u2192'
-        )}
-      </button>
-    </form>
-  )
+  return <ManifestoStep name={name} onComplete={handleComplete} />
 }

@@ -44,6 +44,8 @@ export const PortalSidebar = ({
   const pathname = usePathname()
   const isProfileActive = pathname === '/portal/profile'
 
+  if (pathname === '/portal/onboarding') return null
+
   const allItems = portalNavGroups
     .flatMap((group) => group.items)
     .filter((item) => {
