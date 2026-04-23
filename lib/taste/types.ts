@@ -2,9 +2,27 @@ export type ProfileStatus =
   | 'pending'
   | 'researching'
   | 'formatting'
+  | 'drawing_prophecy'
   | 'generating_skin'
   | 'complete'
   | 'error'
+
+export type ProphecyRoundIndex = 1 | 2 | 3
+
+export interface ProphecyCard {
+  id: string
+  round: ProphecyRoundIndex
+  title: string
+  narrative: string
+  image_url: string | null
+}
+
+export interface ProphecyRound {
+  cards: ProphecyCard[]
+  picked_id: string | null
+}
+
+export type ProphecyRounds = ProphecyRound[]
 
 export interface BuilderProfile {
   id: string
@@ -29,6 +47,9 @@ export interface BuilderProfile {
   avatar_url: string | null
   skin_url: string | null
   data_sources: string[] | null
+  prophecy_rounds: ProphecyRounds | null
+  prophecy_chosen: ProphecyCard[] | null
+  prophecy_drawn_at: string | null
   show_headline: boolean
   show_bio: boolean
   show_tags: boolean
@@ -37,6 +58,7 @@ export interface BuilderProfile {
   show_notable_work: boolean
   show_influences: boolean
   show_key_links: boolean
+  show_prophecy: boolean
   created_at: string
   completed_at: string | null
 }
@@ -50,3 +72,4 @@ export type VisibilityField =
   | 'show_notable_work'
   | 'show_influences'
   | 'show_key_links'
+  | 'show_prophecy'
