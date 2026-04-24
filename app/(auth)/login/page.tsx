@@ -88,7 +88,7 @@ function LoginRedirectEffects({
     if (state.status === 'invalid_credentials') {
       toast({
         type: 'error',
-        description: 'Invalid email or password.',
+        description: "Hmm, that didn't work. Double-check your email and password and try again.",
       })
     } else if (state.status === 'email_not_confirmed') {
       toast({

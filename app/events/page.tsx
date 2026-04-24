@@ -1,8 +1,19 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { PageShell } from '@components/page-shell'
 import { EventsHero, EventList } from '@lib/events/components'
 import { getUpcomingEvents, getPastEvents } from '@lib/events/queries'
+
+const title = 'TAG Events'
+const description = "From hackathons to demo nights. Discover what's happening at TAG."
+
+export const metadata: Metadata = {
+  title,
+  description,
+  openGraph: { title, description },
+  twitter: { card: 'summary_large_image', title, description },
+}
 
 export default async function EventsPage() {
   const [upcoming, past] = await Promise.all([getUpcomingEvents(), getPastEvents()])
