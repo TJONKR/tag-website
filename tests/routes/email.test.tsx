@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { createElement } from 'react'
 
 import { sendEmail } from '../../lib/email/send'
-import { ApplicationReceived } from '../../lib/email/templates/application-received'
+import { ApplicationApproved } from '../../lib/email/templates/application-approved'
 
 // Note: we don't snapshot-render every template here because Playwright's test
 // runner injects its own JSX runtime (see playwright/jsx-runtime.js) which
@@ -20,7 +20,7 @@ test.describe('Email module', () => {
       const result = await sendEmail({
         to: 'test@example.com',
         subject: 'Test',
-        react: createElement(ApplicationReceived, { name: 'Jane' }),
+        react: createElement(ApplicationApproved, { name: 'Jane', signupUrl: 'https://example.com/signup' }),
       })
 
       expect(result.ok).toBe(false)
@@ -44,7 +44,7 @@ test.describe('Email module', () => {
       const result = await sendEmail({
         to: 'test@example.com',
         subject: 'Test',
-        react: createElement(ApplicationReceived, { name: 'Jane' }),
+        react: createElement(ApplicationApproved, { name: 'Jane', signupUrl: 'https://example.com/signup' }),
       })
 
       // Either it's rejected (ok: false, error set) or it was skipped

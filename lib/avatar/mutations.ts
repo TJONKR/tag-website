@@ -1,5 +1,4 @@
 import { createServiceRoleClient } from '@lib/db'
-import { getUserEmail, sendAvatarComplete } from '@lib/email/senders'
 
 import type { AvatarJob } from './types'
 
@@ -36,13 +35,6 @@ export async function updateAvatarJob(
 ) {
   const supabase = createServiceRoleClient()
 
-  // Capture prior status so we only notify on a real transition.
-  const { data: prior } = await supabase
-    .from('avatar_jobs')
-    .select('status, user_id')
-    .eq('id', jobId)
-    .single()
-
   const { error } = await supabase
     .from('avatar_jobs')
     .update({
@@ -52,24 +44,6 @@ export async function updateAvatarJob(
     .eq('id', jobId)
 
   if (error) throw new Error(error.message)
-
-  if (status !== 'complete' || !prior || prior.status === 'complete') return
-
-  const userId = prior.user_id as string
-  const email = await getUserEmail(userId)
-  if (!email) return
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('name')
-    .eq('id', userId)
-    .single()
-
-  await sendAvatarComplete({
-    to: email,
-    name: profile?.name ?? undefined,
-    imageUrl,
-  })
 }
 
 /**

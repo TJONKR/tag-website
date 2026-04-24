@@ -1,5 +1,5 @@
 import { createServiceRoleClient } from '@lib/db'
-import { getUserEmail, sendTasteComplete, sendTasteFailed } from '@lib/email/senders'
+import { getUserEmail, sendTasteFailed } from '@lib/email/senders'
 
 import type {
   ProfileStatus,
@@ -9,11 +9,7 @@ import type {
   VisibilityField,
 } from './types'
 
-async function notifyBuilderProfileStatus(
-  userId: string,
-  status: 'complete' | 'error',
-  errorMessage?: string
-) {
+async function notifyBuilderProfileError(userId: string, errorMessage?: string) {
   const email = await getUserEmail(userId)
   if (!email) return
 
@@ -25,11 +21,7 @@ async function notifyBuilderProfileStatus(
     .single()
   const name = profile?.name ?? undefined
 
-  if (status === 'complete') {
-    await sendTasteComplete({ to: email, name })
-  } else {
-    await sendTasteFailed({ to: email, name, errorMessage })
-  }
+  await sendTasteFailed({ to: email, name, errorMessage })
 }
 
 interface CreateProfileInput {
@@ -137,8 +129,6 @@ export async function saveProfileResult(
     .eq('user_id', userId)
 
   if (error) throw new Error(error.message)
-
-  await notifyBuilderProfileStatus(userId, 'complete')
 }
 
 export async function setEvaluationError(userId: string, errorMessage: string) {
@@ -154,7 +144,7 @@ export async function setEvaluationError(userId: string, errorMessage: string) {
 
   if (error) throw new Error(error.message)
 
-  await notifyBuilderProfileStatus(userId, 'error', errorMessage)
+  await notifyBuilderProfileError(userId, errorMessage)
 }
 
 export async function updateVisibility(

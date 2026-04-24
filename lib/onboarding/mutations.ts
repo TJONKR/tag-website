@@ -1,5 +1,4 @@
 import { createServerSupabaseClient } from '@lib/db'
-import { getUserEmail, sendWelcomeAmbassador } from '@lib/email/senders'
 
 import type { OnboardingInput } from './schema'
 
@@ -8,7 +7,7 @@ export async function finishOnboarding(userId: string) {
 
   const { data: existing } = await supabase
     .from('profiles')
-    .select('onboarding_completed, name')
+    .select('onboarding_completed')
     .eq('id', userId)
     .single()
 
@@ -20,11 +19,6 @@ export async function finishOnboarding(userId: string) {
     .eq('id', userId)
 
   if (error) throw new Error(error.message)
-
-  const email = await getUserEmail(userId)
-  if (email && existing?.name) {
-    await sendWelcomeAmbassador({ to: email, name: existing.name })
-  }
 }
 
 export async function resetOnboarding(userId: string) {
@@ -39,16 +33,6 @@ export async function resetOnboarding(userId: string) {
 
 export async function completeOnboarding(userId: string, input: OnboardingInput) {
   const supabase = await createServerSupabaseClient()
-
-  // Check if this is the transition from in-progress to completed, so we
-  // only send the welcome mail once.
-  const { data: existing } = await supabase
-    .from('profiles')
-    .select('onboarding_completed')
-    .eq('id', userId)
-    .single()
-
-  const wasCompleted = Boolean(existing?.onboarding_completed)
 
   const { error: profileError } = await supabase
     .from('profiles')
@@ -67,11 +51,4 @@ export async function completeOnboarding(userId: string, input: OnboardingInput)
     .eq('id', userId)
 
   if (profileError) throw new Error(profileError.message)
-
-  if (!wasCompleted) {
-    const email = await getUserEmail(userId)
-    if (email) {
-      await sendWelcomeAmbassador({ to: email, name: input.name })
-    }
-  }
 }
