@@ -22,7 +22,7 @@ import type { AuthUser, UserRole } from '@lib/auth/types'
 import type { MembershipStatus } from '@lib/membership/types'
 import type { OnboardingProfile } from '@lib/onboarding/types'
 import type { BuilderProfile } from '@lib/taste/types'
-import type { UserSkin } from '@lib/lootbox/types'
+import type { LootboxStyle, UserSkin } from '@lib/lootbox/types'
 import type { UserPhoto } from '@lib/photos/types'
 
 interface AttendedEvent {
@@ -58,6 +58,7 @@ interface ProfileOverviewTabProps {
   photoUrls: Record<string, string>
   equippedSkin: UserSkin | null
   userSkins: UserSkin[]
+  allStyles: LootboxStyle[]
   pendingSkin: UserSkin | null
   availableLootboxCount: number
   hasEnoughPhotos: boolean
@@ -76,6 +77,7 @@ export const ProfileOverviewTab = ({
   photoUrls,
   equippedSkin,
   userSkins,
+  allStyles,
   pendingSkin,
   availableLootboxCount,
   hasEnoughPhotos,
@@ -187,7 +189,12 @@ export const ProfileOverviewTab = ({
                 trigger={
                   <button
                     type="button"
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-2 font-grotesk text-sm font-medium text-tag-orange transition-colors hover:border-tag-orange/60 hover:bg-tag-orange/20"
+                    className={cn(
+                      'mt-5 flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 font-grotesk text-sm font-medium transition-colors',
+                      userPhotos.length > 0
+                        ? 'border-tag-border bg-tag-bg/60 text-tag-muted hover:border-tag-text/40 hover:text-tag-text'
+                        : 'border-tag-orange/30 bg-tag-orange/10 text-tag-orange hover:border-tag-orange/60 hover:bg-tag-orange/20'
+                    )}
                   >
                     <ImagePlus className="size-4" />
                     {userPhotos.length > 0
@@ -301,7 +308,7 @@ export const ProfileOverviewTab = ({
         </FadeIn>
 
         {/* Skins collection */}
-        {userSkins.length > 0 && <SkinsCollection initialSkins={userSkins} />}
+        <SkinsCollection initialSkins={userSkins} allStyles={allStyles} />
 
         {/* Membership row — woven in */}
         <FadeIn delay={200}>

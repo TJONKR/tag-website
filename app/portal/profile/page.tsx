@@ -15,6 +15,7 @@ import {
   getUserSkins,
   getPendingSkin,
   getAvailableLootboxCount,
+  getGlobalStyles,
 } from '@lib/lootbox/queries'
 import { ensureFirstLootbox } from '@lib/lootbox/mutations'
 import { MAX_PHOTOS } from '@lib/photos/types'
@@ -32,6 +33,7 @@ export default async function ProfilePage() {
     userSkins,
     pendingSkin,
     initialAvailableLootboxCount,
+    allStyles,
   ] = await Promise.all([
     getUserAttendedEvents(user.id),
     getMembershipStatus(user.id, user.role),
@@ -43,6 +45,7 @@ export default async function ProfilePage() {
     getUserSkins(user.id),
     getPendingSkin(user.id),
     getAvailableLootboxCount(user.id),
+    getGlobalStyles(),
   ])
 
   // Signed URLs for the photos modal
@@ -108,6 +111,7 @@ export default async function ProfilePage() {
             photoUrls={photoUrls}
             equippedSkin={equippedSkin}
             userSkins={userSkins}
+            allStyles={allStyles}
             pendingSkin={pendingSkin}
             availableLootboxCount={availableLootboxCount}
             hasEnoughPhotos={hasEnoughPhotos}
