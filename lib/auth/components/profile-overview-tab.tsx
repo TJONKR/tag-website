@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Calendar, Check, Shield, Star } from 'lucide-react'
+import { Calendar, Check, ImagePlus, Shield, Star } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { FadeIn } from '@lib/portal/components'
@@ -180,6 +180,22 @@ export const ProfileOverviewTab = ({
                   Since {formatMemberSince(user.created_at)}
                 </span>
               </div>
+
+              <PhotosModal
+                photos={userPhotos}
+                photoUrls={photoUrls}
+                trigger={
+                  <button
+                    type="button"
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-2 font-grotesk text-sm font-medium text-tag-orange transition-colors hover:border-tag-orange/60 hover:bg-tag-orange/20"
+                  >
+                    <ImagePlus className="size-4" />
+                    {userPhotos.length > 0
+                      ? `Manage reference photos (${userPhotos.length})`
+                      : 'Add reference photos'}
+                  </button>
+                }
+              />
             </div>
           </div>
         </FadeIn>
