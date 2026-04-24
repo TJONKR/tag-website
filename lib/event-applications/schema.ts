@@ -53,7 +53,6 @@ export const eventHostRequestSchema = z.object({
 
   websiteUrl: optionalUrl,
   socialUrl: optionalUrl,
-  referral: optionalString,
 
   // Spam controls. `website` is a honeypot field and is validated as a free
   // string so the API route can silently drop bot-filled submissions instead
@@ -66,7 +65,6 @@ export type EventHostRequestInput = z.infer<typeof eventHostRequestSchema>
 
 export const reviewEventApplicationSchema = z.object({
   status: z.enum(['pending', 'approved', 'rejected', 'archived']),
-  adminNotes: z.string().max(5000).optional().or(z.literal('')),
 })
 
 export type ReviewEventApplicationInput = z.infer<

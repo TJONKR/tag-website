@@ -11,6 +11,7 @@ import {
   SheetTitle,
 } from '@components/ui/sheet'
 
+import { formatDateFull } from '@lib/events/types'
 import type { TagEvent } from '@lib/events/types'
 
 const formatTimeRange = (start: string | null, end: string | null): string | null => {
@@ -18,16 +19,6 @@ const formatTimeRange = (start: string | null, end: string | null): string | nul
   const fmt = (iso: string) =>
     new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
   return end ? `${fmt(start)} – ${fmt(end)}` : fmt(start)
-}
-
-const formatFullDate = (dateIso: string): string => {
-  const date = new Date(dateIso + 'T00:00:00')
-  return date.toLocaleDateString('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
 }
 
 interface EventDetailsSheetProps {
@@ -78,7 +69,7 @@ export const EventDetailsSheet = ({ event, open, onOpenChange }: EventDetailsShe
         <div className="mt-8 space-y-5 border-y border-tag-border py-6 text-sm">
           <div className="flex items-start gap-4">
             <CalendarX className="mt-0.5 size-4 shrink-0 text-tag-orange" />
-            <span className="text-tag-text">{formatFullDate(event.date_iso)}</span>
+            <span className="text-tag-text">{formatDateFull(event.date_iso)}</span>
           </div>
           {timeRange && (
             <div className="flex items-start gap-4">

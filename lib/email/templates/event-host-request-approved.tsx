@@ -1,16 +1,14 @@
 import { EmailLayout } from './_layout'
-import { Divider, H1, LabeledSection, P } from './_components'
+import { H1, P } from './_components'
 
 interface EventHostRequestApprovedProps {
   name: string
   eventTitle: string
-  adminNotes?: string | null
 }
 
 export const EventHostRequestApproved = ({
   name,
   eventTitle,
-  adminNotes,
 }: EventHostRequestApprovedProps) => {
   const firstName = name.split(' ')[0]
 
@@ -22,14 +20,6 @@ export const EventHostRequestApproved = ({
         One of us will be in touch shortly to confirm the date, the setup, and
         the house rules. You can reply to this email with any questions.
       </P>
-
-      {adminNotes ? (
-        <>
-          <Divider />
-          <LabeledSection label="Notes from the team">{adminNotes}</LabeledSection>
-        </>
-      ) : null}
-
       <P muted>See you in the space.</P>
       <P>— Team TAG</P>
     </EmailLayout>

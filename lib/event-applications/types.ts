@@ -23,9 +23,7 @@ export interface EventHostApplication {
   duration_hours: number | null
   website_url: string | null
   social_url: string | null
-  referral: string | null
   status: EventApplicationStatus
-  admin_notes: string | null
   reviewed_at: string | null
   reviewed_by: string | null
   created_at: string

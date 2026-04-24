@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs'
-import { Badge } from '@components/ui/badge'
+import { formatDateDisplay } from '@lib/events/types'
 
-import { EventApplicationDetailDialog } from './event-application-detail-dialog'
+import { EventApplicationDetailSheet } from './event-application-detail-sheet'
 
 import type {
   EventApplicationCounts,
@@ -19,12 +19,15 @@ interface EventApplicationListProps {
   initialSelectedId?: string | null
 }
 
-const statusColors: Record<EventApplicationStatus, string> = {
-  pending: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-  approved: 'bg-green-500/10 text-green-500 border-green-500/20',
-  rejected: 'bg-red-500/10 text-red-500 border-red-500/20',
-  archived: 'bg-tag-border/40 text-tag-dim border-tag-border',
+// Same pill style as the Luma badge in portal-event-list (rounded, mono,
+// tiny uppercase) with a different color per status.
+const statusPillClasses: Record<EventApplicationStatus, string> = {
+  pending: 'bg-yellow-500/10 text-yellow-500',
+  approved: 'bg-green-500/10 text-green-500',
+  rejected: 'bg-red-500/10 text-red-500',
+  archived: 'bg-tag-dim/10 text-tag-muted',
 }
+
 
 const TABS: EventApplicationStatus[] = ['pending', 'approved', 'rejected', 'archived']
 
@@ -88,47 +91,56 @@ export const EventApplicationList = ({
                 No {tab} requests.
               </p>
             ) : (
-              <div className="space-y-3">
-                {filtered.map((app) => (
-                  <button
-                    key={app.id}
-                    type="button"
-                    onClick={() => setSelected(app)}
-                    className="flex w-full items-center justify-between rounded-lg border border-tag-border bg-tag-card p-4 text-left transition-colors hover:border-tag-orange/30"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-3">
-                        <span className="font-grotesk font-medium text-tag-text">
-                          {app.event_title}
-                        </span>
-                        <Badge
-                          variant="outline"
-                          className={statusColors[app.status]}
-                        >
-                          {app.event_type}
-                        </Badge>
+              <div>
+                {filtered.map((app) => {
+                  const displayDate = app.proposed_date ?? app.created_at
+                  return (
+                    <div
+                      key={app.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelected(app)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setSelected(app)
+                        }
+                      }}
+                      className="flex cursor-pointer flex-col gap-2 border-t border-tag-border px-4 py-4 transition-all duration-300 hover:border-l-2 hover:border-l-tag-orange"
+                    >
+                      <div className="font-mono text-sm font-bold text-tag-orange">
+                        {formatDateDisplay(displayDate)}
                       </div>
-                      <p className="mt-1 font-mono text-xs text-tag-dim">
-                        {app.name} · {app.email}
-                      </p>
-                      <p className="mt-1 line-clamp-1 font-grotesk text-sm text-tag-muted">
-                        {app.description}
-                      </p>
+                      <span className="font-syne text-base text-tag-text">
+                        {app.event_title}
+                      </span>
+                      <span className="font-mono text-xs text-tag-muted">
+                        {app.name}
+                        {app.organization ? ` · ${app.organization}` : ''}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider ${statusPillClasses[app.status]}`}
+                        >
+                          {app.status}
+                        </span>
+                        <span className="font-mono text-xs uppercase tracking-wider text-tag-dim">
+                          {app.event_type}
+                        </span>
+                      </div>
                     </div>
-                    <span className="ml-4 shrink-0 font-mono text-xs text-tag-dim">
-                      {new Date(app.created_at).toLocaleDateString()}
-                    </span>
-                  </button>
-                ))}
+                  )
+                })}
               </div>
             )}
           </TabsContent>
         ))}
       </Tabs>
 
-      <EventApplicationDetailDialog
+      <EventApplicationDetailSheet
         application={selected}
-        onClose={() => setSelected(null)}
+        open={!!selected}
+        onOpenChange={(open) => !open && setSelected(null)}
         onUpdated={refresh}
       />
     </div>

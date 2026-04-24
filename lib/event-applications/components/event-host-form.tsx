@@ -23,16 +23,6 @@ const EVENT_TYPE_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'other', label: 'Other' },
 ]
 
-const REFERRAL_OPTIONS = [
-  'Member recommendation',
-  'Twitter/X',
-  'LinkedIn',
-  'Instagram',
-  'Google / search',
-  'Event at TAG',
-  'Other',
-]
-
 const labelClass = 'font-mono text-[12px] uppercase tracking-[0.08em] text-tag-muted'
 
 const inputClass =
@@ -73,7 +63,6 @@ export const EventHostForm = () => {
       durationHours: (formData.get('durationHours') as string) || '',
       websiteUrl: (formData.get('websiteUrl') as string) || '',
       socialUrl: (formData.get('socialUrl') as string) || '',
-      referral: (formData.get('referral') as string) || '',
       // Honeypot — should stay empty
       website: (formData.get('website') as string) || '',
       formLoadedAt: formLoadedAtRef.current,
@@ -379,27 +368,6 @@ export const EventHostForm = () => {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="referral" className={labelClass}>
-                  How did you hear about TAG?
-                </Label>
-                <Select name="referral">
-                  <SelectTrigger className={inputClass}>
-                    <SelectValue placeholder="Select (optional)" />
-                  </SelectTrigger>
-                  <SelectContent className="border-tag-border bg-tag-card">
-                    {REFERRAL_OPTIONS.map((option) => (
-                      <SelectItem
-                        key={option}
-                        value={option}
-                        className="text-tag-text focus:bg-tag-border focus:text-tag-text"
-                      >
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           )}
 

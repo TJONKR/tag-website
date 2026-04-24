@@ -1,20 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CalendarX, ExternalLink, Pencil, Sparkles, Trash2 } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { toast } from '@components/toast'
 import { ConfirmDialog } from '@components/confirm-dialog'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-} from '@components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs'
 import {
   PORTAL_TABS_LIST_CLASSES,
@@ -181,87 +174,6 @@ const PortalEventRow = ({
   )
 }
 
-const HostEventContent = () => (
-  <>
-    <div className="space-y-8">
-      <div>
-        <h3 className="font-mono text-xs uppercase tracking-[0.15em] text-tag-orange">
-          1. Pitch Your Idea
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-tag-muted">
-          Talk to a community manager about your event idea. It can be anything — a workshop,
-          talk, demo night, hackathon, movie night, or something entirely new. We&apos;re open to
-          creative formats.
-        </p>
-      </div>
-
-      <div>
-        <h3 className="font-mono text-xs uppercase tracking-[0.15em] text-tag-orange">
-          2. Pick a Date & Format
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-tag-muted">
-          Together with the community manager, find a date that works. Consider weekday evenings
-          or weekend afternoons. Decide on the format: presentation, hands-on workshop, open
-          discussion, etc.
-        </p>
-      </div>
-
-      <div>
-        <h3 className="font-mono text-xs uppercase tracking-[0.15em] text-tag-orange">
-          3. Space & Setup
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-tag-muted">
-          The event space fits up to 50 people and includes a projector, sound system, and
-          flexible seating. Let us know what you need and we&apos;ll help set it up. You can also
-          use the lounge for more informal gatherings.
-        </p>
-      </div>
-
-      <div>
-        <h3 className="font-mono text-xs uppercase tracking-[0.15em] text-tag-orange">
-          4. Promotion
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-tag-muted">
-          We&apos;ll help promote your event through our Slack, social channels, and the events
-          page. Provide a short description, date, and any relevant links. The more details, the
-          better.
-        </p>
-      </div>
-
-      <div>
-        <h3 className="font-mono text-xs uppercase tracking-[0.15em] text-tag-orange">
-          5. Guidelines
-        </h3>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-tag-muted">
-          <li className="flex gap-2">
-            <span className="text-tag-dim">—</span> Events should be relevant and valuable to
-            the TAG community
-          </li>
-          <li className="flex gap-2">
-            <span className="text-tag-dim">—</span> No hard sales pitches — sharing knowledge
-            and experience is the goal
-          </li>
-          <li className="flex gap-2">
-            <span className="text-tag-dim">—</span> Clean up after your event and leave the
-            space as you found it
-          </li>
-          <li className="flex gap-2">
-            <span className="text-tag-dim">—</span> External guests are welcome but must be
-            registered in advance
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <div className="mt-10 rounded-lg border border-tag-border bg-tag-card p-5">
-      <p className="text-sm text-tag-muted">
-        Ready to go? Reach out to a community manager on Slack or in person and we&apos;ll help
-        you make it happen.
-      </p>
-    </div>
-  </>
-)
-
 export const PortalEventList = ({
   upcoming,
   past,
@@ -348,40 +260,26 @@ export const PortalEventList = ({
       </Tabs>
 
       {/* Host your own event CTA */}
-      <Dialog>
-        <div className="mt-6 rounded-lg border border-dashed border-tag-orange/20 bg-tag-orange/[0.03] p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <Sparkles className="mt-0.5 size-4 shrink-0 text-tag-orange" />
-              <div>
-                <h3 className="font-medium text-tag-text">Want to host your own event?</h3>
-                <p className="mt-1 text-sm text-tag-muted">
-                  We encourage members to organize events — we think that&apos;s awesome! Talk to a
-                  community manager to get started.
-                </p>
-              </div>
+      <div className="mt-6 rounded-lg border border-dashed border-tag-orange/20 bg-tag-orange/[0.03] p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <Sparkles className="mt-0.5 size-4 shrink-0 text-tag-orange" />
+            <div>
+              <h3 className="font-medium text-tag-text">Want to host your own event?</h3>
+              <p className="mt-1 text-sm text-tag-muted">
+                We encourage members to organize events — we think that&apos;s awesome! Submit a
+                request and we&apos;ll get back to you.
+              </p>
             </div>
-            <DialogTrigger asChild>
-              <button className="shrink-0 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-4 py-2 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
-                Learn more
-              </button>
-            </DialogTrigger>
           </div>
+          <Link
+            href="/host-event"
+            className="shrink-0 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-4 py-2 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20"
+          >
+            Request event
+          </Link>
         </div>
-        <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col overflow-hidden">
-          <DialogHeader>
-            <DialogTitle className="font-syne text-3xl font-bold text-tag-text">
-              Host Your Own Event
-            </DialogTitle>
-            <DialogDescription className="text-tag-muted">
-              We love it when members organize events. Here are the guidelines to get started.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="overflow-y-auto">
-            <HostEventContent />
-          </div>
-        </DialogContent>
-      </Dialog>
+      </div>
     </>
   )
 }

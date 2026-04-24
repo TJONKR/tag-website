@@ -26,9 +26,9 @@ export async function PATCH(
       return NextResponse.json({ errors: result.error.issues }, { status: 400 })
     }
 
-    const { status, adminNotes } = result.data
+    const { status } = result.data
 
-    await updateEventApplicationStatus(id, status, user.id, adminNotes || undefined)
+    await updateEventApplicationStatus(id, status, user.id)
 
     return NextResponse.json({ success: true })
   } catch (error) {
