@@ -10,6 +10,7 @@ export interface AuthUser {
   avatar_url: string | null
   created_at: string
   is_super_admin: boolean
+  luma_email: string | null
 }
 
 export interface PublicProfile {

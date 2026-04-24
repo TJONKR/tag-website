@@ -1,5 +1,6 @@
 import { FadeIn } from '@lib/portal/components'
 import { EditNameForm } from '@lib/auth/components/edit-name-form'
+import { EditLumaEmailForm } from '@lib/auth/components/edit-luma-email-form'
 import { SignOutForm } from '@lib/auth/components/sign-out-form'
 import { ResetOnboardingButton } from '@lib/auth/components/reset-onboarding-button'
 
@@ -26,6 +27,12 @@ export const ProfileAccountTab = ({ user }: ProfileAccountTabProps) => {
           <div className="border-t border-tag-border px-5 py-4">
             <span className="text-sm text-tag-muted">Email</span>
             <p className="text-sm text-tag-text">{user.email}</p>
+          </div>
+          <div className="border-t border-tag-border px-5">
+            <EditLumaEmailForm
+              currentLumaEmail={user.luma_email}
+              defaultEmail={user.email}
+            />
           </div>
           <div className="border-t border-tag-border px-5 py-4">
             <span className="text-sm text-tag-muted">Role</span>

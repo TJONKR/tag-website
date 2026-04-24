@@ -226,6 +226,17 @@ export async function syncGuestsForEvent(
       page++
     }
 
+    // User-overridden Luma emails take precedence over the auth email so
+    // members whose Luma account uses a different address still match.
+    const { data: lumaEmailRows } = await supabase
+      .from('profiles')
+      .select('id, luma_email')
+      .not('luma_email', 'is', null)
+
+    for (const row of lumaEmailRows ?? []) {
+      if (row.luma_email) emailToUserId.set(row.luma_email.toLowerCase(), row.id)
+    }
+
     for (const entry of lumaGuests) {
       const { guest } = entry
       if (!guest.email) {

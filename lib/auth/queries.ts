@@ -42,7 +42,7 @@ async function fetchProfile(
 ) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('role, name, avatar_url, created_at, is_super_admin')
+    .select('role, name, avatar_url, created_at, is_super_admin, luma_email')
     .eq('id', userId)
     .maybeSingle()
 
@@ -56,7 +56,7 @@ async function fetchProfile(
 
     const { data: healed } = await supabase
       .from('profiles')
-      .select('role, name, avatar_url, created_at, is_super_admin')
+      .select('role, name, avatar_url, created_at, is_super_admin, luma_email')
       .eq('id', userId)
       .maybeSingle()
 
@@ -66,6 +66,7 @@ async function fetchProfile(
       avatar_url: (healed?.avatar_url as string | null) ?? null,
       created_at: (healed?.created_at as string) ?? new Date().toISOString(),
       is_super_admin: Boolean(healed?.is_super_admin),
+      luma_email: (healed?.luma_email as string | null) ?? null,
     }
   }
 
@@ -75,6 +76,7 @@ async function fetchProfile(
     avatar_url: (data.avatar_url as string | null) ?? null,
     created_at: (data.created_at as string) ?? new Date().toISOString(),
     is_super_admin: Boolean(data.is_super_admin),
+    luma_email: (data.luma_email as string | null) ?? null,
   }
 }
 
@@ -113,6 +115,7 @@ export async function getOptionalUser(): Promise<AuthUser | null> {
     avatar_url: profile.avatar_url,
     created_at: profile.created_at,
     is_super_admin: profile.is_super_admin,
+    luma_email: profile.luma_email,
   }
 }
 
@@ -233,5 +236,6 @@ export async function getUser(): Promise<AuthUser> {
     avatar_url: profile.avatar_url,
     created_at: profile.created_at,
     is_super_admin: profile.is_super_admin,
+    luma_email: profile.luma_email,
   }
 }
