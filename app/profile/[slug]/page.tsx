@@ -13,9 +13,10 @@ import {
 
 import { PageShell } from '@components/page-shell'
 import { getPublicProfile } from '@lib/auth/queries'
-import { slugifyName } from '@lib/utils'
+import { cn, slugifyName } from '@lib/utils'
 import { getUserAttendedEvents } from '@lib/events/queries'
 import { formatDateDisplay } from '@lib/events/types'
+import { rarityStyles } from '@lib/lootbox/rarity'
 
 import type { PublicProfile } from '@lib/auth/types'
 
@@ -122,6 +123,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const activeSocials = socialLinks.filter((s) => profile[s.key])
   const taste = profile.taste
   const hasSkin = !!profile.equipped_skin_url
+  const rarity = profile.equipped_skin_rarity
+    ? rarityStyles[profile.equipped_skin_rarity]
+    : null
 
   return (
     <PageShell>
@@ -144,7 +148,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             {/* Header: Avatar/skin + Info */}
             <header className="flex items-start gap-8 max-md:flex-col">
               {hasSkin ? (
-                <div className="relative aspect-[3/4] w-40 shrink-0 overflow-hidden rounded-lg border border-tag-border bg-tag-card max-md:w-32">
+                <div
+                  className={cn(
+                    'relative aspect-[3/4] w-40 shrink-0 overflow-hidden rounded-lg border-2 bg-tag-card max-md:w-32',
+                    rarity ? [rarity.border, rarity.glow] : 'border-tag-border'
+                  )}
+                >
                   <Image
                     src={profile.equipped_skin_url!}
                     alt={name}

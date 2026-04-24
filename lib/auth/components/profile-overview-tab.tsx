@@ -10,6 +10,7 @@ import {
   UpgradeCard,
 } from '@lib/membership/components'
 import { LootboxOpening, SkinsCollection } from '@lib/lootbox/components'
+import { rarityStyles } from '@lib/lootbox/rarity'
 import { PhotosModal } from '@lib/photos/components'
 import { ProfileEventTimeline } from '@lib/events/components'
 import { AvatarUpload } from '@lib/auth/components/avatar-upload'
@@ -87,6 +88,7 @@ export const ProfileOverviewTab = ({
 
   const equippedSkinUrl = equippedSkin?.image_url ?? builderProfile?.skin_url
   const hasSkin = !!equippedSkinUrl
+  const skinRarity = equippedSkin?.rarity ? rarityStyles[equippedSkin.rarity] : null
 
   const tier = computeTier({
     onboardingProfile,
@@ -112,7 +114,12 @@ export const ProfileOverviewTab = ({
               trigger={
                 <button type="button" className="group block w-full text-left">
                   {hasSkin ? (
-                    <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
+                    <div
+                      className={cn(
+                        'relative aspect-[3/4] overflow-hidden rounded-t-lg',
+                        skinRarity && ['border-2', skinRarity.border, skinRarity.glow]
+                      )}
+                    >
                       <Image
                         src={equippedSkinUrl!}
                         alt={user.name ?? 'Profile skin'}

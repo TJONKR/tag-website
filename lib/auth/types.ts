@@ -1,3 +1,5 @@
+import type { Rarity } from '@lib/lootbox/types'
+
 export type UserRole = 'ambassador' | 'builder' | 'operator'
 
 export interface AuthUser {
@@ -24,6 +26,7 @@ export interface PublicProfile {
   instagram_url: string | null
   created_at: string
   equipped_skin_url: string | null
+  equipped_skin_rarity: Rarity | null
   taste: PublicTaste | null
 }
 

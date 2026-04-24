@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 
 import { cn } from '@lib/utils'
 
+import { rarityStyles } from '../rarity'
 import type { UserSkin } from '../types'
 
 interface SkinsCollectionProps {
@@ -64,6 +65,7 @@ export const SkinsCollection = ({ initialSkins }: SkinsCollectionProps) => {
           const isEpic = skin.rarity === 'epic'
           const isGenerating = skin.status === 'generating'
           const isComplete = skin.status === 'complete'
+          const rarity = rarityStyles[skin.rarity]
 
           return (
             <motion.div
@@ -71,14 +73,8 @@ export const SkinsCollection = ({ initialSkins }: SkinsCollectionProps) => {
               whileHover={isComplete ? { y: -4 } : undefined}
               className={cn(
                 'relative overflow-hidden rounded-xl border-2 transition-colors',
-                skin.equipped
-                  ? isEpic
-                    ? 'border-purple-400'
-                    : isRare
-                      ? 'border-amber-400'
-                      : 'border-tag-orange'
-                  : 'border-tag-border',
-                isComplete && 'cursor-pointer hover:border-tag-orange/50'
+                skin.equipped ? rarity.border : 'border-tag-border',
+                isComplete && !skin.equipped && 'cursor-pointer hover:border-tag-orange/50'
               )}
               onClick={() => {
                 if (isComplete && !skin.equipped) handleEquip(skin.id)
@@ -113,14 +109,14 @@ export const SkinsCollection = ({ initialSkins }: SkinsCollectionProps) => {
               <div className="flex items-center justify-between bg-tag-bg/80 px-3 py-2 backdrop-blur-sm">
                 <div className="flex items-center gap-1.5">
                   {isEpic ? (
-                    <Crown className="size-3 text-purple-400" />
+                    <Crown className={cn('size-3', rarity.text)} />
                   ) : isRare ? (
-                    <Box className="size-3 text-amber-400" />
+                    <Box className={cn('size-3', rarity.text)} />
                   ) : (
-                    <Sparkles className="size-3 text-tag-orange" />
+                    <Sparkles className={cn('size-3', rarity.text)} />
                   )}
                   <span className="text-[10px] text-tag-muted">
-                    {(skin.style as { name?: string } | undefined)?.name ?? skin.rarity}
+                    {(skin.style as { name?: string } | undefined)?.name ?? rarity.label}
                   </span>
                 </div>
 
