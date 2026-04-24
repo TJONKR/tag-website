@@ -1093,6 +1093,7 @@ interface SpaceTabsProps {
   spacePhotos: SpacePhotoWithUrl[]
   ideas: Idea[]
   isAdmin: boolean
+  canUploadPhotos: boolean
   currentUserId: string | null
 }
 
@@ -1104,6 +1105,7 @@ export const SpaceTabs = ({
   spacePhotos,
   ideas,
   isAdmin,
+  canUploadPhotos,
   currentUserId,
 }: SpaceTabsProps) => {
   const [activeTab, setActiveTab] = useState<Tab>('floor-plan')
@@ -1230,6 +1232,7 @@ export const SpaceTabs = ({
           initialPhotos={spacePhotos}
           currentUserId={currentUserId}
           isAdmin={isAdmin}
+          canUpload={canUploadPhotos}
         />
       )}
       {/* Facilities */}

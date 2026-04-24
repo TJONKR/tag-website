@@ -34,6 +34,7 @@ export default async function SpacePage() {
           spacePhotos={spacePhotos}
           ideas={ideas}
           isAdmin={user.role === 'operator'}
+          canUploadPhotos={user.role === 'operator' || user.role === 'builder'}
           currentUserId={user.id}
         />
       </FadeIn>

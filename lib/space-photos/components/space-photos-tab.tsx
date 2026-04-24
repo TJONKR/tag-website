@@ -17,6 +17,7 @@ interface SpacePhotosTabProps {
   initialPhotos: SpacePhotoWithUrl[]
   currentUserId: string | null
   isAdmin: boolean
+  canUpload: boolean
 }
 
 type Filter = 'all' | 'me'
@@ -68,6 +69,7 @@ export const SpacePhotosTab = ({
   initialPhotos,
   currentUserId,
   isAdmin,
+  canUpload,
 }: SpacePhotosTabProps) => {
   const { photos, mutate } = useSpacePhotos(initialPhotos)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -158,7 +160,7 @@ export const SpacePhotosTab = ({
           )}
         </div>
 
-        {isAdmin && (
+        {canUpload && (
           <label className="flex cursor-pointer items-center gap-1.5 rounded-md border border-tag-orange/30 bg-tag-orange/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-tag-orange transition-colors hover:bg-tag-orange/20">
             {uploading ? (
               <Loader2 className="size-3 animate-spin" />

@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   try {
     const user = await getOptionalUser()
 
-    if (!user || user.role !== 'operator') {
+    if (!user || (user.role !== 'operator' && user.role !== 'builder')) {
       return NextResponse.json({ errors: [{ message: 'Unauthorized' }] }, { status: 401 })
     }
 
