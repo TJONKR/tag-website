@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CalendarX, ExternalLink, Pencil, Sparkles, Trash2 } from 'lucide-react'
 
-import { cn } from '@lib/utils'
 import { toast } from '@components/toast'
 import { ConfirmDialog } from '@components/confirm-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs'
@@ -29,7 +28,7 @@ interface PortalEventListProps {
   upcoming: TagEvent[]
   past: TagEvent[]
   isAdmin: boolean
-  attendanceSummaries?: Record<string, { total: number; checkedIn: number }>
+  attendanceCounts?: Record<string, number>
   hostRequests?: EventHostApplication[]
   hostRequestCounts?: EventApplicationCounts
 }
@@ -38,12 +37,12 @@ const PortalEventRow = ({
   event,
   muted = false,
   isAdmin,
-  attendanceSummary,
+  attendanceCount,
 }: {
   event: TagEvent
   muted?: boolean
   isAdmin: boolean
-  attendanceSummary?: { total: number; checkedIn: number }
+  attendanceCount?: number
 }) => {
   const router = useRouter()
   const [deleting, setDeleting] = useState(false)
@@ -76,17 +75,9 @@ const PortalEventRow = ({
             setDetailsOpen(true)
           }
         }}
-        className={cn(
-          'flex cursor-pointer flex-col gap-2 border-t border-tag-border px-4 py-4 transition-all duration-300 hover:border-l-2 hover:border-l-tag-orange',
-          muted && 'opacity-50'
-        )}
+        className="flex cursor-pointer flex-col gap-2 border-t border-tag-border px-4 py-4 transition-all duration-300 hover:border-l-2 hover:border-l-tag-orange"
       >
-        <div
-          className={cn(
-            'font-mono text-sm font-bold',
-            muted ? 'text-tag-dim' : 'text-tag-orange'
-          )}
-        >
+        <div className="font-mono text-sm font-bold text-tag-orange">
           {formatDateDisplay(event.date_iso)}
         </div>
         <span className="font-syne text-base text-tag-text">{event.title}</span>
@@ -96,9 +87,9 @@ const PortalEventRow = ({
           </span>
         )}
         <div className="flex items-center gap-2">
-          {muted && attendanceSummary && attendanceSummary.total > 0 && (
+          {muted && attendanceCount !== undefined && attendanceCount > 0 && (
             <span className="font-mono text-sm text-tag-muted">
-              {attendanceSummary.checkedIn}/{attendanceSummary.total} checked in
+              {attendanceCount} attended
             </span>
           )}
           {event.is_externally_managed ? (
@@ -122,7 +113,7 @@ const PortalEventRow = ({
                   href={event.luma_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-orange"
+                  className="rounded p-1.5 text-tag-orange transition-colors hover:bg-tag-card"
                   aria-label="Open on Luma"
                 >
                   <ExternalLink className="size-3.5" />
@@ -142,7 +133,7 @@ const PortalEventRow = ({
                     isAdmin={isAdmin}
                     trigger={
                       <button
-                        className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
+                        className="rounded p-1.5 text-tag-orange transition-colors hover:bg-tag-card"
                         aria-label="Edit event"
                       >
                         <Pencil className="size-3.5" />
@@ -178,7 +169,7 @@ export const PortalEventList = ({
   upcoming,
   past,
   isAdmin,
-  attendanceSummaries,
+  attendanceCounts,
   hostRequests,
   hostRequestCounts,
 }: PortalEventListProps) => {
@@ -210,7 +201,7 @@ export const PortalEventList = ({
                   key={event.id}
                   event={event}
                   isAdmin={isAdmin}
-                  attendanceSummary={attendanceSummaries?.[event.id]}
+                  attendanceCount={attendanceCounts?.[event.id]}
                 />
               ))
             ) : (
@@ -236,7 +227,7 @@ export const PortalEventList = ({
                   event={event}
                   muted
                   isAdmin={isAdmin}
-                  attendanceSummary={attendanceSummaries?.[event.id]}
+                  attendanceCount={attendanceCounts?.[event.id]}
                 />
               ))
             ) : (

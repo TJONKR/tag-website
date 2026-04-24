@@ -152,25 +152,14 @@ export async function getUserCheckedInCount(userId: string): Promise<number> {
   return count ?? 0
 }
 
-export async function getEventAttendanceSummary(
-  eventId: string
-): Promise<{ total: number; checkedIn: number }> {
+export async function getEventAttendanceCount(eventId: string): Promise<number> {
   const supabase = await createServerSupabaseClient()
 
-  const { count: total, error: totalError } = await supabase
+  const { count, error } = await supabase
     .from('event_attendance')
     .select('*', { count: 'exact', head: true })
     .eq('event_id', eventId)
 
-  if (totalError) throw new Error(totalError.message)
-
-  const { count: checkedIn, error: checkedInError } = await supabase
-    .from('event_attendance')
-    .select('*', { count: 'exact', head: true })
-    .eq('event_id', eventId)
-    .not('checked_in_at', 'is', null)
-
-  if (checkedInError) throw new Error(checkedInError.message)
-
-  return { total: total ?? 0, checkedIn: checkedIn ?? 0 }
+  if (error) throw new Error(error.message)
+  return count ?? 0
 }
