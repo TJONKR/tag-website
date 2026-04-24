@@ -26,7 +26,7 @@ async function healMissingProfile(
   const service = createServiceRoleClient()
   const { error } = await service
     .from('profiles')
-    .insert({ id: userId, name: fallbackName, onboarding_completed: false })
+    .insert({ id: userId, name: fallbackName?.trim() ?? null, onboarding_completed: false })
 
   if (error && !error.message.toLowerCase().includes('duplicate')) {
     console.error('[healMissingProfile] insert failed:', error.message, 'userId:', userId)

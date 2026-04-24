@@ -231,7 +231,7 @@ export async function updateName(
 
     const { error } = await supabase
       .from('profiles')
-      .update({ name })
+      .update({ name: name.trim() })
       .eq('id', user.id)
 
     if (error) throw error
