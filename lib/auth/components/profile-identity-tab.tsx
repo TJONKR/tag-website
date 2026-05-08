@@ -325,59 +325,66 @@ export const ProfileIdentityTab = ({
 
         {/* AI sections — visibility only in v1 */}
         {isComplete && builderProfile?.headline && (
-          <FieldCard
-            title="Headline"
-            show={builderProfile.show_headline}
-            onToggle={(v) => handleToggle('show_headline', v)}
-            isUpdating={updating === 'show_headline'}
-            onEdit={() => setEditing('headline')}
-          >
-            <p className="font-syne text-lg font-semibold text-tag-text">
-              {builderProfile.headline}
-            </p>
-          </FieldCard>
+          <FadeIn delay={200}>
+            <FieldCard
+              title="Headline"
+              show={builderProfile.show_headline}
+              onToggle={(v) => handleToggle('show_headline', v)}
+              isUpdating={updating === 'show_headline'}
+              onEdit={() => setEditing('headline')}
+            >
+              <p className="font-syne text-lg font-semibold text-tag-text">
+                {builderProfile.headline}
+              </p>
+            </FieldCard>
+          </FadeIn>
         )}
 
         {isComplete && builderProfile?.bio && (
-          <FieldCard
-            title="Bio"
-            show={builderProfile.show_bio}
-            onToggle={(v) => handleToggle('show_bio', v)}
-            isUpdating={updating === 'show_bio'}
-            onEdit={() => setEditing('bio')}
-          >
-            <div className="space-y-2 text-sm leading-relaxed text-tag-muted">
-              {builderProfile.bio.split('\n\n').map((para, i) => (
-                <p key={i}>{para}</p>
-              ))}
-            </div>
-          </FieldCard>
+          <FadeIn delay={250}>
+            <FieldCard
+              title="Bio"
+              show={builderProfile.show_bio}
+              onToggle={(v) => handleToggle('show_bio', v)}
+              isUpdating={updating === 'show_bio'}
+              onEdit={() => setEditing('bio')}
+            >
+              <div className="space-y-2 text-sm leading-relaxed text-tag-muted">
+                {builderProfile.bio.split('\n\n').map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
+            </FieldCard>
+          </FadeIn>
         )}
 
         {isComplete && builderProfile?.tags && builderProfile.tags.length > 0 && (
-          <FieldCard
-            title="Tags"
-            show={builderProfile.show_tags}
-            onToggle={(v) => handleToggle('show_tags', v)}
-            isUpdating={updating === 'show_tags'}
-            onEdit={() => setEditing('tags')}
-          >
-            <div className="flex flex-wrap gap-1.5">
-              {builderProfile.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full border border-tag-orange/20 bg-tag-orange/5 px-2.5 py-0.5 text-sm text-tag-orange"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </FieldCard>
+          <FadeIn delay={300}>
+            <FieldCard
+              title="Tags"
+              show={builderProfile.show_tags}
+              onToggle={(v) => handleToggle('show_tags', v)}
+              isUpdating={updating === 'show_tags'}
+              onEdit={() => setEditing('tags')}
+            >
+              <div className="flex flex-wrap gap-1.5">
+                {builderProfile.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-tag-orange/20 bg-tag-orange/5 px-2.5 py-0.5 text-sm text-tag-orange"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </FieldCard>
+          </FadeIn>
         )}
 
         {isComplete &&
           builderProfile?.projects &&
           builderProfile.projects.length > 0 && (
+            <FadeIn delay={350}>
             <FieldCard
               title="Projects"
               show={builderProfile.show_projects}
@@ -415,106 +422,115 @@ export const ProfileIdentityTab = ({
                 ))}
               </div>
             </FieldCard>
+            </FadeIn>
           )}
 
         {isComplete &&
           builderProfile?.interests &&
           builderProfile.interests.length > 0 && (
-            <FieldCard
-              title="Interests"
-              show={builderProfile.show_interests}
-              onToggle={(v) => handleToggle('show_interests', v)}
-              isUpdating={updating === 'show_interests'}
-              onEdit={() => setEditing('interests')}
-            >
-              <div className="flex flex-wrap gap-1.5">
-                {builderProfile.interests.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full border border-tag-border bg-tag-bg px-2.5 py-0.5 text-sm text-tag-muted"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </FieldCard>
+            <FadeIn delay={400}>
+              <FieldCard
+                title="Interests"
+                show={builderProfile.show_interests}
+                onToggle={(v) => handleToggle('show_interests', v)}
+                isUpdating={updating === 'show_interests'}
+                onEdit={() => setEditing('interests')}
+              >
+                <div className="flex flex-wrap gap-1.5">
+                  {builderProfile.interests.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-tag-border bg-tag-bg px-2.5 py-0.5 text-sm text-tag-muted"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </FieldCard>
+            </FadeIn>
           )}
 
         {isComplete &&
           builderProfile?.notable_work &&
           builderProfile.notable_work.length > 0 && (
-            <FieldCard
-              title="Notable work"
-              show={builderProfile.show_notable_work}
-              onToggle={(v) => handleToggle('show_notable_work', v)}
-              isUpdating={updating === 'show_notable_work'}
-              onEdit={() => setEditing('notable_work')}
-            >
-              <ul className="space-y-1.5">
-                {builderProfile.notable_work.map((work, i) => (
-                  <li
-                    key={i}
-                    className="flex gap-2 text-sm text-tag-muted"
-                  >
-                    <span className="mt-1 text-tag-orange">•</span>
-                    <span>{work}</span>
-                  </li>
-                ))}
-              </ul>
-            </FieldCard>
+            <FadeIn delay={450}>
+              <FieldCard
+                title="Notable work"
+                show={builderProfile.show_notable_work}
+                onToggle={(v) => handleToggle('show_notable_work', v)}
+                isUpdating={updating === 'show_notable_work'}
+                onEdit={() => setEditing('notable_work')}
+              >
+                <ul className="space-y-1.5">
+                  {builderProfile.notable_work.map((work, i) => (
+                    <li
+                      key={i}
+                      className="flex gap-2 text-sm text-tag-muted"
+                    >
+                      <span className="mt-1 text-tag-orange">•</span>
+                      <span>{work}</span>
+                    </li>
+                  ))}
+                </ul>
+              </FieldCard>
+            </FadeIn>
           )}
 
         {isComplete &&
           builderProfile?.influences &&
           builderProfile.influences.length > 0 && (
-            <FieldCard
-              title="Influences"
-              show={builderProfile.show_influences}
-              onToggle={(v) => handleToggle('show_influences', v)}
-              isUpdating={updating === 'show_influences'}
-              onEdit={() => setEditing('influences')}
-            >
-              <div className="flex flex-wrap gap-1.5">
-                {builderProfile.influences.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full border border-tag-border bg-tag-bg px-2.5 py-0.5 text-sm text-tag-muted"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </FieldCard>
+            <FadeIn delay={500}>
+              <FieldCard
+                title="Influences"
+                show={builderProfile.show_influences}
+                onToggle={(v) => handleToggle('show_influences', v)}
+                isUpdating={updating === 'show_influences'}
+                onEdit={() => setEditing('influences')}
+              >
+                <div className="flex flex-wrap gap-1.5">
+                  {builderProfile.influences.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-tag-border bg-tag-bg px-2.5 py-0.5 text-sm text-tag-muted"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </FieldCard>
+            </FadeIn>
           )}
 
         {isComplete &&
           builderProfile?.key_links &&
           builderProfile.key_links.length > 0 && (
-            <FieldCard
-              title="Links"
-              show={builderProfile.show_key_links}
-              onToggle={(v) => handleToggle('show_key_links', v)}
-              isUpdating={updating === 'show_key_links'}
-              onEdit={() => setEditing('key_links')}
-            >
-              <div>
-                {builderProfile.key_links.map((link, i) => (
-                  <a
-                    key={i}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 border-t border-t-tag-border py-2 text-sm text-tag-muted transition-colors first:border-t-0 hover:text-tag-orange"
-                  >
-                    <ExternalLink className="size-3 shrink-0" />
-                    <span className="truncate">{link.title}</span>
-                    <span className="ml-auto font-mono text-[10px] uppercase tracking-wider text-tag-dim">
-                      {link.type}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </FieldCard>
+            <FadeIn delay={550}>
+              <FieldCard
+                title="Links"
+                show={builderProfile.show_key_links}
+                onToggle={(v) => handleToggle('show_key_links', v)}
+                isUpdating={updating === 'show_key_links'}
+                onEdit={() => setEditing('key_links')}
+              >
+                <div>
+                  {builderProfile.key_links.map((link, i) => (
+                    <a
+                      key={i}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 border-t border-t-tag-border py-2 text-sm text-tag-muted transition-colors first:border-t-0 hover:text-tag-orange"
+                    >
+                      <ExternalLink className="size-3 shrink-0" />
+                      <span className="truncate">{link.title}</span>
+                      <span className="ml-auto font-mono text-[10px] uppercase tracking-wider text-tag-dim">
+                        {link.type}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </FieldCard>
+            </FadeIn>
           )}
       </div>
 
