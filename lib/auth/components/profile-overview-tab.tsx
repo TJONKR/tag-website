@@ -219,9 +219,11 @@ export const ProfileOverviewTab = ({
           />
         </FadeIn>
 
-        <FadeIn delay={200}>
-          <TierBadge tier={tier} />
-        </FadeIn>
+        {tier.key !== 'sparked' && (
+          <FadeIn delay={200}>
+            <TierBadge tier={tier} />
+          </FadeIn>
+        )}
 
         {/* Lootbox progress (onboarding-completion checklist) */}
         {!lootboxAllDone && !hasSkin && (

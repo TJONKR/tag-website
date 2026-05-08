@@ -80,7 +80,7 @@ export const EventHostRequestNewAdmin = ({
         </>
       ) : null}
 
-      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/event-requests?id=${id}`}>
+      <PrimaryButton href={`${EMAIL_PUBLIC_URL}/portal/events?tab=requests&id=${id}`}>
         Review in portal
       </PrimaryButton>
     </EmailLayout>

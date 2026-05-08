@@ -13,7 +13,7 @@ import {
 
 import { PageShell } from '@components/page-shell'
 import { getPublicProfile } from '@lib/auth/queries'
-import { cn, slugifyName } from '@lib/utils'
+import { cn } from '@lib/utils'
 import { getUserAttendedEvents } from '@lib/events/queries'
 import { formatDateDisplay } from '@lib/events/types'
 import { rarityStyles } from '@lib/lootbox/rarity'
@@ -61,7 +61,7 @@ function buildJsonLd(profile: PublicProfile) {
     name: profile.name,
     ...(profile.avatar_url && { image: profile.avatar_url }),
     jobTitle: `${roleLabels[profile.role] ?? 'Member'} at TAG`,
-    url: `https://tag.space/profile/${slugifyName(profile.name ?? '')}`,
+    url: `https://tag.space/profile/${profile.slug}`,
     ...(sameAs.length > 0 && { sameAs }),
     memberOf: {
       '@type': 'Organization',

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { CalendarX, ExternalLink, Pencil, Sparkles, Trash2 } from 'lucide-react'
 
 import { toast } from '@components/toast'
@@ -173,8 +173,17 @@ export const PortalEventList = ({
   hostRequests,
   hostRequestCounts,
 }: PortalEventListProps) => {
-  const defaultTab = upcoming.length === 0 && past.length > 0 ? 'past' : 'upcoming'
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get('tab')
   const showRequests = isAdmin && hostRequests && hostRequestCounts
+  const defaultTab =
+    tabParam === 'requests' && showRequests
+      ? 'requests'
+      : tabParam === 'past'
+        ? 'past'
+        : upcoming.length === 0 && past.length > 0
+          ? 'past'
+          : 'upcoming'
 
   return (
     <>

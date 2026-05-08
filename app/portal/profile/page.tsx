@@ -1,4 +1,3 @@
-import { slugifyName } from '@lib/utils'
 import { createServerSupabaseClient } from '@lib/db'
 import { FadeIn, PortalHeader, ProfileTabs } from '@lib/portal/components'
 import { getUser } from '@lib/auth/queries'
@@ -87,7 +86,7 @@ export default async function ProfilePage() {
     if (granted) availableLootboxCount += 1
   }
 
-  const publicSlug = user.name ? slugifyName(user.name) : null
+  const publicSlug = user.slug
 
   return (
     <>

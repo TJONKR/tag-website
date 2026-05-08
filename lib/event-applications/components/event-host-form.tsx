@@ -28,11 +28,16 @@ const labelClass = 'font-mono text-[12px] uppercase tracking-[0.08em] text-tag-m
 const inputClass =
   'border-tag-border bg-tag-card text-tag-text placeholder:text-tag-dim focus-visible:ring-tag-orange'
 
+const OptionalTag = () => (
+  <span className="ml-1 font-mono text-[10px] normal-case tracking-normal text-tag-dim">
+    (optional)
+  </span>
+)
+
 export const EventHostForm = () => {
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [showMore, setShowMore] = useState(false)
   const [flexible, setFlexible] = useState(false)
 
   // Timestamp captured when the component mounts. Used server-side to
@@ -52,8 +57,6 @@ export const EventHostForm = () => {
     const payload = {
       name: (formData.get('name') as string) ?? '',
       email: (formData.get('email') as string) ?? '',
-      phone: (formData.get('phone') as string) || '',
-      organization: (formData.get('organization') as string) || '',
       eventTitle: (formData.get('eventTitle') as string) ?? '',
       eventType: (formData.get('eventType') as string) ?? '',
       description: (formData.get('description') as string) ?? '',
@@ -239,7 +242,7 @@ export const EventHostForm = () => {
 
           <div className="space-y-2">
             <Label htmlFor="expectedAttendees" className={labelClass}>
-              Expected attendees
+              Expected attendees <OptionalTag />
             </Label>
             <Input
               id="expectedAttendees"
@@ -257,119 +260,78 @@ export const EventHostForm = () => {
             )}
           </div>
 
-          {/* More details toggle */}
-          <div>
-            <button
-              type="button"
-              onClick={() => setShowMore((v) => !v)}
-              className="font-mono text-xs uppercase tracking-[0.08em] text-tag-orange hover:underline"
-            >
-              {showMore ? '− Hide extra details' : '+ More details (optional)'}
-            </button>
+          <div className="space-y-2">
+            <Label htmlFor="proposedDate" className={labelClass}>
+              Proposed date <OptionalTag />
+            </Label>
+            <Input
+              id="proposedDate"
+              name="proposedDate"
+              type="date"
+              className={inputClass}
+            />
+            <div className="flex items-center gap-2 pt-2">
+              <Checkbox
+                id="proposedDateFlexible"
+                checked={flexible}
+                onCheckedChange={(v) => setFlexible(Boolean(v))}
+              />
+              <Label
+                htmlFor="proposedDateFlexible"
+                className="font-mono text-xs text-tag-muted"
+              >
+                Flexible — we can work with what fits TAG&apos;s calendar
+              </Label>
+            </div>
           </div>
 
-          {showMore && (
-            <div className="space-y-8 border-l border-tag-border pl-6">
-              <div className="space-y-2">
-                <Label htmlFor="organization" className={labelClass}>
-                  Organization / company
-                </Label>
-                <Input
-                  id="organization"
-                  name="organization"
-                  placeholder="Optional"
-                  className={inputClass}
-                />
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="durationHours" className={labelClass}>
+              Duration (hours) <OptionalTag />
+            </Label>
+            <Input
+              id="durationHours"
+              name="durationHours"
+              type="number"
+              min={0.5}
+              max={12}
+              step={0.5}
+              placeholder="e.g. 2"
+              className={inputClass}
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone" className={labelClass}>
-                  Phone
-                </Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="Optional"
-                  className={inputClass}
-                />
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="websiteUrl" className={labelClass}>
+              Website <OptionalTag />
+            </Label>
+            <Input
+              id="websiteUrl"
+              name="websiteUrl"
+              type="url"
+              placeholder="https://..."
+              className={inputClass}
+            />
+            {errors.websiteUrl && (
+              <p className="font-mono text-xs text-red-400">{errors.websiteUrl}</p>
+            )}
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="proposedDate" className={labelClass}>
-                  Proposed date
-                </Label>
-                <Input
-                  id="proposedDate"
-                  name="proposedDate"
-                  type="date"
-                  className={inputClass}
-                />
-                <div className="flex items-center gap-2 pt-2">
-                  <Checkbox
-                    id="proposedDateFlexible"
-                    checked={flexible}
-                    onCheckedChange={(v) => setFlexible(Boolean(v))}
-                  />
-                  <Label
-                    htmlFor="proposedDateFlexible"
-                    className="font-mono text-xs text-tag-muted"
-                  >
-                    Flexible — we can work with what fits TAG&apos;s calendar
-                  </Label>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="durationHours" className={labelClass}>
-                  Duration (hours)
-                </Label>
-                <Input
-                  id="durationHours"
-                  name="durationHours"
-                  type="number"
-                  min={0.5}
-                  max={12}
-                  step={0.5}
-                  placeholder="e.g. 2"
-                  className={inputClass}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="websiteUrl" className={labelClass}>
-                  Website
-                </Label>
-                <Input
-                  id="websiteUrl"
-                  name="websiteUrl"
-                  type="url"
-                  placeholder="https://..."
-                  className={inputClass}
-                />
-                {errors.websiteUrl && (
-                  <p className="font-mono text-xs text-red-400">{errors.websiteUrl}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="socialUrl" className={labelClass}>
-                  Social link
-                </Label>
-                <Input
-                  id="socialUrl"
-                  name="socialUrl"
-                  type="url"
-                  placeholder="https://x.com/you or LinkedIn, Instagram..."
-                  className={inputClass}
-                />
-                {errors.socialUrl && (
-                  <p className="font-mono text-xs text-red-400">{errors.socialUrl}</p>
-                )}
-              </div>
-
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label htmlFor="socialUrl" className={labelClass}>
+              Social link <OptionalTag />
+            </Label>
+            <Input
+              id="socialUrl"
+              name="socialUrl"
+              type="url"
+              placeholder="https://x.com/you or LinkedIn, Instagram..."
+              className={inputClass}
+            />
+            {errors.socialUrl && (
+              <p className="font-mono text-xs text-red-400">{errors.socialUrl}</p>
+            )}
+          </div>
 
           <button
             type="submit"

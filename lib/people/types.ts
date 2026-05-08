@@ -4,6 +4,7 @@ export interface Member {
   id: string
   email: string
   name: string | null
+  slug: string | null
   role: UserRole
   avatar_url: string | null
   building: string | null
