@@ -1,11 +1,13 @@
 import { EMAIL_PUBLIC_URL } from './config'
 import { sendEmail, type SendEmailResult } from './send'
-import { getAdminRecipients, getUserEmail } from './recipients'
-import { ApplicationReceived } from './templates/application-received'
+import {
+  getAdminRecipients,
+  getOperatorRecipients,
+  getUserEmail,
+} from './recipients'
 import { ApplicationNewAdmin } from './templates/application-new-admin'
 import { ApplicationApproved } from './templates/application-approved'
 import { ApplicationRejected } from './templates/application-rejected'
-import { WelcomeAmbassador } from './templates/welcome-ambassador'
 import { SubscriptionActive } from './templates/subscription-active'
 import { PaymentFailed } from './templates/payment-failed'
 import { SubscriptionCancelled } from './templates/subscription-cancelled'
@@ -18,24 +20,14 @@ import { ClaimRevoked } from './templates/claim-revoked'
 import { LootboxUnlocked } from './templates/lootbox-unlocked'
 import { SkinComplete } from './templates/skin-complete'
 import { SkinFailed } from './templates/skin-failed'
-import { TasteComplete } from './templates/taste-complete'
 import { TasteFailed } from './templates/taste-failed'
-import { AvatarComplete } from './templates/avatar-complete'
+import { EventHostRequestNewAdmin } from './templates/event-host-request-new-admin'
+import { EventHostRequestApproved } from './templates/event-host-request-approved'
+import { EventHostRequestRejected } from './templates/event-host-request-rejected'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Applications
 // ─────────────────────────────────────────────────────────────────────────────
-
-export const sendApplicationReceived = (args: {
-  to: string
-  name: string
-}): Promise<SendEmailResult> =>
-  sendEmail({
-    to: args.to,
-    subject: "We've got your TAG application",
-    react: <ApplicationReceived name={args.name} />,
-    tag: 'application-received',
-  })
 
 export const sendApplicationNewAdmin = async (args: {
   applicantName: string
@@ -84,21 +76,6 @@ export const sendApplicationRejected = (args: {
     subject: 'An update on your TAG application',
     react: <ApplicationRejected name={args.name} />,
     tag: 'application-rejected',
-  })
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Onboarding
-// ─────────────────────────────────────────────────────────────────────────────
-
-export const sendWelcomeAmbassador = (args: {
-  to: string
-  name: string
-}): Promise<SendEmailResult> =>
-  sendEmail({
-    to: args.to,
-    subject: 'Welcome to TAG',
-    react: <WelcomeAmbassador name={args.name} />,
-    tag: 'welcome-ambassador',
   })
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -296,17 +273,6 @@ export const sendSkinFailed = (args: {
 // Taste profile
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const sendTasteComplete = (args: {
-  to: string
-  name?: string
-}): Promise<SendEmailResult> =>
-  sendEmail({
-    to: args.to,
-    subject: 'Your TAG Taste profile is live',
-    react: <TasteComplete name={args.name} />,
-    tag: 'taste-complete',
-  })
-
 export const sendTasteFailed = (args: {
   to: string
   name?: string
@@ -320,21 +286,78 @@ export const sendTasteFailed = (args: {
   })
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Avatar
+// External event-host requests
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const sendAvatarComplete = (args: {
+export const sendEventHostRequestNewAdmin = async (args: {
+  id: string
+  applicantName: string
+  applicantEmail: string
+  eventTitle: string
+  eventType: string
+  description: string
+  expectedAttendees: number | null
+  proposedDate: string | null
+  proposedDateFlexible: boolean
+  organization: string | null
+  websiteUrl: string | null
+  socialUrl: string | null
+}): Promise<SendEmailResult> => {
+  const operators = await getOperatorRecipients()
+  if (operators.length === 0) return { ok: false, skipped: true }
+
+  return sendEmail({
+    to: operators,
+    replyTo: args.applicantEmail,
+    subject: `New event request: ${args.eventTitle}`,
+    react: (
+      <EventHostRequestNewAdmin
+        id={args.id}
+        applicantName={args.applicantName}
+        applicantEmail={args.applicantEmail}
+        eventTitle={args.eventTitle}
+        eventType={args.eventType}
+        description={args.description}
+        expectedAttendees={args.expectedAttendees}
+        proposedDate={args.proposedDate}
+        proposedDateFlexible={args.proposedDateFlexible}
+        organization={args.organization}
+        websiteUrl={args.websiteUrl}
+        socialUrl={args.socialUrl}
+      />
+    ),
+    tag: 'event-host-request-new-admin',
+  })
+}
+
+export const sendEventHostRequestApproved = (args: {
   to: string
-  name?: string
-  imageUrl?: string
+  name: string
+  eventTitle: string
 }): Promise<SendEmailResult> =>
   sendEmail({
     to: args.to,
-    subject: 'Your TAG avatar is ready',
-    react: <AvatarComplete name={args.name} imageUrl={args.imageUrl} />,
-    tag: 'avatar-complete',
+    subject: 'Your TAG event request is approved',
+    react: (
+      <EventHostRequestApproved name={args.name} eventTitle={args.eventTitle} />
+    ),
+    tag: 'event-host-request-approved',
+  })
+
+export const sendEventHostRequestRejected = (args: {
+  to: string
+  name: string
+  eventTitle: string
+}): Promise<SendEmailResult> =>
+  sendEmail({
+    to: args.to,
+    subject: 'An update on your TAG event request',
+    react: (
+      <EventHostRequestRejected name={args.name} eventTitle={args.eventTitle} />
+    ),
+    tag: 'event-host-request-rejected',
   })
 
 // Re-exported so callers that need to resolve a user's email from an id
 // don't have to import from two places.
-export { getUserEmail, getAdminRecipients }
+export { getUserEmail, getAdminRecipients, getOperatorRecipients }

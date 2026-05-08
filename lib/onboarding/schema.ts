@@ -1,7 +1,10 @@
 import { z } from 'zod'
 
 export const onboardingSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z
+    .string()
+    .transform((v) => v.trim())
+    .pipe(z.string().min(1, 'Name is required')),
   building: z.string().min(1, 'Tell us what you are building'),
   whyTag: z.string().min(1, 'Tell us why TAG'),
   referral: z.string().optional(),

@@ -21,6 +21,7 @@ export async function GET(req: Request) {
       .from('events')
       .select('id, luma_event_id')
       .not('luma_event_id', 'is', null)
+      .eq('is_externally_managed', false)
 
     let totalGuests = 0
     const guestErrors: string[] = []

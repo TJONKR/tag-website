@@ -42,6 +42,11 @@ export const EventRow = ({ event, muted = false }: EventRowProps) => {
           {formatDateDisplay(event.date_iso)}
         </div>
         <span className="font-syne text-base text-tag-text">{event.title}</span>
+        {event.is_externally_managed && event.external_host && (
+          <span className="font-mono text-[11px] text-tag-muted">
+            Hosted by {event.external_host}
+          </span>
+        )}
         <div className="font-mono text-[11px] uppercase text-tag-muted">{event.type}</div>
         <div className="pointer-events-none absolute bottom-0 left-0 w-full origin-bottom scale-y-0 border-b-2 border-tag-orange transition-transform duration-300 group-hover:h-full group-hover:scale-y-100" />
       </div>

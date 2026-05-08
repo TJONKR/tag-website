@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 
 import { createServerSupabaseClient, createServiceRoleClient } from '@lib/db'
 
+import type { Rarity } from '@lib/lootbox/types'
+
 import type { AuthUser, PublicProfile, PublicTaste, UserRole } from './types'
 
 export async function getSession() {
@@ -26,7 +28,7 @@ async function healMissingProfile(
   const service = createServiceRoleClient()
   const { error } = await service
     .from('profiles')
-    .insert({ id: userId, name: fallbackName, onboarding_completed: false })
+    .insert({ id: userId, name: fallbackName?.trim() ?? null, onboarding_completed: false })
 
   if (error && !error.message.toLowerCase().includes('duplicate')) {
     console.error('[healMissingProfile] insert failed:', error.message, 'userId:', userId)
@@ -40,7 +42,7 @@ async function fetchProfile(
 ) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('role, name, avatar_url, created_at, is_super_admin')
+    .select('role, name, avatar_url, created_at, is_super_admin, luma_email')
     .eq('id', userId)
     .maybeSingle()
 
@@ -54,7 +56,7 @@ async function fetchProfile(
 
     const { data: healed } = await supabase
       .from('profiles')
-      .select('role, name, avatar_url, created_at, is_super_admin')
+      .select('role, name, avatar_url, created_at, is_super_admin, luma_email')
       .eq('id', userId)
       .maybeSingle()
 
@@ -64,6 +66,7 @@ async function fetchProfile(
       avatar_url: (healed?.avatar_url as string | null) ?? null,
       created_at: (healed?.created_at as string) ?? new Date().toISOString(),
       is_super_admin: Boolean(healed?.is_super_admin),
+      luma_email: (healed?.luma_email as string | null) ?? null,
     }
   }
 
@@ -73,6 +76,7 @@ async function fetchProfile(
     avatar_url: (data.avatar_url as string | null) ?? null,
     created_at: (data.created_at as string) ?? new Date().toISOString(),
     is_super_admin: Boolean(data.is_super_admin),
+    luma_email: (data.luma_email as string | null) ?? null,
   }
 }
 
@@ -111,6 +115,7 @@ export async function getOptionalUser(): Promise<AuthUser | null> {
     avatar_url: profile.avatar_url,
     created_at: profile.created_at,
     is_super_admin: profile.is_super_admin,
+    luma_email: profile.luma_email,
   }
 }
 
@@ -131,9 +136,9 @@ export async function getPublicProfile(slug: string): Promise<PublicProfile | nu
 
   if (error || !data) return null
 
-  const [taste, equippedSkinUrl] = await Promise.all([
+  const [taste, equippedSkin] = await Promise.all([
     getPublicTaste(data.id),
-    getEquippedSkinUrl(data.id),
+    getEquippedSkin(data.id),
   ])
 
   return {
@@ -149,7 +154,8 @@ export async function getPublicProfile(slug: string): Promise<PublicProfile | nu
     website_url: data.website_url,
     instagram_url: data.instagram_url,
     created_at: data.created_at,
-    equipped_skin_url: equippedSkinUrl,
+    equipped_skin_url: equippedSkin?.image_url ?? null,
+    equipped_skin_rarity: equippedSkin?.rarity ?? null,
     taste,
   }
 }
@@ -160,7 +166,7 @@ async function getPublicTaste(userId: string): Promise<PublicTaste | null> {
   const { data, error } = await supabase
     .from('builder_profiles')
     .select(
-      'headline, bio, tags, projects, interests, notable_work, influences, key_links, show_headline, show_bio, show_tags, show_projects, show_interests, show_notable_work, show_influences, show_key_links'
+      'headline, bio, tags, projects, interests, notable_work, influences, key_links, prophecy_chosen, show_headline, show_bio, show_tags, show_projects, show_interests, show_notable_work, show_influences, show_key_links, show_prophecy'
     )
     .eq('user_id', userId)
     .eq('status', 'complete')
@@ -177,29 +183,34 @@ async function getPublicTaste(userId: string): Promise<PublicTaste | null> {
     notable_work: data.show_notable_work ? data.notable_work : null,
     influences: data.show_influences ? data.influences : null,
     key_links: data.show_key_links ? data.key_links : null,
+    prophecy: data.show_prophecy ? data.prophecy_chosen : null,
   }
 }
 
-async function getEquippedSkinUrl(userId: string): Promise<string | null> {
+async function getEquippedSkin(
+  userId: string
+): Promise<{ image_url: string; rarity: Rarity } | null> {
   const supabase = createServiceRoleClient()
 
   const { data } = await supabase
     .from('user_skins')
-    .select('image_url')
+    .select('image_url, rarity')
     .eq('user_id', userId)
     .eq('equipped', true)
     .maybeSingle()
 
-  if (data?.image_url) return data.image_url
+  if (data?.image_url) {
+    return { image_url: data.image_url, rarity: (data.rarity as Rarity) ?? 'common' }
+  }
 
-  // Fallback to legacy builder_profiles.skin_url
+  // Fallback to legacy builder_profiles.skin_url — rarity unknown, treat as common.
   const { data: bp } = await supabase
     .from('builder_profiles')
     .select('skin_url')
     .eq('user_id', userId)
     .maybeSingle()
 
-  return bp?.skin_url ?? null
+  return bp?.skin_url ? { image_url: bp.skin_url, rarity: 'common' } : null
 }
 
 export async function getUser(): Promise<AuthUser> {
@@ -225,5 +236,6 @@ export async function getUser(): Promise<AuthUser> {
     avatar_url: profile.avatar_url,
     created_at: profile.created_at,
     is_super_admin: profile.is_super_admin,
+    luma_email: profile.luma_email,
   }
 }

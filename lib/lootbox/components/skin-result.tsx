@@ -7,6 +7,7 @@ import { Check, Loader2 } from 'lucide-react'
 import { cn } from '@lib/utils'
 
 import { useSkinStatus } from '../hooks'
+import { rarityStyles } from '../rarity'
 
 interface SkinResultProps {
   skinId: string
@@ -78,11 +79,8 @@ export const SkinResult = ({ skinId, onComplete }: SkinResultProps) => {
           <div
             className={cn(
               'relative aspect-[3/4] w-48 overflow-hidden rounded-2xl border-2',
-              isEpic
-                ? 'border-purple-400 shadow-[0_0_50px_rgba(168,85,247,0.4)]'
-                : isRare
-                  ? 'border-amber-400 shadow-[0_0_40px_rgba(251,191,36,0.3)]'
-                  : 'border-tag-orange shadow-[0_0_30px_rgba(255,95,31,0.2)]'
+              rarityStyles[skin.rarity].border,
+              rarityStyles[skin.rarity].glow
             )}
           >
             <Image

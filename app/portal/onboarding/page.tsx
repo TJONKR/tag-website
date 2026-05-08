@@ -1,14 +1,19 @@
 import { redirect } from 'next/navigation'
 
 import { getUser } from '@lib/auth/queries'
-import { getOnboardingProfile } from '@lib/onboarding/queries'
+import { createServerSupabaseClient } from '@lib/db'
 import { OnboardingForm } from '@lib/onboarding/components'
+import { getUserPhotos } from '@lib/photos/queries'
 
-export default async function OnboardingPage() {
+interface OnboardingPageProps {
+  searchParams: Promise<{ preview?: string }>
+}
+
+export default async function OnboardingPage({ searchParams }: OnboardingPageProps) {
   const user = await getUser()
+  const { preview } = await searchParams
+  const isPreview = preview === 'true' && !!user.is_super_admin
 
-  // Check if onboarding is already completed
-  const { createServerSupabaseClient } = await import('@lib/db')
   const supabase = await createServerSupabaseClient()
   const { data: profile } = await supabase
     .from('profiles')
@@ -16,23 +21,33 @@ export default async function OnboardingPage() {
     .eq('id', user.id)
     .single()
 
-  if (profile?.onboarding_completed) {
+  if (profile?.onboarding_completed && !isPreview) {
     redirect('/portal/events')
   }
 
-  const onboardingProfile = await getOnboardingProfile(user.id)
+  const userPhotos = await getUserPhotos(user.id)
+  const photoUrls: Record<string, string> = {}
+  for (const photo of userPhotos) {
+    const { data } = await supabase.storage
+      .from('user-photos')
+      .createSignedUrl(photo.storage_path, 3600)
+    if (data?.signedUrl) photoUrls[photo.id] = data.signedUrl
+  }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-syne text-2xl font-bold text-tag-text">
-          Welcome to TAG
-        </h1>
-        <p className="mt-1 font-grotesk text-sm text-tag-muted">
-          Complete your profile to get started.
-        </p>
+    <>
+      <div className="flex justify-center pb-2 pt-4">
+        <span className="font-syne text-2xl font-extrabold tracking-tight text-tag-text">
+          TAG
+        </span>
       </div>
-      <OnboardingForm profile={onboardingProfile} />
-    </div>
+      <OnboardingForm
+        name={user.name}
+        avatarUrl={user.avatar_url}
+        initialPhotos={userPhotos}
+        photoUrls={photoUrls}
+        isPreview={isPreview}
+      />
+    </>
   )
 }

@@ -1,8 +1,19 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { PageShell } from '@components/page-shell'
 import { EventsHero, EventList } from '@lib/events/components'
 import { getUpcomingEvents, getPastEvents } from '@lib/events/queries'
+
+const title = 'TAG Events'
+const description = "From hackathons to demo nights. Discover what's happening at TAG."
+
+export const metadata: Metadata = {
+  title,
+  description,
+  openGraph: { title, description },
+  twitter: { card: 'summary_large_image', title, description },
+}
 
 export default async function EventsPage() {
   const [upcoming, past] = await Promise.all([getUpcomingEvents(), getPastEvents()])
@@ -23,6 +34,17 @@ export default async function EventsPage() {
           >
             Tag In &rarr;
           </Link>
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <p className="font-mono text-xs uppercase tracking-[0.1em] text-tag-dim">
+              Got your own event?
+            </p>
+            <Link
+              href="/host-event"
+              className="border border-tag-border px-6 py-2.5 font-grotesk text-sm text-tag-text transition-colors hover:border-tag-orange hover:text-tag-orange"
+            >
+              Host an event at TAG &rarr;
+            </Link>
+          </div>
         </div>
       </div>
     </PageShell>

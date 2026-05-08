@@ -50,9 +50,19 @@ export const deleteEvent = async (id: string) => {
 export const addAttendance = async (eventId: string, userId: string) => {
   const supabase = await createServerSupabaseClient()
 
+  // Operator marks someone as actually present — attendance implies check-in.
+  // The DB trigger `grant_lootbox_on_checkin` grants a lootbox on the
+  // NULL → non-NULL transition of checked_in_at.
   const { error } = await supabase
     .from('event_attendance')
-    .insert({ event_id: eventId, user_id: userId })
+    .upsert(
+      {
+        event_id: eventId,
+        user_id: userId,
+        checked_in_at: new Date().toISOString(),
+      },
+      { onConflict: 'event_id,user_id' }
+    )
 
   if (error) throw new Error(error.message)
 }

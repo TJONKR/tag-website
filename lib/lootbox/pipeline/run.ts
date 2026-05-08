@@ -31,17 +31,16 @@ export async function runGenerationPipeline(input: PipelineInput) {
       .from('user_photos')
       .select('storage_path')
       .eq('user_id', userId)
-      .order('created_at', { ascending: true })
-      .limit(1)
 
     if (!photos?.length) {
       throw new Error('No reference photos found')
     }
 
-    // Get signed URL for the first photo
+    // Pick a random reference photo so generations vary run-to-run
+    const referencePhoto = photos[Math.floor(Math.random() * photos.length)]
     const { data: signedUrl } = await supabase.storage
       .from('user-photos')
-      .createSignedUrl(photos[0].storage_path, 3600)
+      .createSignedUrl(referencePhoto.storage_path, 3600)
 
     if (!signedUrl?.signedUrl) {
       throw new Error('Failed to get signed URL for photo')

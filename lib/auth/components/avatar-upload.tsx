@@ -9,6 +9,7 @@ import { toast } from '@components/toast'
 interface AvatarUploadProps {
   name: string | null
   avatarUrl: string | null
+  size?: 'md' | 'xl'
 }
 
 function getInitials(name: string | null): string {
@@ -21,7 +22,10 @@ function getInitials(name: string | null): string {
     .slice(0, 2)
 }
 
-export const AvatarUpload = ({ name, avatarUrl }: AvatarUploadProps) => {
+export const AvatarUpload = ({ name, avatarUrl, size = 'md' }: AvatarUploadProps) => {
+  const avatarClass = size === 'xl' ? 'size-40' : 'size-16'
+  const fallbackClass = size === 'xl' ? 'text-4xl' : 'text-lg'
+  const hintClass = size === 'xl' ? 'text-sm font-medium' : 'text-[10px] font-medium'
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
@@ -69,16 +73,14 @@ export const AvatarUpload = ({ name, avatarUrl }: AvatarUploadProps) => {
       className="group relative"
       aria-label="Upload avatar"
     >
-      <Avatar className="size-16">
+      <Avatar className={avatarClass}>
         <AvatarImage src={avatarUrl ?? undefined} alt={name ?? 'Avatar'} />
-        <AvatarFallback className="bg-tag-text/5 font-syne text-lg text-tag-muted">
+        <AvatarFallback className={`bg-tag-text/5 font-syne ${fallbackClass} text-tag-muted`}>
           {getInitials(name)}
         </AvatarFallback>
       </Avatar>
       <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-        <span className="text-[10px] font-medium text-white">
-          {uploading ? '...' : 'Edit'}
-        </span>
+        <span className={`${hintClass} text-white`}>{uploading ? '...' : 'Edit'}</span>
       </div>
       <input
         ref={inputRef}

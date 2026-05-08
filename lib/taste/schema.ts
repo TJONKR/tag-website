@@ -15,6 +15,7 @@ const VISIBILITY_FIELDS = [
   'show_notable_work',
   'show_influences',
   'show_key_links',
+  'show_prophecy',
 ] as const
 
 export const visibilityUpdateSchema = z.object({
@@ -51,3 +52,12 @@ export const tasteProfileUpdateSchema = z.object({
 })
 
 export type TasteProfileUpdateInput = z.infer<typeof tasteProfileUpdateSchema>
+
+// Prophecy advance: member picks one card from the current (unsealed) round.
+// Server resolves the id against the live `prophecy_rounds` so titles and
+// narratives can't be spoofed from the client.
+export const prophecyAdvanceSchema = z.object({
+  pickedCardId: z.string().regex(/^r[1-3]-c[1-4]$/, 'Invalid card id'),
+})
+
+export type ProphecyAdvanceInput = z.infer<typeof prophecyAdvanceSchema>

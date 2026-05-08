@@ -26,11 +26,12 @@ export async function POST() {
     // Create job record
     const job = await createAvatarJob(user.id)
 
-    // Get signed URL for the first photo
+    // Get signed URL for a random reference photo
     const supabase = createServiceRoleClient()
+    const referencePhoto = photos[Math.floor(Math.random() * photos.length)]
     const { data: signedUrl } = await supabase.storage
       .from('user-photos')
-      .createSignedUrl(photos[0].storage_path, 3600)
+      .createSignedUrl(referencePhoto.storage_path, 3600)
 
     if (!signedUrl?.signedUrl) {
       await updateAvatarJob(job.id, 'error')

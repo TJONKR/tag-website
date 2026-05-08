@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Calendar, Check, Shield, Star } from 'lucide-react'
+import { Calendar, Check, ImagePlus, Shield, Star } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { FadeIn } from '@lib/portal/components'
@@ -10,16 +10,19 @@ import {
   UpgradeCard,
 } from '@lib/membership/components'
 import { LootboxOpening, SkinsCollection } from '@lib/lootbox/components'
+import { rarityStyles } from '@lib/lootbox/rarity'
 import { PhotosModal } from '@lib/photos/components'
 import { ProfileEventTimeline } from '@lib/events/components'
 import { AvatarUpload } from '@lib/auth/components/avatar-upload'
 import { SocialLinks } from '@lib/auth/components/social-links'
+import { TierBadge } from '@lib/milestones/components'
+import { computeTier } from '@lib/milestones/tiers'
 
 import type { AuthUser, UserRole } from '@lib/auth/types'
 import type { MembershipStatus } from '@lib/membership/types'
 import type { OnboardingProfile } from '@lib/onboarding/types'
 import type { BuilderProfile } from '@lib/taste/types'
-import type { UserSkin } from '@lib/lootbox/types'
+import type { LootboxStyle, UserSkin } from '@lib/lootbox/types'
 import type { UserPhoto } from '@lib/photos/types'
 
 interface AttendedEvent {
@@ -55,6 +58,7 @@ interface ProfileOverviewTabProps {
   photoUrls: Record<string, string>
   equippedSkin: UserSkin | null
   userSkins: UserSkin[]
+  allStyles: LootboxStyle[]
   pendingSkin: UserSkin | null
   availableLootboxCount: number
   hasEnoughPhotos: boolean
@@ -73,6 +77,7 @@ export const ProfileOverviewTab = ({
   photoUrls,
   equippedSkin,
   userSkins,
+  allStyles,
   pendingSkin,
   availableLootboxCount,
   hasEnoughPhotos,
@@ -85,6 +90,14 @@ export const ProfileOverviewTab = ({
 
   const equippedSkinUrl = equippedSkin?.image_url ?? builderProfile?.skin_url
   const hasSkin = !!equippedSkinUrl
+  const skinRarity = equippedSkin?.rarity ? rarityStyles[equippedSkin.rarity] : null
+
+  const tier = computeTier({
+    onboardingProfile,
+    builderProfile,
+    photoCount: userPhotos.length,
+    checkedInCount,
+  })
 
   const participationRate =
     attendedEvents.length > 0
@@ -103,7 +116,12 @@ export const ProfileOverviewTab = ({
               trigger={
                 <button type="button" className="group block w-full text-left">
                   {hasSkin ? (
-                    <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg">
+                    <div
+                      className={cn(
+                        'relative aspect-[3/4] overflow-hidden rounded-t-lg',
+                        skinRarity && ['border-2', skinRarity.border, skinRarity.glow]
+                      )}
+                    >
                       <Image
                         src={equippedSkinUrl!}
                         alt={user.name ?? 'Profile skin'}
@@ -164,6 +182,27 @@ export const ProfileOverviewTab = ({
                   Since {formatMemberSince(user.created_at)}
                 </span>
               </div>
+
+              <PhotosModal
+                photos={userPhotos}
+                photoUrls={photoUrls}
+                trigger={
+                  <button
+                    type="button"
+                    className={cn(
+                      'mt-5 flex w-full items-center justify-center gap-2 rounded-md border px-3 py-2 font-grotesk text-sm font-medium transition-colors',
+                      userPhotos.length > 0
+                        ? 'border-tag-border bg-tag-bg/60 text-tag-muted hover:border-tag-text/40 hover:text-tag-text'
+                        : 'border-tag-orange/30 bg-tag-orange/10 text-tag-orange hover:border-tag-orange/60 hover:bg-tag-orange/20'
+                    )}
+                  >
+                    <ImagePlus className="size-4" />
+                    {userPhotos.length > 0
+                      ? `Manage reference photos (${userPhotos.length})`
+                      : 'Add reference photos'}
+                  </button>
+                }
+              />
             </div>
           </div>
         </FadeIn>
@@ -178,6 +217,10 @@ export const ProfileOverviewTab = ({
               instagram_url: onboardingProfile.instagram_url,
             }}
           />
+        </FadeIn>
+
+        <FadeIn delay={200}>
+          <TierBadge tier={tier} />
         </FadeIn>
 
         {/* Lootbox progress (onboarding-completion checklist) */}
@@ -264,9 +307,6 @@ export const ProfileOverviewTab = ({
           </div>
         </FadeIn>
 
-        {/* Skins collection */}
-        {userSkins.length > 0 && <SkinsCollection initialSkins={userSkins} />}
-
         {/* Membership row — woven in */}
         <FadeIn delay={200}>
           <MembershipCard status={membershipStatus} />
@@ -280,6 +320,9 @@ export const ProfileOverviewTab = ({
         <FadeIn delay={275}>
           <ProfileEventTimeline events={attendedEvents} />
         </FadeIn>
+
+        {/* Skins collection */}
+        <SkinsCollection initialSkins={userSkins} allStyles={allStyles} />
       </div>
     </div>
   )

@@ -1,6 +1,8 @@
 import { FadeIn } from '@lib/portal/components'
 import { EditNameForm } from '@lib/auth/components/edit-name-form'
+import { EditLumaEmailForm } from '@lib/auth/components/edit-luma-email-form'
 import { SignOutForm } from '@lib/auth/components/sign-out-form'
+import { ResetOnboardingButton } from '@lib/auth/components/reset-onboarding-button'
 
 import type { AuthUser, UserRole } from '@lib/auth/types'
 
@@ -26,6 +28,12 @@ export const ProfileAccountTab = ({ user }: ProfileAccountTabProps) => {
             <span className="text-sm text-tag-muted">Email</span>
             <p className="text-sm text-tag-text">{user.email}</p>
           </div>
+          <div className="border-t border-tag-border px-5">
+            <EditLumaEmailForm
+              currentLumaEmail={user.luma_email}
+              defaultEmail={user.email}
+            />
+          </div>
           <div className="border-t border-tag-border px-5 py-4">
             <span className="text-sm text-tag-muted">Role</span>
             <div className="flex items-center justify-between">
@@ -38,16 +46,22 @@ export const ProfileAccountTab = ({ user }: ProfileAccountTabProps) => {
         </div>
       </FadeIn>
 
-      <FadeIn delay={75}>
-        <div className="rounded-lg border border-dashed border-destructive/30 p-5">
-          <span className="font-mono text-xs uppercase tracking-[0.15em] text-destructive/70">
-            Session
-          </span>
-          <p className="mt-1 text-sm text-tag-muted">Sign out of this device.</p>
-          <div className="mt-3">
-            <SignOutForm />
+      {user.is_super_admin && (
+        <FadeIn delay={75}>
+          <div className="rounded-lg border border-dashed border-tag-orange/30 p-5">
+            <span className="font-mono text-xs uppercase tracking-[0.15em] text-tag-orange/70">
+              Super admin
+            </span>
+            <p className="mt-1 text-sm text-tag-muted">Tools for testing the onboarding flow.</p>
+            <div className="mt-3">
+              <ResetOnboardingButton />
+            </div>
           </div>
-        </div>
+        </FadeIn>
+      )}
+
+      <FadeIn delay={user.is_super_admin ? 150 : 75}>
+        <SignOutForm />
       </FadeIn>
     </div>
   )

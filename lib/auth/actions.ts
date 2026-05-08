@@ -231,7 +231,38 @@ export async function updateName(
 
     const { error } = await supabase
       .from('profiles')
-      .update({ name })
+      .update({ name: name.trim() })
+      .eq('id', user.id)
+
+    if (error) throw error
+
+    return { status: 'success' }
+  } catch {
+    return { status: 'failed' }
+  }
+}
+
+export async function updateLumaEmail(
+  lumaEmail: string
+): Promise<{ status: 'success' | 'invalid' | 'failed' }> {
+  const trimmed = lumaEmail.trim().toLowerCase()
+  // Empty clears the field; otherwise validate a minimal email shape.
+  if (trimmed && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+    return { status: 'invalid' }
+  }
+
+  try {
+    const supabase = await createServerSupabaseClient()
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { status: 'failed' }
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ luma_email: trimmed || null })
       .eq('id', user.id)
 
     if (error) throw error

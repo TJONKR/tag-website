@@ -1,13 +1,15 @@
 import { createServiceRoleClient } from '@lib/db'
-import { getUserEmail, sendTasteComplete, sendTasteFailed } from '@lib/email/senders'
+import { getUserEmail, sendTasteFailed } from '@lib/email/senders'
 
-import type { ProfileStatus, VisibilityField } from './types'
+import type {
+  ProfileStatus,
+  ProphecyCard,
+  ProphecyRound,
+  ProphecyRounds,
+  VisibilityField,
+} from './types'
 
-async function notifyBuilderProfileStatus(
-  userId: string,
-  status: 'complete' | 'error',
-  errorMessage?: string
-) {
+async function notifyBuilderProfileError(userId: string, errorMessage?: string) {
   const email = await getUserEmail(userId)
   if (!email) return
 
@@ -19,11 +21,7 @@ async function notifyBuilderProfileStatus(
     .single()
   const name = profile?.name ?? undefined
 
-  if (status === 'complete') {
-    await sendTasteComplete({ to: email, name })
-  } else {
-    await sendTasteFailed({ to: email, name, errorMessage })
-  }
+  await sendTasteFailed({ to: email, name, errorMessage })
 }
 
 interface CreateProfileInput {
@@ -131,8 +129,6 @@ export async function saveProfileResult(
     .eq('user_id', userId)
 
   if (error) throw new Error(error.message)
-
-  await notifyBuilderProfileStatus(userId, 'complete')
 }
 
 export async function setEvaluationError(userId: string, errorMessage: string) {
@@ -148,7 +144,7 @@ export async function setEvaluationError(userId: string, errorMessage: string) {
 
   if (error) throw new Error(error.message)
 
-  await notifyBuilderProfileStatus(userId, 'error', errorMessage)
+  await notifyBuilderProfileError(userId, errorMessage)
 }
 
 export async function updateVisibility(
@@ -163,6 +159,65 @@ export async function updateVisibility(
     .update({ [field]: value })
     .eq('user_id', userId)
 
+  if (error) throw new Error(error.message)
+}
+
+/**
+ * Start a new prophecy draw — writes the first round and clears any
+ * prior rounds / chosen cards. Used by POST /api/taste/prophecy/draw.
+ */
+export async function startProphecyDraw(
+  userId: string,
+  firstRound: ProphecyRound
+): Promise<void> {
+  const supabase = createServiceRoleClient()
+  const { error } = await supabase
+    .from('builder_profiles')
+    .update({
+      prophecy_rounds: [firstRound] satisfies ProphecyRounds,
+      prophecy_chosen: null,
+      prophecy_drawn_at: null,
+    })
+    .eq('user_id', userId)
+  if (error) throw new Error(error.message)
+}
+
+/**
+ * Replace the full rounds array. Caller is responsible for producing a
+ * valid array (1..3 rounds, last one the unsealed one).
+ */
+export async function saveProphecyRounds(
+  userId: string,
+  rounds: ProphecyRounds
+): Promise<void> {
+  const supabase = createServiceRoleClient()
+  const { error } = await supabase
+    .from('builder_profiles')
+    .update({ prophecy_rounds: rounds })
+    .eq('user_id', userId)
+  if (error) throw new Error(error.message)
+}
+
+/**
+ * Seal the prophecy: round 3 is picked, derive chosen cards, stamp time.
+ */
+export async function sealProphecy(
+  userId: string,
+  rounds: ProphecyRounds,
+  chosen: ProphecyCard[]
+): Promise<void> {
+  if (chosen.length !== 3) {
+    throw new Error('Prophecy choice must contain exactly 3 cards')
+  }
+  const supabase = createServiceRoleClient()
+  const { error } = await supabase
+    .from('builder_profiles')
+    .update({
+      prophecy_rounds: rounds,
+      prophecy_chosen: chosen,
+      prophecy_drawn_at: new Date().toISOString(),
+    })
+    .eq('user_id', userId)
   if (error) throw new Error(error.message)
 }
 

@@ -1,3 +1,5 @@
+import type { Rarity } from '@lib/lootbox/types'
+
 export type UserRole = 'ambassador' | 'builder' | 'operator'
 
 export interface AuthUser {
@@ -8,6 +10,7 @@ export interface AuthUser {
   avatar_url: string | null
   created_at: string
   is_super_admin: boolean
+  luma_email: string | null
 }
 
 export interface PublicProfile {
@@ -24,6 +27,7 @@ export interface PublicProfile {
   instagram_url: string | null
   created_at: string
   equipped_skin_url: string | null
+  equipped_skin_rarity: Rarity | null
   taste: PublicTaste | null
 }
 
@@ -36,6 +40,15 @@ export interface PublicTaste {
   notable_work: string[] | null
   influences: string[] | null
   key_links: { url: string; title: string; type: string }[] | null
+  prophecy:
+    | {
+        id: string
+        round: 1 | 2 | 3
+        title: string
+        narrative: string
+        image_url: string | null
+      }[]
+    | null
 }
 
 export interface LoginActionState {

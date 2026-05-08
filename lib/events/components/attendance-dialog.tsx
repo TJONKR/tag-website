@@ -29,13 +29,6 @@ interface Member {
   role: string
 }
 
-interface Attendee {
-  user_id: string
-  name: string | null
-  checked_in_at: string | null
-  source: string
-}
-
 interface AttendanceDialogProps {
   eventId: string
   eventTitle: string
@@ -47,7 +40,6 @@ export const AttendanceDialog = ({ eventId, eventTitle, isLumaLinked }: Attendan
   const [open, setOpen] = useState(false)
   const [comboboxOpen, setComboboxOpen] = useState(false)
   const [members, setMembers] = useState<Member[]>([])
-  const [attendees, setAttendees] = useState<Attendee[]>([])
   const [attendeeIds, setAttendeeIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [toggling, setToggling] = useState<string | null>(null)
@@ -63,9 +55,8 @@ export const AttendanceDialog = ({ eventId, eventTitle, isLumaLinked }: Attendan
 
       if (membersRes.ok && attendeesRes.ok) {
         const membersData: Member[] = await membersRes.json()
-        const attendeesData: Attendee[] = await attendeesRes.json()
+        const attendeesData: { user_id: string }[] = await attendeesRes.json()
         setMembers(membersData)
-        setAttendees(attendeesData)
         setAttendeeIds(new Set(attendeesData.map((a) => a.user_id)))
       }
     } catch {
@@ -145,13 +136,12 @@ export const AttendanceDialog = ({ eventId, eventTitle, isLumaLinked }: Attendan
   }
 
   const selectedMembers = members.filter((m) => attendeeIds.has(m.id))
-  const checkedInCount = attendees.filter((a) => a.checked_in_at).length
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <button
-          className="rounded p-1.5 text-tag-muted transition-colors hover:bg-tag-card hover:text-tag-text"
+          className="rounded p-1.5 text-tag-orange transition-colors hover:bg-tag-card"
           aria-label="Manage attendance"
         >
           <Users className="size-3.5" />
@@ -173,6 +163,9 @@ export const AttendanceDialog = ({ eventId, eventTitle, isLumaLinked }: Attendan
             )}
           </div>
           <p className="text-sm text-tag-muted">{eventTitle}</p>
+          <p className="text-xs text-tag-dim">
+            Only add members who actually showed up — adding them grants a lootbox.
+          </p>
         </DialogHeader>
 
         {loading ? (
@@ -234,37 +227,22 @@ export const AttendanceDialog = ({ eventId, eventTitle, isLumaLinked }: Attendan
             {/* Selected members as badges */}
             {selectedMembers.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {selectedMembers.map((member) => {
-                  const attendee = attendees.find((a) => a.user_id === member.id)
-                  const isCheckedIn = !!attendee?.checked_in_at
-                  return (
-                    <button
-                      key={member.id}
-                      onClick={() => toggle(member.id)}
-                      disabled={toggling === member.id}
-                      className="flex items-center gap-1 rounded-full border border-tag-border bg-tag-card px-2.5 py-1 text-xs text-tag-text transition-colors hover:border-tag-orange/50 disabled:opacity-50"
-                    >
-                      <span
-                        className={cn(
-                          'inline-block size-1.5 rounded-full',
-                          isCheckedIn ? 'bg-green-500' : attendee?.source === 'luma' ? 'bg-tag-dim' : ''
-                        )}
-                      />
-                      {member.name || 'Unnamed'}
-                      <X className="size-3 text-tag-muted" />
-                    </button>
-                  )
-                })}
+                {selectedMembers.map((member) => (
+                  <button
+                    key={member.id}
+                    onClick={() => toggle(member.id)}
+                    disabled={toggling === member.id}
+                    className="flex items-center gap-1 rounded-full border border-tag-border bg-tag-card px-2.5 py-1 text-xs text-tag-text transition-colors hover:border-tag-orange/50 disabled:opacity-50"
+                  >
+                    {member.name || 'Unnamed'}
+                    <X className="size-3 text-tag-muted" />
+                  </button>
+                ))}
               </div>
             )}
 
-            <div className="flex items-center justify-between border-t border-tag-border pt-3">
-              {checkedInCount > 0 && (
-                <span className="text-xs text-tag-muted">
-                  {checkedInCount} of {attendeeIds.size} checked in
-                </span>
-              )}
-              <span className="ml-auto text-xs text-tag-muted">
+            <div className="flex items-center justify-end border-t border-tag-border pt-3">
+              <span className="text-xs text-tag-muted">
                 {attendeeIds.size} attendee{attendeeIds.size !== 1 ? 's' : ''}
               </span>
             </div>
