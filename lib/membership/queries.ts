@@ -119,17 +119,24 @@ export async function getMembershipStatus(
     getActiveAiAmClaim(userId),
   ])
 
-  const isBuilder = role === 'builder' || role === 'operator'
+  const isOperator = role === 'operator'
+  const isBuilder = role === 'builder' || isOperator
   const hasActiveSubscription = subscription?.status === 'active'
   const hasActiveClaim =
     aiAmClaim?.status === 'pending' || aiAmClaim?.status === 'approved'
+  const hasPaidMembership = hasActiveSubscription || hasActiveClaim
+
+  // Operators retain builder-tier portal access via role, but they still need
+  // to arrange their own paid membership (Stripe or AI/AM). So show the upgrade
+  // CTA whenever they have no active subscription or claim — same gate as ambassadors.
+  const canUpgrade = isOperator ? !hasPaidMembership : !isBuilder && !hasPaidMembership
 
   return {
     tier: isBuilder ? 'builder' : 'ambassador',
     subscription,
     contract,
     aiAmClaim,
-    canUpgrade: !isBuilder && !hasActiveSubscription && !hasActiveClaim,
+    canUpgrade,
     canCancel: hasActiveSubscription && !subscription?.cancel_at,
   }
 }
