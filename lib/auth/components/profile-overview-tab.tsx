@@ -307,9 +307,6 @@ export const ProfileOverviewTab = ({
           </div>
         </FadeIn>
 
-        {/* Skins collection */}
-        <SkinsCollection initialSkins={userSkins} allStyles={allStyles} />
-
         {/* Membership row — woven in */}
         <FadeIn delay={200}>
           <MembershipCard status={membershipStatus} />
@@ -323,6 +320,9 @@ export const ProfileOverviewTab = ({
         <FadeIn delay={275}>
           <ProfileEventTimeline events={attendedEvents} />
         </FadeIn>
+
+        {/* Skins collection */}
+        <SkinsCollection initialSkins={userSkins} allStyles={allStyles} />
       </div>
     </div>
   )

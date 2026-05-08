@@ -60,7 +60,7 @@ export const EditLumaEmailForm = ({
             <span className="text-sm text-tag-muted">Luma email</span>
             <p className="text-sm text-tag-text">{display}</p>
             <p className="mt-1 text-xs text-tag-dim">
-              Used to match Luma guests to your TAG account.
+              So we can link your TAG account with your Luma account and know which events you have attended.
             </p>
           </div>
           <span className="font-mono text-xs uppercase tracking-wider text-tag-muted">Edit</span>

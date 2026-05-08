@@ -61,15 +61,7 @@ export const ProfileAccountTab = ({ user }: ProfileAccountTabProps) => {
       )}
 
       <FadeIn delay={user.is_super_admin ? 150 : 75}>
-        <div className="rounded-lg border border-dashed border-destructive/30 p-5">
-          <span className="font-mono text-xs uppercase tracking-[0.15em] text-destructive/70">
-            Session
-          </span>
-          <p className="mt-1 text-sm text-tag-muted">Sign out of this device.</p>
-          <div className="mt-3">
-            <SignOutForm />
-          </div>
-        </div>
+        <SignOutForm />
       </FadeIn>
     </div>
   )

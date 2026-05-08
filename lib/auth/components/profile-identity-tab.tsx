@@ -63,6 +63,8 @@ export const ProfileIdentityTab = ({
   )
   const prophecyChosen: ProphecyCard[] | null =
     builderProfile?.prophecy_chosen ?? null
+  // Prophecy hidden in profile for now — feature not finished
+  const SHOW_PROPHECY = false as boolean
 
   const handleRevealComplete = (_: ProphecyCard[]) => {
     setRevealOpen(false)
@@ -129,7 +131,7 @@ export const ProfileIdentityTab = ({
   const hasError = builderProfile?.status === 'error'
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
+    <div className="grid grid-cols-1 gap-8">
       {/* ── LEFT: unified field list ── */}
       <div className="max-w-2xl space-y-5">
         <FadeIn>
@@ -215,7 +217,7 @@ export const ProfileIdentityTab = ({
         )}
 
         {/* Prophecy — start CTA (no draw yet) or resume CTA (mid-draw) */}
-        {isComplete && !prophecyChosen && (
+        {SHOW_PROPHECY && isComplete && !prophecyChosen && (
           <FadeIn delay={175}>
             <button
               type="button"
@@ -253,7 +255,7 @@ export const ProfileIdentityTab = ({
         )}
 
         {/* Chosen prophecy — shown after all 3 rounds sealed */}
-        {isComplete && prophecyChosen && prophecyChosen.length === 3 && (
+        {SHOW_PROPHECY && isComplete && prophecyChosen && prophecyChosen.length === 3 && (
           <FieldCard
             title="Prophecy"
             show={builderProfile?.show_prophecy ?? true}
@@ -516,48 +518,6 @@ export const ProfileIdentityTab = ({
           )}
       </div>
 
-      {/* ── RIGHT: visibility summary (sticky) ── */}
-      {isComplete && builderProfile && (
-        <div className="lg:sticky lg:top-20 lg:self-start">
-          <div className="rounded-lg border border-tag-border bg-tag-card p-5">
-            <h3 className="font-mono text-xs uppercase tracking-[0.15em] text-tag-dim">
-              Public visibility
-            </h3>
-            <p className="mt-1 text-xs text-tag-muted">
-              Toggle what shows on your public profile.
-            </p>
-            <div className="mt-3 space-y-0.5">
-              {VISIBILITY_OPTIONS.map(({ field, label }) => {
-                const isOn = builderProfile[field]
-                const disabled = updating === field
-                return (
-                  <button
-                    key={field}
-                    type="button"
-                    onClick={() => handleToggle(field, !isOn)}
-                    disabled={disabled}
-                    className={cn(
-                      'flex w-full items-center justify-between rounded-md px-2.5 py-2 text-sm transition-colors',
-                      isOn
-                        ? 'bg-tag-orange/5 text-tag-text'
-                        : 'bg-transparent text-tag-dim',
-                      disabled && 'opacity-50'
-                    )}
-                  >
-                    <span>{label}</span>
-                    {isOn ? (
-                      <Eye className="size-4 text-tag-orange" />
-                    ) : (
-                      <EyeOff className="size-4 text-tag-dim" />
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ── Edit dialogs ── */}
       <HeadlineDialog
         open={editing === 'headline'}
@@ -643,18 +603,6 @@ function formatDrawnAt(iso: string): string {
   const months = Math.floor(days / 30)
   return `${months} month${months === 1 ? '' : 's'} ago`
 }
-
-const VISIBILITY_OPTIONS: { field: VisibilityField; label: string }[] = [
-  { field: 'show_headline', label: 'Headline' },
-  { field: 'show_prophecy', label: 'Prophecy' },
-  { field: 'show_bio', label: 'Bio' },
-  { field: 'show_tags', label: 'Tags' },
-  { field: 'show_projects', label: 'Projects' },
-  { field: 'show_interests', label: 'Interests' },
-  { field: 'show_notable_work', label: 'Notable work' },
-  { field: 'show_influences', label: 'Influences' },
-  { field: 'show_key_links', label: 'Links' },
-]
 
 interface FieldCardProps {
   title: string
