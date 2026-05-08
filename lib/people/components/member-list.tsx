@@ -36,7 +36,6 @@ import { toast } from '@components/toast'
 
 import type { Member, MemberCounts } from '../types'
 import type { UserRole } from '@lib/auth/types'
-import { slugifyName } from '@lib/utils'
 
 interface MemberListProps {
   initialMembers: Member[]
@@ -244,8 +243,7 @@ export const MemberList = ({
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {filtered.map((member) => {
-            const profileSlug = member.name ? slugifyName(member.name) : null
-            const profileHref = profileSlug ? `/profile/${profileSlug}` : null
+            const profileHref = member.slug ? `/profile/${member.slug}` : null
 
             return (
             <div
@@ -382,13 +380,13 @@ export const MemberList = ({
                 </p>
 
                 <div className="flex flex-wrap items-center gap-2 border-t border-tag-border pt-4">
-                  {selected.name && (
+                  {selected.slug && (
                     <Button
                       variant="outline"
                       size="sm"
                       className="gap-2 border-tag-border text-tag-text hover:border-tag-orange hover:text-tag-orange"
                       onClick={() => {
-                        window.open(`/profile/${slugifyName(selected.name!)}`, '_blank')
+                        window.open(`/profile/${selected.slug}`, '_blank')
                       }}
                     >
                       <ExternalLink className="size-4" />

@@ -42,7 +42,7 @@ async function fetchProfile(
 ) {
   const { data, error } = await supabase
     .from('profiles')
-    .select('role, name, avatar_url, created_at, is_super_admin, luma_email')
+    .select('role, name, slug, avatar_url, created_at, is_super_admin, luma_email')
     .eq('id', userId)
     .maybeSingle()
 
@@ -56,13 +56,14 @@ async function fetchProfile(
 
     const { data: healed } = await supabase
       .from('profiles')
-      .select('role, name, avatar_url, created_at, is_super_admin, luma_email')
+      .select('role, name, slug, avatar_url, created_at, is_super_admin, luma_email')
       .eq('id', userId)
       .maybeSingle()
 
     return {
       role: (healed?.role as UserRole) ?? 'ambassador',
       name: (healed?.name as string | null) ?? fallbackName,
+      slug: (healed?.slug as string | null) ?? null,
       avatar_url: (healed?.avatar_url as string | null) ?? null,
       created_at: (healed?.created_at as string) ?? new Date().toISOString(),
       is_super_admin: Boolean(healed?.is_super_admin),
@@ -73,6 +74,7 @@ async function fetchProfile(
   return {
     role: (data.role as UserRole) ?? 'ambassador',
     name: (data.name as string | null) ?? null,
+    slug: (data.slug as string | null) ?? null,
     avatar_url: (data.avatar_url as string | null) ?? null,
     created_at: (data.created_at as string) ?? new Date().toISOString(),
     is_super_admin: Boolean(data.is_super_admin),
@@ -111,6 +113,7 @@ export async function getOptionalUser(): Promise<AuthUser | null> {
     id: user.id,
     email: user.email || '',
     name: profile.name,
+    slug: profile.slug,
     role: profile.role,
     avatar_url: profile.avatar_url,
     created_at: profile.created_at,
@@ -122,16 +125,12 @@ export async function getOptionalUser(): Promise<AuthUser | null> {
 export async function getPublicProfile(slug: string): Promise<PublicProfile | null> {
   const supabase = createServiceRoleClient()
 
-  // Convert slug back to name pattern for case-insensitive matching
-  const namePattern = slug.replace(/-/g, ' ')
-
   const { data, error } = await supabase
     .from('profiles')
     .select(
-      'id, name, role, avatar_url, building, why_tag, linkedin_url, twitter_url, github_url, website_url, instagram_url, created_at'
+      'id, name, slug, role, avatar_url, building, why_tag, linkedin_url, twitter_url, github_url, website_url, instagram_url, created_at'
     )
-    .ilike('name', `${namePattern}`)
-    .limit(1)
+    .eq('slug', slug)
     .maybeSingle()
 
   if (error || !data) return null
@@ -144,6 +143,7 @@ export async function getPublicProfile(slug: string): Promise<PublicProfile | nu
   return {
     id: data.id,
     name: data.name,
+    slug: data.slug,
     role: data.role as UserRole,
     avatar_url: data.avatar_url,
     building: data.building,
@@ -232,6 +232,7 @@ export async function getUser(): Promise<AuthUser> {
     id: user.id,
     email: user.email || '',
     name: profile.name,
+    slug: profile.slug,
     role: profile.role,
     avatar_url: profile.avatar_url,
     created_at: profile.created_at,

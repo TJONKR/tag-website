@@ -6,6 +6,7 @@ export interface AuthUser {
   id: string
   email: string
   name: string | null
+  slug: string | null
   role: UserRole
   avatar_url: string | null
   created_at: string
@@ -16,6 +17,7 @@ export interface AuthUser {
 export interface PublicProfile {
   id: string
   name: string | null
+  slug: string
   role: UserRole
   avatar_url: string | null
   building: string | null
