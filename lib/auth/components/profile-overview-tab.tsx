@@ -324,7 +324,9 @@ export const ProfileOverviewTab = ({
         </FadeIn>
 
         {/* Skins collection */}
-        <SkinsCollection initialSkins={userSkins} allStyles={allStyles} />
+        <FadeIn delay={325}>
+          <SkinsCollection initialSkins={userSkins} allStyles={allStyles} />
+        </FadeIn>
       </div>
     </div>
   )
