@@ -8,7 +8,6 @@ import type { UserPhoto } from '@lib/photos/types'
 import { AvatarStep } from './steps/avatar-step'
 import { PhotosStep } from './steps/photos-step'
 import { TourStep } from './steps/tour-step'
-import { ProphecyStep } from './steps/prophecy-step'
 import { ManifestoStep } from './steps/manifesto-step'
 
 interface OnboardingFormProps {
@@ -19,8 +18,8 @@ interface OnboardingFormProps {
   isPreview: boolean
 }
 
-const TOTAL_STEPS = 5
-const STEPPER_TOTAL = 4
+const TOTAL_STEPS = 4
+const STEPPER_TOTAL = 3
 
 export const OnboardingForm = ({
   name,
@@ -34,9 +33,6 @@ export const OnboardingForm = ({
   const searchParams = useSearchParams()
   const ensureFired = useRef(false)
 
-  // Kick off the taste pipeline as soon as onboarding starts so the
-  // prophecy step has a complete builder profile by the time the user
-  // gets there. Idempotent on the server.
   useEffect(() => {
     if (ensureFired.current) return
     ensureFired.current = true
@@ -110,18 +106,6 @@ export const OnboardingForm = ({
     return (
       <TourStep
         stepNumber={3}
-        totalSteps={STEPPER_TOTAL}
-        onBack={handleBack}
-        onNext={handleNext}
-        onStepClick={goToStep}
-      />
-    )
-  }
-
-  if (step === 4) {
-    return (
-      <ProphecyStep
-        stepNumber={4}
         totalSteps={STEPPER_TOTAL}
         onBack={handleBack}
         onNext={handleNext}
