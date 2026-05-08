@@ -6,6 +6,7 @@ import { ProfileIdentityTab } from '@lib/auth/components/profile-identity-tab'
 import { ProfileAccountTab } from '@lib/auth/components/profile-account-tab'
 import { getUserAttendedEvents, getUserCheckedInCount } from '@lib/events/queries'
 import { getMembershipStatus } from '@lib/membership/queries'
+import { UpgradeSuccessOverlay, UpgradeCanceledToast } from '@lib/membership/components'
 import { getOnboardingProfile } from '@lib/onboarding/queries'
 import { getBuilderProfile } from '@lib/taste/queries'
 import { getUserPhotos } from '@lib/photos/queries'
@@ -90,6 +91,9 @@ export default async function ProfilePage() {
 
   return (
     <>
+      <UpgradeSuccessOverlay name={user.name} />
+      <UpgradeCanceledToast />
+
       <FadeIn>
         <PortalHeader
           title="Profile"
