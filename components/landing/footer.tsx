@@ -5,6 +5,7 @@ const footerLinks = [
   { label: 'Events', href: '/events' },
   { label: 'Ecosystem', href: '/ecosystem' },
   { label: 'Join', href: '/join' },
+  { label: 'Brand', href: '/brand' },
 ]
 
 export const Footer = () => {
