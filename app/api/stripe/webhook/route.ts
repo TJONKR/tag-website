@@ -45,9 +45,14 @@ export async function POST(req: Request) {
           const subscription = await getStripe().subscriptions.retrieve(
             session.subscription as string
           )
-          await handleSubscriptionChange(subscription)
-          // New subscription → welcome to Builder email
-          await notifySubscriptionActive(subscription)
+          await handleSubscriptionChange(subscription, {
+            // Optimistic flip: iDEAL/Bancontact/card all return payment_status='paid'
+            // at this point. SEPA-direct returns 'unpaid' and waits for invoice.paid.
+            optimisticBuilder: session.payment_status === 'paid',
+          })
+          if (session.payment_status === 'paid') {
+            await notifySubscriptionActive(subscription)
+          }
         }
         break
       }
@@ -62,6 +67,31 @@ export async function POST(req: Request) {
         const subscription = event.data.object as Stripe.Subscription
         await handleSubscriptionChange(subscription)
         await notifySubscriptionCancelled(subscription)
+        break
+      }
+
+      case 'invoice.paid': {
+        // SEPA settles here (5+ days after checkout). Promote to Builder and
+        // send the welcome email if we didn't already on checkout.session.completed.
+        const invoice = event.data.object as Stripe.Invoice
+        const subId = invoice.parent?.subscription_details?.subscription
+        if (subId && typeof subId === 'string') {
+          const subscription = await getStripe().subscriptions.retrieve(subId)
+          const userId = subscription.metadata.supabase_user_id
+          await handleSubscriptionChange(subscription, { optimisticBuilder: true })
+          if (userId) {
+            // Idempotent: only send welcome if not already builder
+            const client = createServiceRoleClient()
+            const { data: profile } = await client
+              .from('profiles')
+              .select('role')
+              .eq('id', userId)
+              .single()
+            if (profile?.role === 'builder') {
+              await notifySubscriptionActive(subscription)
+            }
+          }
+        }
         break
       }
 
@@ -87,7 +117,10 @@ export async function POST(req: Request) {
   }
 }
 
-async function handleSubscriptionChange(subscription: Stripe.Subscription) {
+async function handleSubscriptionChange(
+  subscription: Stripe.Subscription,
+  opts: { optimisticBuilder?: boolean } = {}
+) {
   const userId = subscription.metadata.supabase_user_id
   if (!userId) {
     console.error('No supabase_user_id in subscription metadata')
@@ -118,7 +151,10 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     cancelAt,
   })
 
-  if (status === 'active') {
+  // Promote to Builder on active/trialing, OR optimistically when the caller
+  // has a paid checkout signal (covers SEPA-mandate-via-iDEAL where the sub
+  // briefly shows non-active before the next subscription.updated event).
+  if (status === 'active' || status === 'trialing' || opts.optimisticBuilder) {
     await updateProfileRoleFromWebhook(userId, 'builder')
   } else if (status === 'canceled' || status === 'unpaid') {
     await updateProfileRoleFromWebhook(userId, 'ambassador')

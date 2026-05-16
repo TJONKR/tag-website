@@ -1,4 +1,4 @@
-import { Check, Star } from 'lucide-react'
+import { Check, Clock, Star } from 'lucide-react'
 
 import { ManageSubscription } from './manage-subscription'
 import type { MembershipStatus } from '../types'
@@ -34,6 +34,19 @@ export const MembershipCard = ({ status }: MembershipCardProps) => {
           </p>
         </div>
       </div>
+
+      {status.pendingPayment && (
+        <div className="mt-4 flex items-start gap-3 border-t border-tag-border pt-4">
+          <Clock className="mt-0.5 size-4 shrink-0 text-tag-orange" />
+          <div className="text-sm text-tag-muted">
+            <p className="font-medium text-tag-text">Payment processing</p>
+            <p className="mt-1">
+              Your SEPA Direct Debit is settling — Builder access activates as
+              soon as the first payment clears (usually within 5 business days).
+            </p>
+          </div>
+        </div>
+      )}
 
       {status.subscription && (
         <div className="mt-4 flex flex-col gap-3 border-t border-tag-border pt-4 sm:flex-row sm:items-center sm:justify-between">

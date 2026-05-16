@@ -23,7 +23,21 @@ export async function createOrGetStripeCustomer(
     .single()
 
   if (profile?.stripe_customer_id) {
-    return profile.stripe_customer_id
+    // Verify the customer still exists in the current Stripe mode (test/live
+    // swap or manual deletion leaves a dangling ID otherwise).
+    try {
+      const existing = await getStripe().customers.retrieve(
+        profile.stripe_customer_id
+      )
+      if (!existing.deleted) {
+        return profile.stripe_customer_id
+      }
+    } catch (err) {
+      // Fall through to create a fresh customer
+      if (!(err instanceof Stripe.errors.StripeError && err.code === 'resource_missing')) {
+        throw err
+      }
+    }
   }
 
   const customer = await getStripe().customers.create({
@@ -46,6 +60,19 @@ export async function createCheckoutSession(
   const session = await getStripe().checkout.sessions.create({
     customer: customerId,
     mode: 'subscription',
+    // iDEAL pays first invoice instantly and Stripe auto-converts it into a
+    // SEPA Direct Debit mandate for monthly renewals — the Dutch default flow.
+    // Bancontact does the same for BE. Card is the fallback for everyone else.
+    // (No sepa_debit here — we want users to go through iDEAL, not the IBAN form.)
+    payment_method_types: ['card', 'ideal', 'bancontact'],
+    payment_method_collection: 'always',
+    locale: 'auto',
+    // Stripe Tax: auto-calculates 21% NL VAT, reverse-charges EU B2B with a
+    // valid VAT ID, and issues compliant invoices. Needs address.
+    automatic_tax: { enabled: true },
+    billing_address_collection: 'required',
+    customer_update: { address: 'auto', name: 'auto' },
+    tax_id_collection: { enabled: true },
     line_items: [
       {
         price: process.env.STRIPE_PRICE_ID!,

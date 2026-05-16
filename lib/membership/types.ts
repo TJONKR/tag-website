@@ -3,6 +3,8 @@ export type SubscriptionStatus =
   | 'canceled'
   | 'past_due'
   | 'incomplete'
+  | 'incomplete_expired'
+  | 'processing'
   | 'trialing'
   | 'unpaid'
 
@@ -62,4 +64,7 @@ export interface MembershipStatus {
   aiAmClaim: AiAmClaim | null
   canUpgrade: boolean
   canCancel: boolean
+  // True when a subscription exists but the first payment hasn't cleared yet
+  // (SEPA direct debit takes ~5 business days). Suppresses the upgrade CTA.
+  pendingPayment: boolean
 }

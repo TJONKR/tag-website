@@ -121,10 +121,16 @@ export async function getMembershipStatus(
 
   const isOperator = role === 'operator'
   const isBuilder = role === 'builder' || isOperator
-  const hasActiveSubscription = subscription?.status === 'active'
+  const hasActiveSubscription =
+    subscription?.status === 'active' || subscription?.status === 'trialing'
+  const pendingPayment =
+    !!subscription &&
+    (subscription.status === 'incomplete' ||
+      subscription.status === 'processing' ||
+      subscription.status === 'past_due')
   const hasActiveClaim =
     aiAmClaim?.status === 'pending' || aiAmClaim?.status === 'approved'
-  const hasPaidMembership = hasActiveSubscription || hasActiveClaim
+  const hasPaidMembership = hasActiveSubscription || hasActiveClaim || pendingPayment
 
   // Operators retain builder-tier portal access via role, but they still need
   // to arrange their own paid membership (Stripe or AI/AM). So show the upgrade
@@ -138,5 +144,6 @@ export async function getMembershipStatus(
     aiAmClaim,
     canUpgrade,
     canCancel: hasActiveSubscription && !subscription?.cancel_at,
+    pendingPayment,
   }
 }

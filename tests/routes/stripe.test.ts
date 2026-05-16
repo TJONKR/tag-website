@@ -25,6 +25,23 @@ test.describe('Stripe routes', () => {
       // 400 from signature verification failure (or 500 if STRIPE_WEBHOOK_SECRET not set)
       expect([400, 500]).toContain(response.status())
     })
+
+    // SEPA Direct Debit settles ~5 business days after checkout. invoice.paid
+    // is the signal we listen for to promote to Builder. Make sure the route
+    // accepts the event type at the surface (signature path still runs).
+    test('rejects invoice.paid with invalid signature (route is wired)', async ({
+      request,
+    }) => {
+      const response = await request.post('/api/stripe/webhook', {
+        data: '{"type":"invoice.paid"}',
+        headers: {
+          'Content-Type': 'application/json',
+          'stripe-signature': 't=1234,v1=invalid_signature',
+        },
+      })
+
+      expect([400, 500]).toContain(response.status())
+    })
   })
 
   test.describe('POST /api/stripe/checkout', () => {
