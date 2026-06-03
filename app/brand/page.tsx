@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { Footer, GrainOverlay } from '@components/landing'
+import { AvatarDownload } from '@lib/brand/components/AvatarDownload'
 import { ColorSwatch } from '@lib/brand/components/ColorSwatch'
 import { LogoDownload } from '@lib/brand/components/LogoDownload'
 import { TypeSpecimen } from '@lib/brand/components/TypeSpecimen'
@@ -124,12 +125,31 @@ export default function BrandPage() {
           </div>
         </section>
 
+        {/* Avatar */}
+        <section className="border-b border-tag-border px-16 py-24 max-md:px-6 max-md:py-16">
+          <div className="mx-auto flex max-w-[1200px] flex-col gap-10">
+            <header className="flex flex-col gap-2">
+              <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-tag-dim">
+                02 — Avatar
+              </span>
+              <h2 className="font-syne text-[clamp(32px,5vw,56px)] leading-[1] text-tag-text">
+                Avatar
+              </h2>
+              <p className="max-w-[560px] font-grotesk text-base text-tag-muted">
+                The square mark for profile pictures and social avatars. Use as-is — keep the full
+                frame and don&apos;t crop the wordmark.
+              </p>
+            </header>
+            <AvatarDownload />
+          </div>
+        </section>
+
         {/* Colors */}
         <section className="border-b border-tag-border px-16 py-24 max-md:px-6 max-md:py-16">
           <div className="mx-auto flex max-w-[1200px] flex-col gap-10">
             <header className="flex flex-col gap-2">
               <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-tag-dim">
-                02 — Color
+                03 — Color
               </span>
               <h2 className="font-syne text-[clamp(32px,5vw,56px)] leading-[1] text-tag-text">
                 Color palette
@@ -152,7 +172,7 @@ export default function BrandPage() {
           <div className="mx-auto flex max-w-[1200px] flex-col gap-10">
             <header className="flex flex-col gap-2">
               <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-tag-dim">
-                03 — Typography
+                04 — Typography
               </span>
               <h2 className="font-syne text-[clamp(32px,5vw,56px)] leading-[1] text-tag-text">
                 Typography
@@ -175,7 +195,7 @@ export default function BrandPage() {
           <div className="mx-auto flex max-w-[1200px] flex-col gap-10">
             <header className="flex flex-col gap-2">
               <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-tag-dim">
-                04 — Voice & tone
+                05 — Voice & tone
               </span>
               <h2 className="font-syne text-[clamp(32px,5vw,56px)] leading-[1] text-tag-text">
                 How we sound

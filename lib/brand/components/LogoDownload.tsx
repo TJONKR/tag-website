@@ -73,9 +73,14 @@ export const LogoDownload = () => {
           primary
         />
         <DownloadLink
-          href="/images/tag-logo.png"
-          filename="tag-logo.png"
-          label="PNG"
+          href="/brand/tag-logo-white.png"
+          filename="tag-logo-white.png"
+          label="PNG · White"
+        />
+        <DownloadLink
+          href="/brand/tag-logo-black.png"
+          filename="tag-logo-black.png"
+          label="PNG · Black"
         />
       </div>
     </div>
