@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { Footer, GrainOverlay } from '@components/landing'
 import { AvatarDownload } from '@lib/brand/components/AvatarDownload'
+import { BrandGuides } from '@lib/brand/components/BrandGuides'
 import { ColorSwatch } from '@lib/brand/components/ColorSwatch'
 import { LogoDownload } from '@lib/brand/components/LogoDownload'
 import { TypeSpecimen } from '@lib/brand/components/TypeSpecimen'
@@ -89,7 +90,8 @@ export default function BrandPage() {
   return (
     <>
       <GrainOverlay />
-      <main className="bg-tag-bg">
+      <BrandGuides />
+      <main className="relative bg-transparent">
         {/* Hero */}
         <section className="border-b border-tag-border bg-tag-bg-deep px-16 pb-16 pt-32 max-md:px-6 max-md:pt-24">
           <div className="mx-auto flex max-w-[1200px] flex-col gap-6">
