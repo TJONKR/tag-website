@@ -1,17 +1,26 @@
-import { Toaster } from 'sonner'
-import type { Metadata } from 'next'
-import { Syne, Space_Grotesk, Space_Mono } from 'next/font/google'
+import { Toaster } from 'sonner';
+import type { Metadata } from 'next';
+import { Syne, Space_Grotesk, Space_Mono } from 'next/font/google';
 
-import { StickyNav } from '@components/navigation'
-import { getOptionalUser } from '@lib/auth/queries'
+import { StickyNav } from '@components/navigation';
+import { getOptionalUser } from '@lib/auth/queries';
+import { GOOGLE_SITE_VERIFICATION, SITE_URL } from '@lib/config/site';
 
-import './globals.css'
+import './globals.css';
+
+const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION ?? GOOGLE_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://aiambuilders.com'),
+  metadataBase: new URL(SITE_URL),
   title: 'TAG — To Achieve Greatness',
   description:
     'A community of builders, hackers, and creators in Amsterdam. We meet every week. We ship every month. We show what we built — then we do it again.',
+  alternates: {
+    canonical: '/',
+  },
+  ...(googleSiteVerification && {
+    verification: { google: googleSiteVerification },
+  }),
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -24,39 +33,39 @@ export const metadata: Metadata = {
   appleWebApp: {
     title: 'TAG',
   },
-}
+};
 
 export const viewport = {
   maximumScale: 1,
-}
+};
 
 const syne = Syne({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-syne',
   weight: ['800'],
-})
+});
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-grotesk',
   weight: ['400', '500', '600'],
-})
+});
 
 const spaceMono = Space_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-mono',
   weight: ['400', '700'],
-})
+});
 
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
-  const user = await getOptionalUser()
+  const user = await getOptionalUser();
 
   return (
     <html
@@ -69,5 +78,5 @@ export default async function RootLayout({
         {children}
       </body>
     </html>
-  )
+  );
 }

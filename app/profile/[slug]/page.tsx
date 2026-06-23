@@ -1,36 +1,30 @@
-import type { Metadata } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import {
-  ArrowLeft,
-  ExternalLink,
-  Github,
-  Globe,
-  Instagram,
-  Linkedin,
-} from 'lucide-react'
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { ArrowLeft, ExternalLink, Github, Globe, Instagram, Linkedin } from 'lucide-react';
 
-import { PageShell } from '@components/page-shell'
-import { getPublicProfile } from '@lib/auth/queries'
-import { cn } from '@lib/utils'
-import { getUserAttendedEvents } from '@lib/events/queries'
-import { formatDateDisplay } from '@lib/events/types'
-import { rarityStyles } from '@lib/lootbox/rarity'
+import { PageShell } from '@components/page-shell';
+import { getPublicProfile } from '@lib/auth/queries';
+import { SITE_URL } from '@lib/config/site';
+import { cn } from '@lib/utils';
+import { getUserAttendedEvents } from '@lib/events/queries';
+import { formatDateDisplay } from '@lib/events/types';
+import { rarityStyles } from '@lib/lootbox/rarity';
 
-import type { PublicProfile } from '@lib/auth/types'
+import type { PublicProfile } from '@lib/auth/types';
 
 interface ProfilePageProps {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }>;
 }
 
-export const revalidate = 60
+export const revalidate = 60;
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
   </svg>
-)
+);
 
 const socialLinks = [
   { key: 'linkedin_url' as const, icon: Linkedin, label: 'LinkedIn' },
@@ -38,13 +32,13 @@ const socialLinks = [
   { key: 'github_url' as const, icon: Github, label: 'GitHub' },
   { key: 'website_url' as const, icon: Globe, label: 'Website' },
   { key: 'instagram_url' as const, icon: Instagram, label: 'Instagram' },
-]
+];
 
 const roleLabels: Record<string, string> = {
   ambassador: 'Ambassador',
   builder: 'Builder',
   operator: 'Operator',
-}
+};
 
 function buildJsonLd(profile: PublicProfile) {
   const sameAs = [
@@ -53,7 +47,7 @@ function buildJsonLd(profile: PublicProfile) {
     profile.github_url,
     profile.website_url,
     profile.instagram_url,
-  ].filter(Boolean)
+  ].filter(Boolean);
 
   return {
     '@context': 'https://schema.org',
@@ -61,36 +55,37 @@ function buildJsonLd(profile: PublicProfile) {
     name: profile.name,
     ...(profile.avatar_url && { image: profile.avatar_url }),
     jobTitle: `${roleLabels[profile.role] ?? 'Member'} at TAG`,
-    url: `https://tag.space/profile/${profile.slug}`,
+    url: `${SITE_URL}/profile/${profile.slug}`,
     ...(sameAs.length > 0 && { sameAs }),
     memberOf: {
       '@type': 'Organization',
       name: 'TAG — To Achieve Greatness',
-      url: 'https://tag.space',
+      url: SITE_URL,
     },
-  }
+  };
 }
 
-export async function generateMetadata({
-  params,
-}: ProfilePageProps): Promise<Metadata> {
-  const { slug } = await params
-  const profile = await getPublicProfile(slug)
-  if (!profile) return {}
+export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const profile = await getPublicProfile(slug);
+  if (!profile) return {};
 
-  const name = profile.name ?? 'Member'
-  const role = roleLabels[profile.role] ?? 'Member'
-  const headline = profile.taste?.headline
+  const name = profile.name ?? 'Member';
+  const role = roleLabels[profile.role] ?? 'Member';
+  const headline = profile.taste?.headline;
   const description =
     headline ??
     (profile.building
       ? `${name} — ${role} at TAG. Building: ${profile.building}`
-      : `${name} — ${role} at TAG`)
-  const ogImage = profile.equipped_skin_url ?? profile.avatar_url
+      : `${name} — ${role} at TAG`);
+  const ogImage = profile.equipped_skin_url ?? profile.avatar_url;
 
   return {
     title: `${name} — TAG`,
     description,
+    alternates: {
+      canonical: `/profile/${slug}`,
+    },
     openGraph: {
       title: `${name} — TAG`,
       description,
@@ -103,29 +98,27 @@ export async function generateMetadata({
       title: `${name} — TAG`,
       description,
     },
-  }
+  };
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
-  const { slug } = await params
-  const profile = await getPublicProfile(slug)
-  if (!profile) notFound()
+  const { slug } = await params;
+  const profile = await getPublicProfile(slug);
+  if (!profile) notFound();
 
-  const events = await getUserAttendedEvents(profile.id)
+  const events = await getUserAttendedEvents(profile.id);
 
-  const name = profile.name ?? 'Member'
-  const role = roleLabels[profile.role] ?? 'Member'
+  const name = profile.name ?? 'Member';
+  const role = roleLabels[profile.role] ?? 'Member';
   const memberSince = new Date(profile.created_at).toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
-  })
+  });
 
-  const activeSocials = socialLinks.filter((s) => profile[s.key])
-  const taste = profile.taste
-  const hasSkin = !!profile.equipped_skin_url
-  const rarity = profile.equipped_skin_rarity
-    ? rarityStyles[profile.equipped_skin_rarity]
-    : null
+  const activeSocials = socialLinks.filter((s) => profile[s.key]);
+  const taste = profile.taste;
+  const hasSkin = !!profile.equipped_skin_url;
+  const rarity = profile.equipped_skin_rarity ? rarityStyles[profile.equipped_skin_rarity] : null;
 
   return (
     <PageShell>
@@ -190,21 +183,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               )}
 
               <div className="flex flex-col">
-                <h1 className="font-syne text-3xl font-bold text-tag-text">
-                  {name}
-                </h1>
+                <h1 className="font-syne text-3xl font-bold text-tag-text">{name}</h1>
                 {taste?.headline && (
-                  <p className="mt-2 font-grotesk text-lg text-tag-orange">
-                    {taste.headline}
-                  </p>
+                  <p className="mt-2 font-grotesk text-lg text-tag-orange">{taste.headline}</p>
                 )}
                 <div className="mt-2 flex items-center gap-3">
                   <span className="rounded bg-tag-orange/10 px-2 py-0.5 font-mono text-xs uppercase tracking-wider text-tag-orange">
                     {role}
                   </span>
-                  <span className="font-mono text-xs text-tag-dim">
-                    Member since {memberSince}
-                  </span>
+                  <span className="font-mono text-xs text-tag-dim">Member since {memberSince}</span>
                 </div>
 
                 {taste?.tags && taste.tags.length > 0 && (
@@ -223,7 +210,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 {activeSocials.length > 0 && (
                   <div className="mt-4 flex items-center gap-2">
                     {activeSocials.map((social) => {
-                      const Icon = social.icon
+                      const Icon = social.icon;
                       return (
                         <a
                           key={social.key}
@@ -235,7 +222,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         >
                           <Icon className="size-4" />
                         </a>
-                      )
+                      );
                     })}
                   </div>
                 )}
@@ -289,10 +276,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 <Section title="Bio">
                   <div className="space-y-3">
                     {taste.bio.split('\n\n').map((paragraph, i) => (
-                      <p
-                        key={i}
-                        className="font-grotesk leading-relaxed text-tag-text"
-                      >
+                      <p key={i} className="font-grotesk leading-relaxed text-tag-text">
                         {paragraph}
                       </p>
                     ))}
@@ -302,17 +286,13 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
               {profile.building && (
                 <Section title="What I'm building">
-                  <p className="font-grotesk leading-relaxed text-tag-text">
-                    {profile.building}
-                  </p>
+                  <p className="font-grotesk leading-relaxed text-tag-text">{profile.building}</p>
                 </Section>
               )}
 
               {profile.why_tag && (
                 <Section title="Why TAG">
-                  <p className="font-grotesk leading-relaxed text-tag-text">
-                    {profile.why_tag}
-                  </p>
+                  <p className="font-grotesk leading-relaxed text-tag-text">{profile.why_tag}</p>
                 </Section>
               )}
 
@@ -354,10 +334,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 <Section title="Notable work">
                   <ul className="space-y-2">
                     {taste.notable_work.map((work, i) => (
-                      <li
-                        key={i}
-                        className="flex gap-2 font-grotesk text-sm text-tag-muted"
-                      >
+                      <li key={i} className="flex gap-2 font-grotesk text-sm text-tag-muted">
                         <span className="mt-1 text-tag-orange">•</span>
                         <span>{work}</span>
                       </li>
@@ -429,9 +406,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         <div className="font-mono text-sm font-bold text-tag-orange">
                           {formatDateDisplay(event.date_iso)}
                         </div>
-                        <span className="font-syne text-base text-tag-text">
-                          {event.title}
-                        </span>
+                        <span className="font-syne text-base text-tag-text">{event.title}</span>
                       </div>
                     ))}
                   </div>
@@ -442,20 +417,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         </div>
       </div>
     </PageShell>
-  )
+  );
 }
 
-const Section = ({
-  title,
-  children,
-}: {
-  title: string
-  children: React.ReactNode
-}) => (
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section>
-    <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.08em] text-tag-muted">
-      {title}
-    </h2>
+    <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.08em] text-tag-muted">{title}</h2>
     {children}
   </section>
-)
+);
